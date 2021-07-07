@@ -1,0 +1,19 @@
+new levels
+
+var level = {
+    players: [ 
+        new Player(400, 0, 50, 50, "lightgreen", "green", "aqua"),
+],
+    boxes: [],
+    walls: [],
+    finishAreas: [
+        new FinishArea(0, 550, 850, 50),
+    ],
+    changeDirectionSquares: [],
+    unlocks: [],
+}
+
+Cube templates
+Forest ""
+Sea "lightgreen", "yellowgreen", "rgb(255, 81, 73)"
+Other "rgb(255, 255, 132)", "coral", "rgb(255, 81, 73)"
