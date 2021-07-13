@@ -108,7 +108,7 @@ class Backround {
         }*/
     }
 
-}
+};
 
 class Box extends GameObject {
     constructor(x,y, width, height, color1, color2, color3, movesLeftRight, movesUpDown, block_speed = 5) {
@@ -289,7 +289,7 @@ class Wall extends GameObject {
 
 class ChangeDirectionSquare extends GameObject {
     constructor(x, y, width, height){
-        super(x, y, width, height, "lightgray")
+        super(x, y, width, height, "red")
     }
 };
 
@@ -309,6 +309,42 @@ class Unlock extends GameObject {
                 self.activated = true
             }
         })
+
+       levels[game.currentLevel].boxes.forEach(function(box) {
+            if (self.intersectsAll(box)) {
+                self.unlockWall.allowMovement = true
+                self.activated = true
+            }
+        })
+    }
+};
+
+class Teleporter extends GameObject {
+    constructor(x, y, otherTeleporter, width, height, color1, color2, Id){
+        super(x, y, width, height, color1)
+        this.color2 = color2
+        this.Id = Id
+        this.stop = false
+        this.otherTeleporter = otherTeleporter
+    }
+
+    update() {
+       var self = this
+       levels[game.currentLevel].players.forEach(function(player) {
+            if (self.intersectsAll(player) && !self.stop) {   
+                self.otherTeleporter.stop = true
+                player.y = self.otherTeleporter.y
+                player.x = self.otherTeleporter.x
+            
+            }
+            if (!self.intersects(player) && self.stop) {
+                self.stop = false        
+            }
+        })
+    }
+
+    Draw(){
+    game.context.drawImage(game.Teleporter, 0, 0, game.Teleporter.width, game.Teleporter.height, this.x, this.y, game.Teleporter.width, game.Teleporter.height)   
     }
 };
 

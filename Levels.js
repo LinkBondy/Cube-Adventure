@@ -14,6 +14,8 @@ var level1 = {
     changeDirectionSquares: [],
     
     unlocks: [],
+
+    teleporters: [],
 }
 
 var level2 = {
@@ -40,6 +42,8 @@ var level2 = {
     changeDirectionSquares: [],
     
     unlocks: [],
+    
+    teleporters: [],
 }
 
 var level3 = {
@@ -89,6 +93,8 @@ var level3 = {
     ],
     
     unlocks: [],
+    
+    teleporters: [],
 }
 
 var level4UnlockWall = new Wall(400, 500, 50, 50, "lightblue", "aqua", false, true)
@@ -131,11 +137,13 @@ var level4 = {
     unlocks: [
         new Unlock(700, 100, 50, 50, "rgb(180, 180, 180)", "lightblue", level4UnlockWall, "aqua")
     ],
+
+    teleporters: [],
 }
 
-var level5UnlockWall = new Wall(300, 150, 50, 50, "lightblue", "aqua", false, true)
-var level5_1UnlockWall = new Wall(350, 200, 50, 50, "lightblue", "aqua", false, true)
-var level5_2UnlockWall = new Wall(450, 50, 50, 50, "rgb(245, 245, 122)", "gold", false, true)
+var level5_1UnlockWall = new Wall(300, 150, 50, 50, "lightblue", "aqua", false, true)
+var level5_2UnlockWall = new Wall(350, 200, 50, 50, "lightblue", "auqa", false, true)
+var level5_3UnlockWall = new Wall(450, 50, 50, 50, "plum", "orchid", false, true)
 var level5 = {
     players: [
         new Player(150, 150, 50, 50, "lightgreen", "green", "aqua"),
@@ -156,9 +164,9 @@ var level5 = {
         /// 
         new Wall(100, 150, 50, 50, "rgb(190, 190, 190)", "rgba(190, 190, 190, 0.9)", true),
         // Unlock Wall
-        level5UnlockWall,
         level5_1UnlockWall,
         level5_2UnlockWall,
+        level5_3UnlockWall,
         ///
         new Wall(400, 100, 50, 100, "rgb(190, 190, 190)"),
         new Wall(400, 200, 50, 350, "rgb(190, 190, 190)"),
@@ -188,24 +196,85 @@ var level5 = {
         new ChangeDirectionSquare(50, 50, 50, 50)
     ],
     unlocks: [
-        new Unlock(350, 150, 50, 50, "rgb(180, 180, 180)", "rgb(245, 245, 122)", level5_2UnlockWall,"gold"),
-        new Unlock(150, 500, 50, 50, "rgb(180, 180, 180)", "lightblue", level5UnlockWall, "aqua"),
-        new Unlock(150, 500, 50, 50, "rgb(180, 180, 180)", "lightblue", level5_1UnlockWall, "aqua")            
+        new Unlock(150, 500, 50, 50, "rgb(180, 180, 180)", "lightblue", level5_1UnlockWall, "aqua"),
+        new Unlock(150, 500, 50, 50, "rgb(180, 180, 180)", "lightblue", level5_2UnlockWall, "aqua"),
+        new Unlock(350, 150, 50, 50, "rgb(180, 180, 180)", "plum", level5_3UnlockWall,"orchid")            
     ],
+
+    teleporters: [],
 }
 
-/*var level6 = {
+var level6_1UnlockWall = new Wall(100, 300, 50, 50, "plum", "orchid", false, true)
+var level6_2UnlockWall = new Wall(650, 500, 50, 50, "plum", "orchid", false, true)
+var teleporter1 = new Teleporter(50, 500, undefined, 50, 50, "rgb(180, 180, 180)", "tomato", 1)
+var teleporter2 = new Teleporter(250, 300, teleporter1, 50, 50, "rgb(180, 180, 180)", "tomato", 2)
+teleporter1.otherTeleporter = teleporter2
+var level6 = {
     players: [ 
-        new Player(400, 0, 50, 50, "lightgreen", "green", "aqua"),
+        new Player(50, 50, 50, 50, "lightgreen", "green", "aqua"),
 ],
-    boxes: [],
-    walls: [],
-    finishAreas: [
-        new FinishArea(0, 550, 850, 50),
+    boxes: [
+        new Box(700, 500, 50, 50, "rgb(255, 255, 132)", "coral", "rgb(255, 81, 73)", true, false, 2),    
     ],
-    changeDirectionSquares: [],
-    unlocks: [],
-}*/
+    walls: [
+        new Wall(0, 0, 850, 50, "rgb(190, 190, 190)"),
+        new Wall(0, 550, 850, 50, "rgb(190, 190, 190)"),
+        new Wall(800, 50, 50, 500, "rgb(190, 190, 190)"),
+        ///
+        new Wall(0, 50, 50, 550, "rgb(190, 190, 190)"),
+        ///
+        new Wall(100, 50, 50, 250, "rgb(190, 190, 190)"),
+        new Wall(100, 350, 50, 250, "rgb(190, 190, 190)"),
+        ///
+        level6_1UnlockWall,
+        ///
+        new Wall(200, 50, 50, 550, "rgb(190, 190, 190)"),
+        ///
+        new Wall(250, 50, 50, 250, "rgb(190, 190, 190)"),
+        new Wall(250, 350, 50, 200, "rgb(190, 190, 190)"),
+        ///
+        new Wall(300, 50, 50, 250, "rgb(190, 190, 190)"),
+        ///
+        new Wall(350, 50, 50, 450, "rgb(190, 190, 190)"),
+        ///
+        new Wall(400, 50, 50, 250, "rgb(190, 190, 190)"),
+        new Wall(450, 350, 50, 200, "rgb(190, 190, 190)"),
+        ///
+        new Wall(500, 150, 50, 400, "rgb(190, 190, 190)"),
+        ///
+        new Wall(550, 150, 200, 50, "rgb(190, 190, 190)"),
+        new Wall(500, 100, 250, 50, "rgb(190, 190, 190)"),
+        ///
+        new Wall(600, 250, 200, 250, "rgb(190, 190, 190)"),
+        ///
+        level6_2UnlockWall,
+        ///
+        new Wall(750, 500, 50, 50, "rgb(190, 190, 190)"),
+    ],
+    finishAreas: [
+        new FinishArea(150, 0, 50, 600),
+    ],
+    changeDirectionSquares: [
+        new ChangeDirectionSquare(550, 500, 50, 50),
+        new ChangeDirectionSquare(550, 200, 50, 50),
+        new ChangeDirectionSquare(750, 200, 50, 50),
+        new ChangeDirectionSquare(750, 50, 50, 50),
+        new ChangeDirectionSquare(450, 50, 50, 50),
+        new ChangeDirectionSquare(450, 300, 50, 50),
+        new ChangeDirectionSquare(400, 300, 50, 50),
+        new ChangeDirectionSquare(400, 500, 50, 50),
+        new ChangeDirectionSquare(300, 500, 50, 50),      
+    ],
+    unlocks: [
+        new Unlock(550, 500, 50, 50, "rgb(180, 180, 180)", "plum", level6_1UnlockWall, "orchid"),
+        new Unlock(550, 500, 50, 50, "rgb(180, 180, 180)", "plum", level6_2UnlockWall, "orchid"),
+    ],
+
+    teleporters: [
+        teleporter1,
+        teleporter2
+    ],
+}
 
 var levels = [
 
@@ -214,5 +283,5 @@ var levels = [
     level3,
     level4,
     level5,
-    //level6
+    level6
 ]

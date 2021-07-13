@@ -23,20 +23,27 @@ var game = {
     shopWorld1: false,
     gameState: GameState.NotStarted,
     gameMode: GameMode.StoryMode,
+    // Blue Cube
     BlueCube: new Image(),
+    BlueCubeStyle: true,
+    // BlueCubeAlien
+    BlueCubeAlien: new Image(),
+    BlueCubeAlienStyle: false,
+    // Red Cube
     RedCube: new Image(),
+    ///
     grass: new Image(),
     WallGrass: new Image(),
-    Level1: new Image(),
-    Level2: new Image(),
-    Level3: new Image(),
-    Level4: new Image(),
-    Level5: new Image(),
+    WallGrassV2: new Image(),
+    ///
+    Teleporter: new Image(),
+    ///
     mainScreen: false,
     difficultyScreen: false,
     currentLevel: 0,
     backround: new Backround(),
     selector: new Selector(),
+    teleporter: new Teleporter(),
      
     Restart: function(){
             game.gameState = GameState.Started
@@ -104,6 +111,9 @@ var game = {
             levels[game.currentLevel].unlocks.forEach(function(unlock) {
                 unlock.update()
             })
+            levels[game.currentLevel].teleporters.forEach(function(teleporter) {
+                teleporter.update()
+            })
 
         }
     },
@@ -151,19 +161,27 @@ var game = {
                     game.DrawFinish(finishArea)
                 },)
 
-                levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
+                /*levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
                     game.DrawChangeDirectionSquare(changeDirectionSquare)
-                },)
+                },)*/
                 
                 levels[game.currentLevel].walls.forEach(function(wall){
-                    if (wall.drawLast){
+                    if (wall.drawLast && game.shopWorld1 == false){
                     game.DrawWall(wall)
                     }
                 },)
 
+                levels[game.currentLevel].teleporters.forEach(function(teleporter) {
+                    teleporter.Draw()
+                })
+
                 levels[game.currentLevel].players.forEach(function(player) {
+                    if (game.BlueCubeStyle == true) {
                     game.context.drawImage(game.BlueCube, 0, 0, game.BlueCube.width, game.BlueCube.height, player.x, player.y, player.width, player.height)
-                    //game.DrawBox(player)   
+                    }
+                    else if (game.BlueCubeAlienStyle == true) {
+                    game.context.drawImage(game.BlueCubeAlien, 0, 0, game.BlueCubeAlien.width, game.BlueCubeAlien.height, player.x, player.y, player.width, player.height)
+                    }    
                 },)
 
                 levels[game.currentLevel].boxes.forEach(function(box){
@@ -171,10 +189,11 @@ var game = {
                 },)
                 
                 levels[game.currentLevel].walls.forEach(function(wall){
-                    if (!wall.drawLast){
+                    if (!wall.drawLast || wall.drawLast && game.shopWorld1 == true){
                     game.DrawWall(wall)
                     }
                 },)
+
                 game.DrawFreeplayLevel()
 
             } else if (game.gameState == GameState.Rules && game.gameMode == GameMode.StoryMode) {
@@ -245,7 +264,14 @@ var game = {
         game.context.fillText("Level " + (game.currentLevel + 1) + " Complete!", 63, 100); 
         game.context.font = '45px Arial';
         game.context.fillStyle = 'darkpink'
+        if (game.currentLevel < 5) {
         game.context.fillText("Press Space to continue", 155, 550);
+        }
+        else {
+        game.context.font = '175px Arial';
+        game.context.fillStyle = 'tomato' 
+        game.context.fillText("You win!", 85, 550)   
+        }
     },
 
     DrawLoseText: function(){
@@ -273,7 +299,7 @@ var game = {
         } else if (game.shopWorld1) { 
             for (var x = wall.left(); x < wall.right(); x = x + 50) {
                 for (var y = wall.top(); y < wall.bottom(); y = y + 50) {
-                    game.context.drawImage(game.WallGrass, 0, 0, game.WallGrass.width, game.WallGrass.height, x, y, game.WallGrass.width, game.WallGrass.height) 
+                    game.context.drawImage(game.WallGrassV2, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height, x, y, game.WallGrassV2.width, game.WallGrassV2.height) 
                 }
                 }
         } else if (game.basictheme) {
@@ -311,13 +337,15 @@ function Loaded(){
     game.context = game.canvas.getContext("2d")
     //game.grass.src = "grass.png";
     game.WallGrass.src = "WallGrass.png";
-    game.Level1.src = "Level1.png"
-    game.Level2.src = "Level2.png"
-    game.Level3.src = "Level3.png"
-    game.Level4.src = "Level4.png"
-    game.Level5.src = "Level5.png"
-    game.BlueCube.src = "BlueCube.png"
-    game.RedCube.src = "RedCube.png"
+    game.WallGrassV2.src = "WallGrassV2.png";
+    ///
+    game.BlueCube.src = "BlueCube.png";
+    game.BlueCubeAlien.src = "BlueCubeAlien.png";
+    ///
+    game.RedCube.src = "RedCube.png";
+    //game.RedCube.src = "RedCubeW1.png";
+    ///
+    game.Teleporter.src = "Teleporter.png";
     window.setTimeout(game.mainLoop, 100)    
 }
 
@@ -343,18 +371,30 @@ function Keydown(event){
         return
     }
     // Down "Freeplay"   
-    if(event.keyCode==40 && game.currentLevel <4 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay || event.key=="s" && game.currentLevel <4 && game.gameState == game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay)
+    if(event.keyCode==40 && game.currentLevel <5 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay || event.key=="s" && game.currentLevel <5 && game.gameState == game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay)
         game.currentLevel = game.currentLevel + 1
 
     // Up "Freeplay"
     if(event.keyCode==38 && game.currentLevel !=0 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay || event.key=="w" &&  game.currentLevel !=0 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay)
         game.currentLevel = game.currentLevel - 1
     
-    /*
-    if(event.key == "Backspace" && game.gameMode == GameMode.Freeplay) {
-    game.gameState = GameState.Started
+    if(event.key == "Backspace" && game.gameState <= 2 && game.gameState > 0 || event.key == "Backspace" && game.gameState == 3 && game.gameMode == GameMode.Freeplay) {
+    game.gameState = game.gameState - 1
+    game.currentLevel = 0,
+    
+    levels[game.currentLevel].boxes.forEach(function(box) {
+        box.resetPosition() 
+    })
+    levels[game.currentLevel].players.forEach(function(player) {
+        player.resetPosition()
+    })
+    levels[game.currentLevel].unlocks.forEach(function(unlock) {
+        unlock.unlockWall.allowMovement = false
+        unlock.activated = false    
+    })
+
     return
-    }*/
+    }
 
     // Rules to Game
     if(event.key == " " && game.gameState == GameState.Rules || event.key == "Enter" && game.gameState == GameState.Rules) {
