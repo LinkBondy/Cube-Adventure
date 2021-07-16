@@ -32,11 +32,13 @@ var game = {
     // Red Cube
     RedCube: new Image(),
     ///
-    grass: new Image(),
-    WallGrass: new Image(),
+    WallGrassV1: new Image(),
     WallGrassV2: new Image(),
+    WallGrassV3: new Image(),
     ///
     Teleporter: new Image(),
+    ///
+    SwitchW1: new Image(),
     ///
     mainScreen: false,
     difficultyScreen: false,
@@ -153,8 +155,14 @@ var game = {
                 game.DrawLoseText()
             
             } else if(game.gameState == GameState.Started || game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay) {
+                
                 levels[game.currentLevel].unlocks.forEach(function(unlock) {
-                    game.DrawSwich(unlock)
+                    if (game.shopWorld1 == true) {
+                        game.context.drawImage(game.SwitchW1, 0, 0, game.SwitchW1.width, game.SwitchW1.height, unlock.x - 2, unlock.y - 2, game.SwitchW1.width, game.SwitchW1.height)
+                    
+                    } else if (game.basictheme == true) {
+                        game.DrawSwitch(unlock)
+                    }
                 },)
 
                 levels[game.currentLevel].finishAreas.forEach(function(finishArea) {
@@ -180,7 +188,7 @@ var game = {
                     game.context.drawImage(game.BlueCube, 0, 0, game.BlueCube.width, game.BlueCube.height, player.x, player.y, player.width, player.height)
                     }
                     else if (game.BlueCubeAlienStyle == true) {
-                    game.context.drawImage(game.BlueCubeAlien, 0, 0, game.BlueCubeAlien.width, game.BlueCubeAlien.height, player.x, player.y, player.width, player.height)
+                    game.context.drawImage(game.BlueCubeAlien, 0, 0, game.BlueCubeAlien.width, game.BlueCubeAlien.height, player.x, player.y, game.BlueCubeAlien.width, game.BlueCubeAlien.height)
                     }    
                 },)
 
@@ -296,10 +304,18 @@ var game = {
            game.context.fillStyle = wall.color2
            game.context.fillRect(wall.x, wall.y, wall.width, wall.height)
         
-        } else if (game.shopWorld1) { 
+        } else if (game.shopWorld1) {
+            var i = 0; 
             for (var x = wall.left(); x < wall.right(); x = x + 50) {
                 for (var y = wall.top(); y < wall.bottom(); y = y + 50) {
-                    game.context.drawImage(game.WallGrassV2, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height, x, y, game.WallGrassV2.width, game.WallGrassV2.height) 
+                    i++
+                    if (wall.randomList[i]  % 30 == 0)
+                        game.context.drawImage(game.WallGrassV3, 0, 0, game.WallGrassV3.width, game.WallGrassV3.height, x - 2, y - 2, game.WallGrassV3.width, game.WallGrassV3.height) 
+                    else if (wall.randomList[i]  % 10 == 0)
+                        game.context.drawImage(game.WallGrassV2, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height, x - 2, y - 2, game.WallGrassV2.width, game.WallGrassV2.height) 
+                    else
+                        game.context.drawImage(game.WallGrassV1, 0, 0, game.WallGrassV1.width, game.WallGrassV1.height, x - 2, y - 2, game.WallGrassV1.width, game.WallGrassV1.height) 
+                        
                 }
                 }
         } else if (game.basictheme) {
@@ -314,7 +330,7 @@ var game = {
         game.context.fillRect(changeDirectionSquare.x, changeDirectionSquare.y, changeDirectionSquare.width, changeDirectionSquare.height)
     },
 
-    DrawSwich: function(unlock){
+    DrawSwitch: function(unlock){
         game.context.fillStyle = unlock.color1
         game.context.fillRect(unlock.x, unlock.y, unlock.width, unlock.height)
         if (unlock.activated) {
@@ -335,9 +351,10 @@ var game = {
 function Loaded(){
     game.canvas = document.getElementById("mycanvas");
     game.context = game.canvas.getContext("2d")
-    //game.grass.src = "grass.png";
-    game.WallGrass.src = "WallGrass.png";
+    ///
+    game.WallGrassV1.src = "WallGrassV1.png";
     game.WallGrassV2.src = "WallGrassV2.png";
+    game.WallGrassV3.src = "WallGrassV3.png";
     ///
     game.BlueCube.src = "BlueCube.png";
     game.BlueCubeAlien.src = "BlueCubeAlien.png";
@@ -346,6 +363,9 @@ function Loaded(){
     //game.RedCube.src = "RedCubeW1.png";
     ///
     game.Teleporter.src = "Teleporter.png";
+    ///
+    game.SwitchW1.src = "SwitchW1.png";
+    ///
     window.setTimeout(game.mainLoop, 100)    
 }
 

@@ -284,6 +284,10 @@ class Wall extends GameObject {
         this.color2 = color2
         this.allowMovement = allowMovement
         this.drawLast = drawLast
+        this.randomList = Array(100)
+        for (var i = 0; i < 100; i++) {
+            this.randomList[i] = Math.floor(Math.random() * 1000)
+        }
     }
 };
 

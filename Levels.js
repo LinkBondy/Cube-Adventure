@@ -252,7 +252,7 @@ var level6 = {
         new Wall(750, 500, 50, 50, "rgb(190, 190, 190)"),
     ],
     finishAreas: [
-        new FinishArea(150, 0, 50, 600),
+        new FinishArea(150, 50, 50, 500),
     ],
     changeDirectionSquares: [
         new ChangeDirectionSquare(550, 500, 50, 50),
