@@ -97,7 +97,7 @@ var level3 = {
     teleporters: [],
 }
 
-var level4UnlockWall = new Wall(400, 500, 50, 50, "lightblue", "aqua", false, true)
+var level4UnlockWall = new Wall(400, 500, 50, 50, "lightblue", "aqua", false, false, true)
 var level4 = {
     players: [
         new Player(100, 100, 50, 50, "lightgreen", "green", "aqua"),
@@ -141,9 +141,9 @@ var level4 = {
     teleporters: [],
 }
 
-var level5_1UnlockWall = new Wall(300, 150, 50, 50, "lightblue", "aqua", false, true)
-var level5_2UnlockWall = new Wall(350, 200, 50, 50, "lightblue", "auqa", false, true)
-var level5_3UnlockWall = new Wall(450, 50, 50, 50, "plum", "orchid", false, true)
+var level5_1UnlockWall = new Wall(300, 150, 50, 50, "lightblue", "aqua", false, false, true)
+var level5_2UnlockWall = new Wall(350, 200, 50, 50, "lightblue", "auqa", false, false, true)
+var level5_3UnlockWall = new Wall(450, 50, 50, 50, "plum", "orchid", false, false, true)
 var level5 = {
     players: [
         new Player(150, 150, 50, 50, "lightgreen", "green", "aqua"),
@@ -162,7 +162,7 @@ var level5 = {
         new Wall(100, 100, 50, 50, "rgb(190, 190, 190)"),
         new Wall(100, 200, 50, 450, "rgb(190, 190, 190)"),
         /// 
-        new Wall(100, 150, 50, 50, "rgb(190, 190, 190)", "rgba(190, 190, 190, 0.9)", true),
+        new Wall(100, 150, 50, 50, "rgb(190, 190, 190)", "rgba(190, 190, 190, 0.9)", true, true),
         // Unlock Wall
         level5_1UnlockWall,
         level5_2UnlockWall,
@@ -182,9 +182,9 @@ var level5 = {
         new Wall(700, 350, 50, 100, "rgb(190, 190, 190)"),
         new Wall(700, 500, 50, 50, "rgb(190, 190, 190)"),
         ///
-        new Wall(700, 450, 50, 50, "rgb(190, 190, 190)", "rgba(191, 191, 191, 0.9)", true),
-        new Wall(700, 300, 50, 50, "rgb(190, 190, 190)", "rgba(191, 191, 191, 0.9)", true),
-        new Wall(700, 150, 50, 50, "rgb(190, 190, 190)", "rgba(191, 191, 191, 0.9)", true),
+        new Wall(700, 450, 50, 50, "rgb(190, 190, 190)", "rgba(191, 191, 191, 0.9)", true, true),
+        new Wall(700, 300, 50, 50, "rgb(190, 190, 190)", "rgba(191, 191, 191, 0.9)", true, true),
+        new Wall(700, 150, 50, 50, "rgb(190, 190, 190)", "rgba(191, 191, 191, 0.9)", true, true),
         ///
         new Wall(800, 50, 50, 500, "rgb(190, 190, 190)", "rgb(195, 195, 195)"),
         
@@ -204,8 +204,8 @@ var level5 = {
     teleporters: [],
 }
 
-var level6_1UnlockWall = new Wall(100, 300, 50, 50, "plum", "orchid", false, true)
-var level6_2UnlockWall = new Wall(650, 500, 50, 50, "plum", "orchid", false, true)
+var level6_1UnlockWall = new Wall(100, 300, 50, 50, "plum", "orchid", false, false, true)
+var level6_2UnlockWall = new Wall(650, 500, 50, 50, "plum", "orchid", false, false, true)
 var teleporter1 = new Teleporter(50, 500, undefined, 50, 50, "rgb(180, 180, 180)", "tomato", 1)
 var teleporter2 = new Teleporter(250, 300, teleporter1, 50, 50, "rgb(180, 180, 180)", "tomato", 2)
 teleporter1.otherTeleporter = teleporter2

@@ -38,14 +38,17 @@ var game = {
     ///
     Teleporter: new Image(),
     ///
-    SwitchW1: new Image(),
+    SwitchW1Blue: new Image(),
+    SwitchW1Purple: new Image(),
+    SwitchW1ActivatedBlue: new Image(),
+    ///
+    InvisibleWall: new Image(),
     ///
     mainScreen: false,
     difficultyScreen: false,
     currentLevel: 0,
     backround: new Backround(),
     selector: new Selector(),
-    teleporter: new Teleporter(),
      
     Restart: function(){
             game.gameState = GameState.Started
@@ -62,12 +65,13 @@ var game = {
     },
 
     NextLevel: function(){
-            levels[game.currentLevel].players.forEach(function(player) {
-                player.x = 400
-                player.y = 0
-            })
+        game.currentLevel = game.currentLevel + 1
+        if (game.currentLevel == 6) {
+            game.gameState = GameState.Menu
+            game.currentLevel = 0
+        } else {
             game.gameState = GameState.Started
-            game.currentLevel = game.currentLevel + 1
+        }
 
     },
 
@@ -150,32 +154,29 @@ var game = {
         var currentTime = new Date()
         if(game.gameState == GameState.WonStage) {
             game.DrawFinishText()
+        
         } else {
+            
             if(game.gameState == GameState.Lost) {
                 game.DrawLoseText()
             
             } else if(game.gameState == GameState.Started || game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay) {
                 
                 levels[game.currentLevel].unlocks.forEach(function(unlock) {
-                    if (game.shopWorld1 == true) {
-                        game.context.drawImage(game.SwitchW1, 0, 0, game.SwitchW1.width, game.SwitchW1.height, unlock.x - 2, unlock.y - 2, game.SwitchW1.width, game.SwitchW1.height)
-                    
-                    } else if (game.basictheme == true) {
-                        game.DrawSwitch(unlock)
-                    }
+                    unlock.Draw()
                 },)
 
                 levels[game.currentLevel].finishAreas.forEach(function(finishArea) {
-                    game.DrawFinish(finishArea)
+                    finishArea.Draw()
                 },)
 
                 /*levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
-                    game.DrawChangeDirectionSquare(changeDirectionSquare)
+                    changeDirectionSquare.Draw()
                 },)*/
                 
                 levels[game.currentLevel].walls.forEach(function(wall){
-                    if (wall.drawLast && game.shopWorld1 == false){
-                    game.DrawWall(wall)
+                    if (wall.drawLast || wall.invisibleWall){
+                    wall.Draw()
                     }
                 },)
 
@@ -184,21 +185,16 @@ var game = {
                 })
 
                 levels[game.currentLevel].players.forEach(function(player) {
-                    if (game.BlueCubeStyle == true) {
-                    game.context.drawImage(game.BlueCube, 0, 0, game.BlueCube.width, game.BlueCube.height, player.x, player.y, player.width, player.height)
-                    }
-                    else if (game.BlueCubeAlienStyle == true) {
-                    game.context.drawImage(game.BlueCubeAlien, 0, 0, game.BlueCubeAlien.width, game.BlueCubeAlien.height, player.x, player.y, game.BlueCubeAlien.width, game.BlueCubeAlien.height)
-                    }    
+                    player.Draw()        
                 },)
 
                 levels[game.currentLevel].boxes.forEach(function(box){
-                    game.context.drawImage(game.RedCube, 0, 0, game.RedCube.width, game.RedCube.height, box.x, box.y, box.width, box.height)
+                    box.Draw()
                 },)
                 
                 levels[game.currentLevel].walls.forEach(function(wall){
                     if (!wall.drawLast || wall.drawLast && game.shopWorld1 == true){
-                    game.DrawWall(wall)
+                    wall.Draw()
                     }
                 },)
 
@@ -298,54 +294,6 @@ var game = {
         game.context.fillText("Level " + (game.currentLevel + 1), 225, 575);
         }
     },
-
-    DrawWall: function(wall){
-        if (wall.allowMovement && game.basictheme) {
-           game.context.fillStyle = wall.color2
-           game.context.fillRect(wall.x, wall.y, wall.width, wall.height)
-        
-        } else if (game.shopWorld1) {
-            var i = 0; 
-            for (var x = wall.left(); x < wall.right(); x = x + 50) {
-                for (var y = wall.top(); y < wall.bottom(); y = y + 50) {
-                    i++
-                    if (wall.randomList[i]  % 30 == 0)
-                        game.context.drawImage(game.WallGrassV3, 0, 0, game.WallGrassV3.width, game.WallGrassV3.height, x - 2, y - 2, game.WallGrassV3.width, game.WallGrassV3.height) 
-                    else if (wall.randomList[i]  % 10 == 0)
-                        game.context.drawImage(game.WallGrassV2, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height, x - 2, y - 2, game.WallGrassV2.width, game.WallGrassV2.height) 
-                    else
-                        game.context.drawImage(game.WallGrassV1, 0, 0, game.WallGrassV1.width, game.WallGrassV1.height, x - 2, y - 2, game.WallGrassV1.width, game.WallGrassV1.height) 
-                        
-                }
-                }
-        } else if (game.basictheme) {
-            game.context.fillStyle = wall.color1
-            game.context.fillRect(wall.x, wall.y, wall.width, wall.height)
-            
-        }
-    },
-
-    DrawChangeDirectionSquare: function(changeDirectionSquare){
-        game.context.fillStyle = changeDirectionSquare.color1
-        game.context.fillRect(changeDirectionSquare.x, changeDirectionSquare.y, changeDirectionSquare.width, changeDirectionSquare.height)
-    },
-
-    DrawSwitch: function(unlock){
-        game.context.fillStyle = unlock.color1
-        game.context.fillRect(unlock.x, unlock.y, unlock.width, unlock.height)
-        if (unlock.activated) {
-            game.context.fillStyle = unlock.activatedcolor
-         } else {
-             game.context.fillStyle = unlock.color2    
-         }
-        game.context.fillRect(unlock.x + 10, unlock.y + 10, 30, 30)
-    },
-
-    DrawFinish: function(finishArea){
-        // Finish
-        game.context.fillStyle = finishArea.color1;
-        game.context.fillRect(finishArea.x, finishArea.y, finishArea.width, finishArea.height)
-    }
 }
 
 function Loaded(){
@@ -364,7 +312,11 @@ function Loaded(){
     ///
     game.Teleporter.src = "Teleporter.png";
     ///
-    game.SwitchW1.src = "SwitchW1.png";
+    game.SwitchW1Blue.src = "SwitchW1Blue.png";
+    game.SwitchW1Purple.src = "SwitchW1Purple.png";
+    game.SwitchW1ActivatedBlue.src = "SwitchW1ActivatedBlue.png";
+    ///
+    game.InvisibleWall.src = "InvisibleWall.png";
     ///
     window.setTimeout(game.mainLoop, 100)    
 }
@@ -399,8 +351,13 @@ function Keydown(event){
         game.currentLevel = game.currentLevel - 1
     
     if(event.key == "Backspace" && game.gameState <= 2 && game.gameState > 0 || event.key == "Backspace" && game.gameState == 3 && game.gameMode == GameMode.Freeplay) {
+    
+    if (game.gameMode == GameMode.Freeplay && game.gameState == GameState.Started) {
     game.gameState = game.gameState - 1
+    } else {
     game.currentLevel = 0,
+    game.gameState = game.gameState - 1
+    }
     
     levels[game.currentLevel].boxes.forEach(function(box) {
         box.resetPosition() 

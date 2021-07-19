@@ -90,10 +90,10 @@ class Backround {
     }
     
     Draw(){
-        if (game.gameState == GameState.Started && game.shopWorld1) {
-            this.color1 = "rgb(20, 150, 20)"
+        if (game.gameState == GameState.Started && game.shopWorld1 || game.gameState == GameState.Rules && game.shopWorld1 && game.gameMode == GameMode.Freeplay) {
+            this.color1 = "rgb(100, 200, 100)"
         }
-        else if (game.gameState == GameState.Started && game.basictheme) {
+        else {
             this.color1 = "lightgray"
         }
         game.context.clearRect(0, 0, game.canvas.width, game.canvas.height);
@@ -193,7 +193,10 @@ class Box extends GameObject {
                 this.forward_y = !this.forward_y 
         }
     }
-   
+
+    Draw() {
+        game.context.drawImage(game.RedCube, 0, 0, game.RedCube.width, game.RedCube.height, this.x, this.y, this.width, this.height)
+    } 
 };
 
 class Player extends GameObject {
@@ -276,24 +279,70 @@ class Player extends GameObject {
     update() {
 
     }
+    
+    Draw() {
+    if (game.BlueCubeStyle == true) {
+        game.context.drawImage(game.BlueCube, 0, 0, game.BlueCube.width, game.BlueCube.height, this.x, this.y, this.width, this.height)
+        }
+        
+        else if (game.BlueCubeAlienStyle == true) {
+            game.context.drawImage(game.BlueCubeAlien, 0, 0, game.BlueCubeAlien.width, game.BlueCubeAlien.height, this.x, this.y, game.BlueCubeAlien.width, game.BlueCubeAlien.height)
+        }
+    }
 };
 
 class Wall extends GameObject {
-    constructor(x, y, width, height, color1, color2, allowMovement, drawLast){
+    constructor(x, y, width, height, color1, color2, allowMovement, invisibleWall, drawLast){
         super(x, y, width, height, color1)
         this.color2 = color2
         this.allowMovement = allowMovement
         this.drawLast = drawLast
+        this.invisibleWall = invisibleWall
         this.randomList = Array(100)
         for (var i = 0; i < 100; i++) {
             this.randomList[i] = Math.floor(Math.random() * 1000)
         }
+    }
+
+    Draw(){
+        if (this.allowMovement && game.basictheme) {
+            game.context.fillStyle = this.color2
+            game.context.fillRect(this.x, this.y, this.width, this.height)
+         
+         } else if (this.invisibleWall) {
+             game.context.drawImage(game.InvisibleWall, 0, 0, game.InvisibleWall.width, game.InvisibleWall.height, this.x - 2,  this.y - 2, game.InvisibleWall.width, game.InvisibleWall.height)            
+         } else if (game.shopWorld1 && !this.allowMovement) {
+             var i = 0; 
+             for (var x = this.left(); x < this.right(); x = x + 50) {
+                 for (var y = this.top(); y < this.bottom(); y = y + 50) {
+                     i++
+                     if (this.randomList[i]  % 40 == 0)
+                         game.context.drawImage(game.WallGrassV3, 0, 0, game.WallGrassV3.width, game.WallGrassV3.height, x - 2, y - 2, game.WallGrassV3.width, game.WallGrassV3.height) 
+                     else if (this.randomList[i]  % 9 == 0)
+                         game.context.drawImage(game.WallGrassV2, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height, x - 2, y - 2, game.WallGrassV2.width, game.WallGrassV2.height) 
+                     
+                     else
+                         game.context.drawImage(game.WallGrassV1, 0, 0, game.WallGrassV1.width, game.WallGrassV1.height, x - 2, y - 2, game.WallGrassV1.width, game.WallGrassV1.height) 
+                         
+                 }
+             }
+             
+             } else if (game.basictheme) {
+                 game.context.fillStyle = this.color1
+                 game.context.fillRect(this.x, this.y, this.width, this.height)
+             
+         }
+ 
     }
 };
 
 class ChangeDirectionSquare extends GameObject {
     constructor(x, y, width, height){
         super(x, y, width, height, "red")
+    }
+    Draw() {
+        game.context.fillStyle = this.color1
+        game.context.fillRect(this.x, this.y, this.width, this.height)
     }
 };
 
@@ -320,6 +369,26 @@ class Unlock extends GameObject {
                 self.activated = true
             }
         })
+    }
+
+    Draw(){
+        if (game.shopWorld1 == true) {
+            if (this.activated) {
+                game.context.drawImage(game.SwitchW1ActivatedBlue, 0, 0, game.SwitchW1ActivatedBlue.width, game.SwitchW1ActivatedBlue.height, this.x, this.y, game.SwitchW1ActivatedBlue.width, game.SwitchW1ActivatedBlue.height)
+                } else {
+                    game.context.drawImage(game.SwitchW1Blue, 0, 0, game.SwitchW1Blue.width, game.SwitchW1Blue.height, this.x, this.y, game.SwitchW1Blue.width, game.SwitchW1Blue.height)    
+                }            
+        
+        } else if (game.basictheme == true) {
+            game.context.fillStyle = this.color1
+            game.context.fillRect(this.x, this.y, this.width, this.height)
+            if (this.activated) {
+                game.context.fillStyle = this.activatedcolor
+            } else {
+                 game.context.fillStyle = this.color2    
+            }
+            game.context.fillRect(this.x + 10, this.y + 10, 30, 30)
+        }
     }
 };
 
@@ -355,6 +424,11 @@ class Teleporter extends GameObject {
 class FinishArea extends GameObject {
     constructor(x, y, width, height){
         super(x, y, width, height, "pink")
+    }
+    
+    Draw(){
+        game.context.fillStyle = this.color1;
+        game.context.fillRect(this.x, this.y, this.width, this.height)
     }
 };
 
