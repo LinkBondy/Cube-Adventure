@@ -15,43 +15,84 @@ var GameMode = {
     Shop: 3
 }
 
+var ShopMode = {
+    ShopMenu: 1,
+    Backround: 2,
+    Player: 3
+}
+
+var PlayerShop = {
+    BlueCube: 1,
+    BlueCubeAlien: 2,
+    BlueCubeLava: 3,
+}
+
+var BackroundShop = {
+    Classic: 1,
+    Sprite: 2
+}
+
 var game = {
     canvas: undefined,
     context: undefined,
     startTime: new Date(),
-    basictheme: true,
-    shopWorld1: false,
+    classicStyle: false,
+    spriteStyle: true,
+    ///
     gameState: GameState.NotStarted,
     gameMode: GameMode.StoryMode,
+    shopMode: ShopMode.ShopMenu,
+    backroundShop: BackroundShop.Classic,
+    playerShop: PlayerShop.BlueCube,
+    ///
     // Blue Cube
     BlueCube: new Image(),
-    BlueCubeStyle: true,
-    // BlueCubeAlien
+    // Blue Cube Alien
     BlueCubeAlien: new Image(),
-    BlueCubeAlienStyle: false,
+    // Blue Cube Lava
+    BlueCubeLava: new Image(),
     // Red Cube
     RedCube: new Image(),
-    ///
+    // Wall Grass
     WallGrassV1: new Image(),
     WallGrassV2: new Image(),
     WallGrassV3: new Image(),
-    ///
+    // Teleporter
     Teleporter: new Image(),
-    ///
+    // Switch
     SwitchW1Blue: new Image(),
     SwitchW1Purple: new Image(),
     SwitchW1ActivatedBlue: new Image(),
-    ///
+    SwitchW1ActivatedPurple: new Image(),
+    // Unlock Rock
+    UnlockRockPurple: new Image(),
+    UnlockedRockPurple: new Image(),
+    UnlockRockBlue: new Image(),
+    UnlockedRockBlue: new Image(),
+    // Invisible Wall
     InvisibleWall: new Image(),
     ///
+    Music: new Audio(),
+    // Other
     mainScreen: false,
+    reset: false,
     difficultyScreen: false,
     currentLevel: 0,
     backround: new Backround(),
     selector: new Selector(),
-     
+    
+    SetGameState: function(gameState) {
+        game.gameState = gameState
+        /*if (game.gameState == GameState.Started)
+            game.Music.play();
+        else
+            game.Music.pause();
+    */},
+
     Restart: function(){
-            game.gameState = GameState.Started
+        if (!game.reset) {
+            game.SetGameState(GameState.Started)
+        }
             levels[game.currentLevel].boxes.forEach(function(box) {
                 box.resetPosition() 
             })
@@ -67,10 +108,13 @@ var game = {
     NextLevel: function(){
         game.currentLevel = game.currentLevel + 1
         if (game.currentLevel == 6) {
-            game.gameState = GameState.Menu
             game.currentLevel = 0
+            game.reset == true
+            game.Restart()
+            game.reset == false
+            game.SetGameState(GameState.Menu)
         } else {
-            game.gameState = GameState.Started
+            game.Restart()
         }
 
     },
@@ -81,9 +125,9 @@ var game = {
         if(game.checkWin() && game.gameState != GameState.WonStage ) {
             setTimeout(function() {
                 if (game.gameMode == GameMode.StoryMode) {
-                    game.gameState = GameState.WonStage
+                    game.SetGameState(GameState.WonStage)
                 } else {
-                    game.gameState = GameState.Rules
+                    game.SetGameState(GameState.Rules)
                     levels[game.currentLevel].boxes.forEach(function(box) {
                         box.resetPosition() 
                     })
@@ -100,7 +144,7 @@ var game = {
 
         } else if(game.checkLose() &&  game.gameState != GameState.Lost) {
             setTimeout(function() {
-                game.gameState = GameState.Lost
+                game.SetGameState(GameState.Lost)
               }, 30)
         }
         window.setTimeout(game.mainLoop, 1000 / 120)
@@ -151,67 +195,89 @@ var game = {
 
     Draw: function(){
         game.backround.Draw() 
-        var currentTime = new Date()
-        if(game.gameState == GameState.WonStage) {
+
+        if (game.gameState == GameState.WonStage) {
             game.DrawFinishText()
+            return
+        }
+            
+        if (game.gameState == GameState.Lost) {
+            game.DrawLoseText()
         
-        } else {
+        } else if (game.gameState == GameState.Started && game.gameMode != GameMode.Shop || game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay) {
             
-            if(game.gameState == GameState.Lost) {
-                game.DrawLoseText()
+            levels[game.currentLevel].unlocks.forEach(function(unlock) {
+                unlock.Draw()
+            },)
+
+            levels[game.currentLevel].finishAreas.forEach(function(finishArea) {
+                finishArea.Draw()
+            },)
+
+            /*levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
+                changeDirectionSquare.Draw()
+            },)*/
             
-            } else if(game.gameState == GameState.Started || game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay) {
-                
-                levels[game.currentLevel].unlocks.forEach(function(unlock) {
-                    unlock.Draw()
-                },)
+            levels[game.currentLevel].walls.forEach(function(wall){
+                if (wall.drawLast || wall.invisibleWall){
+                wall.Draw()
+                }
+            },)
 
-                levels[game.currentLevel].finishAreas.forEach(function(finishArea) {
-                    finishArea.Draw()
-                },)
+            levels[game.currentLevel].teleporters.forEach(function(teleporter) {
+                teleporter.Draw()
+            })
 
-                /*levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
-                    changeDirectionSquare.Draw()
-                },)*/
-                
-                levels[game.currentLevel].walls.forEach(function(wall){
-                    if (wall.drawLast || wall.invisibleWall){
-                    wall.Draw()
-                    }
-                },)
+            levels[game.currentLevel].players.forEach(function(player) {
+                player.Draw()        
+            },)
 
-                levels[game.currentLevel].teleporters.forEach(function(teleporter) {
-                    teleporter.Draw()
-                })
-
-                levels[game.currentLevel].players.forEach(function(player) {
-                    player.Draw()        
-                },)
-
-                levels[game.currentLevel].boxes.forEach(function(box){
-                    box.Draw()
-                },)
-                
-                levels[game.currentLevel].walls.forEach(function(wall){
-                    if (!wall.drawLast || wall.drawLast && game.shopWorld1 == true){
-                    wall.Draw()
-                    }
-                },)
-
-                game.DrawFreeplayLevel()
-
-            } else if (game.gameState == GameState.Rules && game.gameMode == GameMode.StoryMode) {
-                game.DrawRules() 
+            levels[game.currentLevel].boxes.forEach(function(box){
+                box.Draw()
+            },)
             
-            } else if (game.gameState == GameState.Menu) {
-                game.selector.Draw()
-                game.DrawMenu()
+            levels[game.currentLevel].walls.forEach(function(wall){
+                if (!wall.drawLast){
+                wall.Draw()
+                }
+            },)
             
-            } else if (game.gameState == GameState.NotStarted){
-                game.DrawTitleSrceen()
-                game.DrawLogo()
-                
-           }
+        } if (game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay) {
+            game.DrawFreeplayLevel()
+        } 
+        if (game.gameState == GameState.Started && game.gameMode == GameMode.Shop && game.shopMode == ShopMode.Backround) {
+            if (game.backroundShop == BackroundShop.Classic) {
+                game.DrawBackroundClassicShop()   
+            }
+            
+            if (game.backroundShop == BackroundShop.Sprite) {
+                game.DrawBackroundSpriteShop()   
+            }  
+        } if (game.gameState == GameState.Started && game.gameMode == GameMode.Shop && game.shopMode == ShopMode.Player) {
+            if (game.playerShop == PlayerShop.BlueCube) {
+                game.DrawBlueCubeShop()   
+            }
+            
+            if (game.playerShop == PlayerShop.BlueCubeAlien) {
+                game.DrawBlueCubeAlienShop()   
+            }
+            
+            if (game.playerShop == PlayerShop.BlueCubeLava) {
+                game.DrawBlueCubeLavaShop()   
+            }  
+        } else if (game.gameState == GameState.Rules && game.gameMode == GameMode.Shop) {
+            game.selector.Draw()
+            game.DrawShopType()
+        } else if (game.gameState == GameState.Rules && game.gameMode == GameMode.StoryMode) {
+            game.DrawRules() 
+        
+        } else if (game.gameState == GameState.Menu) {
+            game.selector.Draw()
+            game.DrawMenu()
+        } else if (game.gameState == GameState.NotStarted){
+            game.DrawTitleSrceen()
+            game.DrawLogo()
+            
         }
     }, 
     
@@ -220,11 +286,11 @@ var game = {
         game.context.fillStyle = 'lime'
         game.context.fillText("Story Mode", 30, 145)
         game.context.font = '130px Arial'
-        game.context.fillStyle = 'yellowgreen'
+        game.context.fillStyle = 'lightgreen'
         game.context.fillText("Freeplay", 160, 350)
-        game.context.font = '80px Arial'
-        game.context.fillStyle = 'yellow'
-        game.context.fillText("Shop (Coming Soon)", 50, 530)
+        game.context.font = '150px Arial'
+        game.context.fillStyle = 'lightblue'
+        game.context.fillText("Shop", 220, 550)
 
     },
    
@@ -288,12 +354,95 @@ var game = {
     },
 
     DrawFreeplayLevel: function(){
-        if (game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay){
         game.context.font = '125px Arial';
         game.context.fillStyle = "rgba(255, 255, 132, 0.788)";
         game.context.fillText("Level " + (game.currentLevel + 1), 225, 575);
-        }
+        
     },
+
+    DrawShopType: function(){
+        game.context.font = '175px Arial'
+        game.context.fillStyle = 'black'
+        game.context.fillText("Backround", 0, 200)
+        game.context.font = '175px Arial'
+        game.context.fillStyle = 'red'
+        game.context.fillText("Player", 0, 500)    
+    },
+
+    DrawBackroundClassicShop: function(){
+        if (game.classicStyle) {
+            game.context.font = '100px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Classic(Selected)", 30, 550)      
+        }
+        else {
+        game.context.font = '175px Arial'
+        game.context.fillStyle = 'indianred'
+        game.context.fillText("Classic", 95, 550)
+        }    
+    },
+
+    DrawBackroundSpriteShop: function(){
+        if (game.spriteStyle) {
+            game.context.font = '100px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Sprite(Selected)", 60, 550)      
+        }
+        else {
+        game.context.font = '175px Arial'
+        game.context.fillStyle = 'indianred'
+        game.context.fillText("Sprite", 160, 550)
+        }
+
+    },
+
+    DrawBlueCubeShop: function(){
+        levels[game.currentLevel].players.forEach(function(player) {
+        if (Player.CubeStyle == CubeStyle.BlueCube) {
+            game.context.font = '100px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Classic(Selected)", 35, 550)      
+        }
+        else {
+        game.context.font = '175px Arial'
+        game.context.fillStyle = 'indianred'
+        game.context.fillText("Classic", 110, 550)
+        }
+    })
+
+    },
+
+    DrawBlueCubeAlienShop: function(){
+        levels[game.currentLevel].players.forEach(function(player) {
+        if (Player.CubeStyle == CubeStyle.Alien) {
+            game.context.font = '100px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Alien(Selected)", 80, 550)      
+        }
+        else {
+        game.context.font = '175px Arial'
+        game.context.fillStyle = 'indianred'
+        game.context.fillText("Alien", 200, 550)
+        }
+    })
+
+    },
+
+    DrawBlueCubeLavaShop: function(){
+        levels[game.currentLevel].players.forEach(function(player) {
+        if (Player.CubeStyle == CubeStyle.Lava) {
+            game.context.font = '100px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Lava(Selected)", 80, 550)      
+        }
+        else {
+        game.context.font = '175px Arial'
+        game.context.fillStyle = 'indianred'
+        game.context.fillText("Lava", 200, 550)
+        }
+    })
+
+    }
 }
 
 function Loaded(){
@@ -306,118 +455,28 @@ function Loaded(){
     ///
     game.BlueCube.src = "BlueCube.png";
     game.BlueCubeAlien.src = "BlueCubeAlien.png";
+    game.BlueCubeLava.src = "BlueCubeLava.png";
     ///
     game.RedCube.src = "RedCube.png";
-    //game.RedCube.src = "RedCubeW1.png";
+    // game.RedCube.src = "RedCubeW1.png";
     ///
     game.Teleporter.src = "Teleporter.png";
     ///
     game.SwitchW1Blue.src = "SwitchW1Blue.png";
     game.SwitchW1Purple.src = "SwitchW1Purple.png";
     game.SwitchW1ActivatedBlue.src = "SwitchW1ActivatedBlue.png";
+    game.SwitchW1ActivatedPurple.src = "SwitchW1ActivatedPurple.png";
     ///
     game.InvisibleWall.src = "InvisibleWall.png";
+    ///
+    game.UnlockRockPurple.src = "UnlockRockPurple.png";
+    game.UnlockedRockPurple.src = "UnlockedRockPurple.png";
+    game.UnlockRockBlue.src = "UnlockRockBlue.png";
+    game.UnlockedRockBlue.src = "UnlockedRockBlue.png";
+    ///
+    game.Music.src = "Music.mp3"
     ///
     window.setTimeout(game.mainLoop, 100)    
 }
 
-function Keydown(event){
-    
-    // Start Game "Menu"
-    if(event.key == " " && game.gameState == GameState.NotStarted || event.key == "Enter" && game.gameState == GameState.NotStarted) {
-        game.gameState = GameState.Menu
-        return
-    }
-
-    // Down "Menu"
-    if(event.keyCode==40 && game.selector.y<400 && game.gameState == GameState.Menu || event.key=="s" && game.selector.y<400 && game.gameState == GameState.Menu)
-        game.selector.moveDown()
-
-
-    // Up "Menu"
-    if(event.keyCode==38 && game.selector.y !=0 && game.gameState == GameState.Menu || event.key=="w" &&  game.selector.y !=0 && game.gameState == GameState.Menu)
-        game.selector.moveUp()
-
-    if(event.key == " " && game.gameState == GameState.Menu || event.key == "Enter"  && game.gameState == GameState.Menu) {
-        game.selector.update()
-        return
-    }
-    // Down "Freeplay"   
-    if(event.keyCode==40 && game.currentLevel <5 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay || event.key=="s" && game.currentLevel <5 && game.gameState == game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay)
-        game.currentLevel = game.currentLevel + 1
-
-    // Up "Freeplay"
-    if(event.keyCode==38 && game.currentLevel !=0 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay || event.key=="w" &&  game.currentLevel !=0 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay)
-        game.currentLevel = game.currentLevel - 1
-    
-    if(event.key == "Backspace" && game.gameState <= 2 && game.gameState > 0 || event.key == "Backspace" && game.gameState == 3 && game.gameMode == GameMode.Freeplay) {
-    
-    if (game.gameMode == GameMode.Freeplay && game.gameState == GameState.Started) {
-    game.gameState = game.gameState - 1
-    } else {
-    game.currentLevel = 0,
-    game.gameState = game.gameState - 1
-    }
-    
-    levels[game.currentLevel].boxes.forEach(function(box) {
-        box.resetPosition() 
-    })
-    levels[game.currentLevel].players.forEach(function(player) {
-        player.resetPosition()
-    })
-    levels[game.currentLevel].unlocks.forEach(function(unlock) {
-        unlock.unlockWall.allowMovement = false
-        unlock.activated = false    
-    })
-
-    return
-    }
-
-    // Rules to Game
-    if(event.key == " " && game.gameState == GameState.Rules || event.key == "Enter" && game.gameState == GameState.Rules) {
-        game.gameState = GameState.Started
-        return
-    }
-    
-    // Next Level
-    if(event.key == " " && game.gameState == GameState.WonStage || event.key == "Enter" && game.gameState == GameState.WonStage) {
-        game.NextLevel()
-    }
-    
-    // Restart Game
-    if(event.key==" " && game.gameState == GameState.Lost || event.key == "Enter" && game.gameState == GameState.Lost)
-        game.Restart()
-    
-    if(game.gameState != GameState.Started){
-        return
-    }
-
-    //console.log('key pressed/')
-        // "Right" Arrow /// "d" Key (Right)
-    levels[game.currentLevel].players.forEach(function(player) {    
-        if(event.keyCode==39 && player.x<800 || event.key=="d" && player.x<800)
-        player.moveRight()
-    })
-    
-        // "Down" Arrow / "s" Key (Down)
-    levels[game.currentLevel].players.forEach(function(player) {    
-        if(event.keyCode==40 && player.y<550 || event.key=="s" && player.y<550)
-        player.moveDown()
-    })
-    
-        // "Up" Arrow / "w" Key (Up)
-        levels[game.currentLevel].players.forEach(function(player) {    
-        if(event.keyCode==38 && player.y != 0 || event.key=="w" && player.y !=0)
-        player.moveUp()
-    })
-    
-        // "Left" Arrow / "a" Key (Left)
-    levels[game.currentLevel].players.forEach(function(player) {
-        if(event.keyCode==37 && player.x != 0 || event.key=="a" && player.x != 0)
-        player.moveLeft()
-    })
-        
-}
-
 document.addEventListener('DOMContentLoaded', Loaded )
-document.addEventListener('keydown', Keydown )
