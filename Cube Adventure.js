@@ -51,6 +51,12 @@ var game = {
     BlueCubeAlien: new Image(),
     // Blue Cube Lava
     BlueCubeLava: new Image(),
+    // Blue Cube Plastic 
+    BlueCubePlastic: new Image(),
+    // Blue Cube Alien Plastic 
+    BlueCubeAlienPlastic: new Image(),
+    // Blue Cube Lava Plastic
+    BlueCubeLavaPlastic: new Image(), 
     // Red Cube
     RedCube: new Image(),
     // Wall Grass
@@ -58,7 +64,10 @@ var game = {
     WallGrassV2: new Image(),
     WallGrassV3: new Image(),
     // Teleporter
-    Teleporter: new Image(),
+    TeleporterTomato: new Image(),
+    TeleporterTomatoSprite: new Image(),
+    TeleporterPurple: new Image(),
+    TeleporterPurpleSprite: new Image(),
     // Switch
     SwitchW1Blue: new Image(),
     SwitchW1Purple: new Image(),
@@ -71,6 +80,8 @@ var game = {
     UnlockedRockBlue: new Image(),
     // Invisible Wall
     InvisibleWall: new Image(),
+    // Items
+    LifeJacket: new Image(),
     ///
     Music: new Audio(),
     // Other
@@ -94,10 +105,13 @@ var game = {
             game.SetGameState(GameState.Started)
         }
             levels[game.currentLevel].boxes.forEach(function(box) {
-                box.resetPosition() 
+                box.reset() 
             })
             levels[game.currentLevel].players.forEach(function(player) {
-                player.resetPosition()
+                player.reset()
+            })
+            levels[game.currentLevel].waters.forEach(function(water) {
+                water.reset()
             })
             levels[game.currentLevel].unlocks.forEach(function(unlock) {
                 unlock.unlockWall.allowMovement = false
@@ -106,8 +120,9 @@ var game = {
     },
 
     NextLevel: function(){
+        game.Restart()
         game.currentLevel = game.currentLevel + 1
-        if (game.currentLevel == 6) {
+        if (game.currentLevel == 7) {
             game.currentLevel = 0
             game.reset == true
             game.Restart()
@@ -129,10 +144,14 @@ var game = {
                 } else {
                     game.SetGameState(GameState.Rules)
                     levels[game.currentLevel].boxes.forEach(function(box) {
-                        box.resetPosition() 
+                        box.reset() 
                     })
                     levels[game.currentLevel].players.forEach(function(player) {
-                        player.resetPosition()
+                        player.reset()
+                    })
+
+                    levels[game.currentLevel].waters.forEach(function(water) {
+                        water.reset()
                     })
                     levels[game.currentLevel].unlocks.forEach(function(unlock) {
                         unlock.unlockWall.allowMovement = false
@@ -205,14 +224,26 @@ var game = {
             game.DrawLoseText()
         
         } else if (game.gameState == GameState.Started && game.gameMode != GameMode.Shop || game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay) {
-            
-            levels[game.currentLevel].unlocks.forEach(function(unlock) {
-                unlock.Draw()
+
+            levels[game.currentLevel].waters.forEach(function(water) {
+                water.Draw()
             },)
 
             levels[game.currentLevel].finishAreas.forEach(function(finishArea) {
                 finishArea.Draw()
             },)
+
+            levels[game.currentLevel].unlocks.forEach(function(unlock) {
+                unlock.Draw()
+            },)
+
+            levels[game.currentLevel].teleporters.forEach(function(teleporter) {
+                teleporter.Draw()
+            })
+
+            levels[game.currentLevel].items.forEach(function(item) {
+                item.Draw()
+            })
 
             /*levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
                 changeDirectionSquare.Draw()
@@ -223,10 +254,6 @@ var game = {
                 wall.Draw()
                 }
             },)
-
-            levels[game.currentLevel].teleporters.forEach(function(teleporter) {
-                teleporter.Draw()
-            })
 
             levels[game.currentLevel].players.forEach(function(player) {
                 player.Draw()        
@@ -301,10 +328,11 @@ var game = {
         game.context.font = '45px Arial';
         game.context.fillStyle = 'darkblue'
         game.context.fillText("Get to the pink to beat levels", 125, 275);
-        game.context.fillText("Watch out for enemies", 175, 375);
-        game.context.font = '60px Arial';
+        game.context.fillText("Watch out for enemies", 175, 350);
+        game.context.fillText("Use A, D, S, F or Arrow Keys to move", 50, 425);
+        game.context.font = '75px Arial';
         game.context.fillStyle = 'blue'
-        game.context.fillText("Press Space to Continue", 85, 550);
+        game.context.fillText("Press space to start", 80, 550);
     }, 
 
     DrawTitleSrceen: function(){
@@ -334,7 +362,7 @@ var game = {
         game.context.fillText("Level " + (game.currentLevel + 1) + " Complete!", 63, 100); 
         game.context.font = '45px Arial';
         game.context.fillStyle = 'darkpink'
-        if (game.currentLevel < 5) {
+        if (game.currentLevel < 6) {
         game.context.fillText("Press Space to continue", 155, 550);
         }
         else {
@@ -449,30 +477,37 @@ function Loaded(){
     game.canvas = document.getElementById("mycanvas");
     game.context = game.canvas.getContext("2d")
     ///
-    game.WallGrassV1.src = "WallGrassV1.png";
-    game.WallGrassV2.src = "WallGrassV2.png";
-    game.WallGrassV3.src = "WallGrassV3.png";
+    game.WallGrassV1.src = "images/WallGrassV1.png";
+    game.WallGrassV2.src = "images/WallGrassV2.png";
+    game.WallGrassV3.src = "images/WallGrassV3.png";
     ///
-    game.BlueCube.src = "BlueCube.png";
-    game.BlueCubeAlien.src = "BlueCubeAlien.png";
-    game.BlueCubeLava.src = "BlueCubeLava.png";
+    game.BlueCube.src = "images/BlueCube.png";
+    game.BlueCubeAlien.src = "images/BlueCubeAlien.png";
+    game.BlueCubeLava.src = "images/BlueCubeLava.png";
+    game.BlueCubePlastic.src = "images/BlueCubePlastic.png";
+    game.BlueCubeAlienPlastic.src = "images/BlueCubeAlienPlastic.png";
+    game.BlueCubeLavaPlastic.src = "images/BlueCubeLavaPlastic.png";
     ///
-    game.RedCube.src = "RedCube.png";
-    // game.RedCube.src = "RedCubeW1.png";
+    game.RedCube.src = "images/RedCube.png";
     ///
-    game.Teleporter.src = "Teleporter.png";
+    game.TeleporterTomato.src = "images/TeleporterTomato.png";
+    game.TeleporterTomatoSprite.src = "images/TeleporterTomatoSprite.png";
+    game.TeleporterPurple.src = "images/TeleporterPurple.png";
+    game.TeleporterPurpleSprite.src = "images/TeleporterPurpleSprite.png";
     ///
-    game.SwitchW1Blue.src = "SwitchW1Blue.png";
-    game.SwitchW1Purple.src = "SwitchW1Purple.png";
-    game.SwitchW1ActivatedBlue.src = "SwitchW1ActivatedBlue.png";
-    game.SwitchW1ActivatedPurple.src = "SwitchW1ActivatedPurple.png";
+    game.SwitchW1Blue.src = "images/SwitchW1Blue.png";
+    game.SwitchW1Purple.src = "images/SwitchW1Purple.png";
+    game.SwitchW1ActivatedBlue.src = "images/SwitchW1ActivatedBlue.png";
+    game.SwitchW1ActivatedPurple.src = "images/SwitchW1ActivatedPurple.png";
     ///
-    game.InvisibleWall.src = "InvisibleWall.png";
+    game.InvisibleWall.src = "images/InvisibleWall.png";
     ///
-    game.UnlockRockPurple.src = "UnlockRockPurple.png";
-    game.UnlockedRockPurple.src = "UnlockedRockPurple.png";
-    game.UnlockRockBlue.src = "UnlockRockBlue.png";
-    game.UnlockedRockBlue.src = "UnlockedRockBlue.png";
+    game.LifeJacket.src = "images/LifeJacket.png"
+    ///
+    game.UnlockRockPurple.src = "images/UnlockRockPurple.png";
+    game.UnlockedRockPurple.src = "images/UnlockedRockPurple.png";
+    game.UnlockRockBlue.src = "images/UnlockRockBlue.png";
+    game.UnlockedRockBlue.src = "images/UnlockedRockBlue.png";
     ///
     game.Music.src = "Music.mp3"
     ///

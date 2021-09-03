@@ -1,8 +1,8 @@
 new levels
 
-var level = {
+var level_ = {
     players: [ 
-        new Player(400, 0, 50, 50, "lightgreen", "green", "aqua"),
+        new Player(400, 0, 50, 50),
 ],
     boxes: [],
     walls: [],
@@ -11,9 +11,29 @@ var level = {
     ],
     changeDirectionSquares: [],
     unlocks: [],
+    teleporters: [],
 }
+
+class ___ extends GameObject {
+    constructor(x, y, width, height, color1, ){
+        super(x, y, width, height, color1)
+    }
+
+    Draw(){
+        
+    }
+    
+    Update(){
+        
+    }
+
+    reset() {
+        
+    }   
+};
 
 Cube templates
 Forest ""
 Sea "lightgreen", "yellowgreen", "rgb(255, 81, 73)"
 Other "rgb(255, 255, 132)", "coral", "rgb(255, 81, 73)"
+Player "lightgreen", "green", "aqua"

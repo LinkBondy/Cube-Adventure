@@ -152,10 +152,8 @@ class Backround {
 };
 
 class Box extends GameObject {
-    constructor(x,y, width, height, color1, color2, color3, movesLeftRight, movesUpDown, block_speed = 5) {
-        super(x, y, width, height, color1)
-        this.color2 = color2
-        this.color3 = color3
+    constructor(x,y, width, height, movesLeftRight, movesUpDown, block_speed = 5) {
+        super(x, y, width, height)
         this.forward_x = true
         this.forward_y = false
         this.block_speed = block_speed
@@ -165,19 +163,24 @@ class Box extends GameObject {
         this.originaMovesUpDown = movesUpDown
         this.movesLeftRight = movesLeftRight
         this.movesUpDown = movesUpDown
+        this.original_block_speed = block_speed
+        this.inWater = undefined
 
     }
    
-    resetPosition() {
+    reset() {
        this.x = this.original_x 
        this.y = this.original_y
        this.movesLeftRight = this.originalMovesLeftRight
        this.movesUpDown = this.originaMovesUpDown
-    }   
+       this.block_speed = this.original_block_speed
+       this.inWater = undefined
+    }  
     update() {
         var oldX = this.x
         var oldY = this.y
         var intersectsWall = false
+        var intersectsWater = false
         var enemy = this
    
         if (this.movesLeftRight) {
@@ -219,6 +222,21 @@ class Box extends GameObject {
             }
         })
 
+        levels[game.currentLevel].waters.forEach(function(water) {
+            if (water.intersects(enemy)) {   
+                intersectsWater = true
+            }
+        })
+        if (intersectsWater && (this.inWater === false || this.inWater === undefined)){
+            this.block_speed = this.block_speed / 2    
+        }
+
+        if (!intersectsWater && this.inWater === true){
+            this.block_speed = this.block_speed * 2    
+        }
+
+        this.inWater = intersectsWater
+
         levels[game.currentLevel].finishAreas.forEach(function(finishArea) {
             if (finishArea.intersects(enemy)) {
                 intersectsWall = true
@@ -236,23 +254,21 @@ class Box extends GameObject {
     }
 
     Draw() {
-        game.context.drawImage(game.RedCube, 0, 0, game.RedCube.width, game.RedCube.height, this.x, this.y, this.width, this.height)
+        game.context.drawImage(game.RedCube, 0, 0, game.RedCube.width, game.RedCube.height, this.x, this.y, game.RedCube.width, game.RedCube.height)
     } 
 };
 
 class Player extends GameObject {
-    constructor(x,y, width, height, color1, color2, color3) {
-        super(x, y, width, height, color1)
-        this.color2 = color2
-        this.color3 = color3
+    constructor(x,y, width, height) {
+        super(x, y, width, height)
         this.forward_x = true
         this.forward_y = false
         this.block_speed = block_speed
         this.original_x = x
         this.original_y = y
-
         this.BlueCubeAlienStyle = false
         this.BlueCubeLavaStyle = false
+        this.allowMovementWater = false
     }
     moveRight() {
         var oldX = this.x
@@ -262,6 +278,18 @@ class Player extends GameObject {
         levels[game.currentLevel].walls.forEach(function(wall) {
             if (!wall.allowMovement && wall.intersects(self)) {
                 intersectsWall = true
+            }
+        })
+
+        levels[game.currentLevel].waters.forEach(function(water) {
+            if (!self.allowMovementWater && water.intersects(self)) {
+                intersectsWall = true
+            }
+        })
+
+        levels[game.currentLevel].items.forEach(function(item) {
+            if (item.intersects(self)) {
+                self.allowMovementWater = true     
             }
         })
 
@@ -281,6 +309,18 @@ class Player extends GameObject {
             }
         })
 
+        levels[game.currentLevel].waters.forEach(function(water) {
+            if (!self.allowMovementWater && water.intersects(self)) {
+                intersectsWall = true
+            }
+        })
+
+        levels[game.currentLevel].items.forEach(function(item) {
+            if (item.intersects(self)) {
+                self.allowMovementWater = true    
+            }
+        })
+
         if (intersectsWall) {
             this.x = oldX 
         } 
@@ -293,6 +333,18 @@ class Player extends GameObject {
         levels[game.currentLevel].walls.forEach(function(wall) {
             if (!wall.allowMovement && wall.intersects(self)) {
                 intersectsWall = true
+            }
+        })
+
+        levels[game.currentLevel].waters.forEach(function(water) {
+            if (!self.allowMovementWater && water.intersects(self)) {
+                intersectsWall = true
+            }
+        })
+
+        levels[game.currentLevel].items.forEach(function(item) {
+            if (item.intersects(self)) {
+                this.allowMovementWater = true    
             }
         })
 
@@ -311,13 +363,26 @@ class Player extends GameObject {
             }
         })
 
+        levels[game.currentLevel].waters.forEach(function(water) {
+            if (!self.allowMovementWater && water.intersects(self)) {
+                intersectsWall = true
+            }
+        })
+
+        levels[game.currentLevel].items.forEach(function(item) {
+            if (item.intersects(self)) {
+                self.allowMovementWater = true    
+            }
+        })
+
         if (intersectsWall) {
             this.y = oldY
         } 
     }
-    resetPosition() {
+    reset() {
         this.x = this.original_x 
         this.y = this.original_y
+        this.allowMovementWater = false
     }   
     update() {
 
@@ -423,6 +488,45 @@ class Wall extends GameObject {
     }
 };
 
+class Water extends GameObject {
+    constructor(x, y, width, height, color1){
+        super(x, y, width, height, color1)
+
+    }
+
+    Draw(){
+    game.context.fillStyle = this.color1;
+    game.context.fillRect(this.x, this.y, this.width, this.height)    
+    }
+    
+    Update(){
+        
+    }
+    
+    reset() {  
+    } 
+};
+
+class Item extends GameObject {
+    constructor(x, y, width, height, typeNumber){
+        super(x, y, width, height)
+        this.typeNumber = typeNumber
+    }
+
+    Draw() {
+    var self = this
+    levels[game.currentLevel].players.forEach(function(player) {
+        if (self.typeNumber == 1 && !player.allowMovementWater) {    
+            game.context.drawImage(game.LifeJacket, 0, 0, game.LifeJacket.width, game.LifeJacket.height, self.x, self.y, game.LifeJacket.width, game.LifeJacket.height)     
+        }
+    })
+    }
+    
+    Update() {
+        
+    }  
+};
+
 class ChangeDirectionSquare extends GameObject {
     constructor(x, y, width, height){
         super(x, y, width, height, "red")
@@ -495,10 +599,9 @@ class Unlock extends GameObject {
 };
 
 class Teleporter extends GameObject {
-    constructor(x, y, otherTeleporter, width, height, color1, color2, Id){
-        super(x, y, width, height, color1)
-        this.color2 = color2
-        this.Id = Id
+    constructor(x, y, otherTeleporter, width, height, colorNumber){
+        super(x, y, width, height)
+        this.colorNumber = colorNumber
         this.stop = false
         this.otherTeleporter = otherTeleporter
     }
@@ -519,8 +622,27 @@ class Teleporter extends GameObject {
     }
 
     Draw(){
-    game.context.drawImage(game.Teleporter, 0, 0, game.Teleporter.width, game.Teleporter.height, this.x, this.y, game.Teleporter.width, game.Teleporter.height)   
-    }
+        if (game.spriteStyle) {
+            if (this.colorNumber == 1) {
+                game.context.drawImage(game.TeleporterTomatoSprite, 0, 0, game.TeleporterTomatoSprite.width, game.TeleporterTomatoSprite.height, this.x, this.y, game.TeleporterTomatoSprite.width, game.TeleporterTomatoSprite.height)   
+            }
+
+            if (this.colorNumber == 2) {
+                game.context.drawImage(game.TeleporterPurpleSprite, 0, 0, game.TeleporterPurpleSprite.width, game.TeleporterPurpleSprite.height, this.x, this.y, game.TeleporterPurpleSprite.width, game.TeleporterPurpleSprite.height)   
+            }
+        }
+
+        else if (game.classicStyle) {
+            if (this.colorNumber == 1) {
+                game.context.drawImage(game.TeleporterTomato, 0, 0, game.TeleporterTomato.width, game.TeleporterTomato.height, this.x, this.y, game.TeleporterTomato.width, game.TeleporterTomato.height)   
+            }
+
+            if (this.colorNumber == 2) {
+                game.context.drawImage(game.TeleporterPurple, 0, 0, game.TeleporterPurple.width, game.TeleporterPurple.height, this.x, this.y, game.TeleporterPurple.width, game.TeleporterPurple.height)   
+            }
+
+        }
+    }   
 };
 
 class FinishArea extends GameObject {

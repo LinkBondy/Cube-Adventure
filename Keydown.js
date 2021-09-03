@@ -1,3 +1,4 @@
+"use strict";
 function Keydown(event){
     
     // Start Game "Menu"
@@ -97,7 +98,7 @@ function Keydown(event){
 ///
 
     // Down "Freeplay"   
-    if (event.keyCode == 40 && game.currentLevel <5 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay || event.key=="s" && game.currentLevel < 5 && game.gameState == game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay)
+    if (event.keyCode == 40 && game.currentLevel < 6 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay || event.key=="s" && game.currentLevel < 6 && game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay)
         game.currentLevel = game.currentLevel + 1
 
     // Up "Freeplay"
@@ -119,10 +120,13 @@ function Keydown(event){
         }
         
         levels[game.currentLevel].boxes.forEach(function(box) {
-            box.resetPosition() 
+            box.reset() 
         })
         levels[game.currentLevel].players.forEach(function(player) {
-            player.resetPosition()
+            player.reset()
+        })
+        levels[game.currentLevel].waters.forEach(function(water) {
+            water.reset()
         })
         levels[game.currentLevel].unlocks.forEach(function(unlock) {
             unlock.unlockWall.allowMovement = false
