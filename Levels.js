@@ -29,8 +29,8 @@ var level2 = {
         new Box(400, 500, 50, 50, false, true, 3),
     ],
     walls: [
-        new Wall(0, 0, 350, 550, "rgb(190, 190, 190)"),
-        new Wall(500, 0, 350, 550, "rgb(190, 190, 190)"),
+        new Wall(0, 0, 350, 600, "rgb(190, 190, 190)"),
+        new Wall(500, 0, 350, 600, "rgb(190, 190, 190)"),
         ///
         new Wall(350, 100, 50, 50, "rgb(190, 190, 190)"),
         new Wall(350, 250, 50, 200, "rgb(190, 190, 190)"),
@@ -41,7 +41,7 @@ var level2 = {
     waters: [],
     items: [],
     finishAreas: [
-        new FinishArea(0, 550, 850, 50),
+        new FinishArea(350, 550, 150, 50),
     ],
     changeDirectionSquares: [],
     
@@ -73,20 +73,20 @@ var level3 = {
         new Wall(550, 150, 100, 250, "rgb(190, 190, 190)"),
         new Wall(200, 150, 100, 250, "rgb(190, 190, 190)"),
         ///
-        new Wall(0, 400, 200, 550, "rgb(190, 190, 190)"),
-        new Wall(650, 400, 200, 550, "rgb(190, 190, 190)"),
+        new Wall(0, 550, 350, 50, "rgb(190, 190, 190)"),
+        new Wall(500, 550, 350, 50, "rgb(190, 190, 190)"),
         ///
         new Wall(200, 400, 150, 50, "rgb(190, 190, 190)"),
         new Wall(500, 400, 150, 50, "rgb(190, 190, 190)"),
         ///
-        new Wall(200, 500, 150, 100, "rgb(190, 190, 190)"),
-        new Wall(500, 500, 150, 100, "rgb(190, 190, 190)"),
+        new Wall(200, 500, 150, 50, "rgb(190, 190, 190)"),
+        new Wall(500, 500, 150, 50, "rgb(190, 190, 190)"),
     ],
 
     waters: [],
     items: [],
     finishAreas: [
-        new FinishArea(0, 550, 850, 50),
+        new FinishArea(350, 550, 150, 50),
     ],
     
     changeDirectionSquares: [
@@ -169,7 +169,7 @@ var level5 = {
         new Wall(0, 0, 850, 50, "rgb(190, 190, 190)"),
         ///
         new Wall(100, 100, 50, 50, "rgb(190, 190, 190)"),
-        new Wall(100, 200, 50, 450, "rgb(190, 190, 190)"),
+        new Wall(100, 200, 50, 400, "rgb(190, 190, 190)"),
         /// 
         new Wall(100, 150, 50, 50, "rgb(190, 190, 190)", "rgba(190, 190, 190, 0.9)", true, true),
         // Unlock Wall
@@ -405,6 +405,9 @@ var level8 = {
         new Wall(750, 150, 50, 50, "rgb(190, 190, 190)"),
         new Wall(600, 100, 100, 50, "rgb(190, 190, 190)"),            
     ],
+
+    waters: [],
+    items: [],
     finishAreas: [
         new FinishArea(0, 550, 850, 50),
     ],

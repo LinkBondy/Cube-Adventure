@@ -8,42 +8,8 @@ var CubeStyle = {
     BlueCube: 0,
     Alien: 1,
     Lava: 2,
+    Wooden: 3,
 }
-
-/*var StoryMode = {
-    x = 0,
-    y = 0,
-    width = 850,
-    height = 200        
-}
-
-var Freeplay = {
-    x = 0,
-    y = 200,
-    width = 850,
-    height = 200        
-}
-
-var Shop = {
-    x = 0,
-    y = 400,
-    width = 850,
-    height = 200        
-}
-
-var Player = {
-    x = 0,
-    y = 0,
-    width = 850,
-    height = 300        
-}
-
-var Backround = {
-    x = 0,
-    y = 300,
-    width = 850,
-    height = 300        
-}*/
 
 class GameObject {
     constructor(x, y, width, height, color1){
@@ -127,7 +93,6 @@ class GameObject {
 class Backround {
     constructor(color1) {
         this.color1 = color1
-
     }
     
     Draw(){
@@ -254,7 +219,13 @@ class Box extends GameObject {
     }
 
     Draw() {
-        game.context.drawImage(game.RedCube, 0, 0, game.RedCube.width, game.RedCube.height, this.x, this.y, game.RedCube.width, game.RedCube.height)
+        if (game.spriteStyle) {
+            game.context.drawImage(game.RedCube, 0, 0, game.RedCube.width, game.RedCube.height, this.x, this.y, game.RedCube.width, game.RedCube.height)
+        }
+        
+        else if (game.classicStyle) {
+            game.context.drawImage(game.RedCubePlastic, 0, 0, game.RedCubePlastic.width, game.RedCubePlastic.height, this.x, this.y, game.RedCubePlastic.width, game.RedCubePlastic.height)
+        }
     } 
 };
 
@@ -266,8 +237,6 @@ class Player extends GameObject {
         this.block_speed = block_speed
         this.original_x = x
         this.original_y = y
-        this.BlueCubeAlienStyle = false
-        this.BlueCubeLavaStyle = false
         this.allowMovementWater = false
     }
     moveRight() {
@@ -288,7 +257,7 @@ class Player extends GameObject {
         })
 
         levels[game.currentLevel].items.forEach(function(item) {
-            if (item.intersects(self)) {
+            if (item.intersects(self) && item.typeNumber === 1) {
                 self.allowMovementWater = true     
             }
         })
@@ -316,7 +285,7 @@ class Player extends GameObject {
         })
 
         levels[game.currentLevel].items.forEach(function(item) {
-            if (item.intersects(self)) {
+            if (item.intersects(self) && item.typeNumber === 1) {
                 self.allowMovementWater = true    
             }
         })
@@ -343,7 +312,7 @@ class Player extends GameObject {
         })
 
         levels[game.currentLevel].items.forEach(function(item) {
-            if (item.intersects(self)) {
+            if (item.intersects(self) && item.typeNumber === 1) {
                 this.allowMovementWater = true    
             }
         })
@@ -370,7 +339,7 @@ class Player extends GameObject {
         })
 
         levels[game.currentLevel].items.forEach(function(item) {
-            if (item.intersects(self)) {
+            if (item.intersects(self) && item.typeNumber === 1) {
                 self.allowMovementWater = true    
             }
         })
@@ -388,16 +357,36 @@ class Player extends GameObject {
 
     }   
     Draw() {
-        if (Player.CubeStyle == CubeStyle.BlueCube) {
+        if (Player.CubeStyle === CubeStyle.BlueCube && game.spriteStyle) {
             game.context.drawImage(game.BlueCube, 0, 0, game.BlueCube.width, game.BlueCube.height, this.x, this.y, game.BlueCube.width, game.BlueCube.height)
         }
         
-        else if (Player.CubeStyle == CubeStyle.Alien) {
+        else if (Player.CubeStyle === CubeStyle.Alien && game.spriteStyle) {
             game.context.drawImage(game.BlueCubeAlien, 0, 0, game.BlueCubeAlien.width, game.BlueCubeAlien.height, this.x, this.y, game.BlueCubeAlien.width, game.BlueCubeAlien.height)
         }
 
-        else if (Player.CubeStyle == CubeStyle.Lava) {
+        else if (Player.CubeStyle === CubeStyle.Lava && game.spriteStyle) {
             game.context.drawImage(game.BlueCubeLava, 0, 0, game.BlueCubeLava.width, game.BlueCubeLava.height, this.x, this.y, game.BlueCubeLava.width, game.BlueCubeLava.height)
+        }
+
+        else if (Player.CubeStyle === CubeStyle.Wooden && game.spriteStyle) {
+            game.context.drawImage(game.BlueCubeWooden, 0, 0, game.BlueCubeWooden.width, game.BlueCubeWooden.height, this.x, this.y, game.BlueCubeWooden.width, game.BlueCubeWooden.height)
+        }
+
+        else if (Player.CubeStyle === CubeStyle.BlueCube && game.classicStyle) {
+            game.context.drawImage(game.BlueCubePlastic, 0, 0, game.BlueCubePlastic.width, game.BlueCubePlastic.height, this.x, this.y, game.BlueCubePlastic.width, game.BlueCubePlastic.height)
+        }
+        
+        else if (Player.CubeStyle === CubeStyle.Alien && game.classicStyle) {
+            game.context.drawImage(game.BlueCubeAlienPlastic, 0, 0, game.BlueCubeAlienPlastic.width, game.BlueCubeAlienPlastic.height, this.x, this.y, game.BlueCubeAlienPlastic.width, game.BlueCubeAlienPlastic.height)
+        }
+
+        else if (Player.CubeStyle === CubeStyle.Lava && game.classicStyle) {
+            game.context.drawImage(game.BlueCubeLavaPlastic, 0, 0, game.BlueCubeLavaPlastic.width, game.BlueCubeLavaPlastic.height, this.x, this.y, game.BlueCubeLavaPlastic.width, game.BlueCubeLavaPlastic.height)
+        }
+
+        else if (Player.CubeStyle === CubeStyle.Wooden && game.classicStyle) {
+            game.context.drawImage(game.BlueCubeWoodenPlastic, 0, 0, game.BlueCubeWoodenPlastic.width, game.BlueCubeWoodenPlastic.height, this.x, this.y, game.BlueCubeWoodenPlastic.width, game.BlueCubeWoodenPlastic.height)
         }
     }
 };
@@ -426,7 +415,7 @@ class Wall extends GameObject {
          } else if (this.invisibleWall) {
              game.context.drawImage(game.InvisibleWall, 0, 0, game.InvisibleWall.width, game.InvisibleWall.height, this.x - 2,  this.y - 2, game.InvisibleWall.width, game.InvisibleWall.height)            
          
-        } else if (game.spriteStyle && !this.allowMovement && this.colorNumber != 1 && this.colorNumber != 2) {
+        } else if (game.spriteStyle && !this.allowMovement && this.colorNumber !== 1 && this.colorNumber !== 2) {
              var i = 0; 
              for (var x = this.left(); x < this.right(); x = x + 50) {
                  for (var y = this.top(); y < this.bottom(); y = y + 50) {
@@ -438,13 +427,18 @@ class Wall extends GameObject {
                     //if (this.randomList[i] % 2 == 0)
                         //game.context.rotate(90 * Math.PI / 180)
                         
-
-                    if (this.randomList[i]  % 40 == 0)
+                    
+                    if (this.randomList[i] % 40 === 0)
                         game.context.drawImage(game.WallGrassV3, 0, 0, game.WallGrassV3.width, game.WallGrassV3.height, 0, 0, game.WallGrassV3.width, game.WallGrassV3.height) 
                      
-                    else if (this.randomList[i]  % 9 == 0)
+                    else if (this.randomList[i] % 9 === 0)
                         game.context.drawImage(game.WallGrassV2, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height) 
-                     
+                    
+                    else if (this.randomList[i] % 200 === 0 && game.gameMode === GameMode.StoryMode) {
+                        game.context.drawImage(game.WallGrassTree, 0, 0, game.WallGrassTree.width, game.WallGrassTree.height, 0, 0, game.WallGrassTree.width, game.WallGrassTree.height)
+                        game.blueCubeWoodenLock = false
+                    }
+ 
                     else
                         game.context.drawImage(game.WallGrassV1, 0, 0, game.WallGrassV1.width, game.WallGrassV1.height, 0, 0, game.WallGrassV1.width, game.WallGrassV1.height) 
 
@@ -456,9 +450,9 @@ class Wall extends GameObject {
             
             } else if (game.spriteStyle) {
 
-            if (this.colorNumber == 1) {
+            if (this.colorNumber === 1) {
                 levels[game.currentLevel].unlocks.forEach(function(unlock) {
-                    if (unlock.colorNumber == 1) {
+                    if (unlock.colorNumber === 1) {
                         if (unlock.activated) {
                             game.context.drawImage(game.UnlockedRockBlue, 0, 0, game.UnlockedRockBlue.width, game.UnlockedRockBlue.height, self.x, self.y, game.UnlockedRockBlue.width, game.UnlockedRockBlue.height)
                         
@@ -467,9 +461,9 @@ class Wall extends GameObject {
                         }
                     }
                 })
-            } else if (this.colorNumber == 2) {
+            } else if (this.colorNumber === 2) {
                 levels[game.currentLevel].unlocks.forEach(function(unlock) {
-                    if (unlock.colorNumber == 2) {
+                    if (unlock.colorNumber === 2) {
                         if (unlock.activated) {
                             game.context.drawImage(game.UnlockedRockPurple, 0, 0, game.UnlockedRockPurple.width, game.UnlockedRockPurple.height, self.x, self.y, game.UnlockedRockPurple.width, game.UnlockedRockPurple.height)    
                     
@@ -516,8 +510,12 @@ class Item extends GameObject {
     Draw() {
     var self = this
     levels[game.currentLevel].players.forEach(function(player) {
-        if (self.typeNumber == 1 && !player.allowMovementWater) {    
+        if (self.typeNumber === 1 && !player.allowMovementWater && game.spriteStyle) {    
             game.context.drawImage(game.LifeJacket, 0, 0, game.LifeJacket.width, game.LifeJacket.height, self.x, self.y, game.LifeJacket.width, game.LifeJacket.height)     
+        }
+
+        if (self.typeNumber === 1 && !player.allowMovementWater && game.classicStyle) {    
+            game.context.drawImage(game.LifeJacketPlastic, 0, 0, game.LifeJacketPlastic.width, game.LifeJacketPlastic.height, self.x, self.y, game.LifeJacketPlastic.width, game.LifeJacketPlastic.height)     
         }
     })
     }
@@ -568,7 +566,7 @@ class Unlock extends GameObject {
             if (this.colorNumber == 1) {
             
                 if (this.activated) {
-                game.context.drawImage(game.SwitchW1ActivatedBlue, 0, 0, game.SwitchW1ActivatedBlue.width, game.SwitchW1ActivatedBlue.height, this.x, this.y, game.SwitchW1ActivatedBlue.width, game.SwitchW1ActivatedBlue.height)
+                    game.context.drawImage(game.SwitchW1ActivatedBlue, 0, 0, game.SwitchW1ActivatedBlue.width, game.SwitchW1ActivatedBlue.height, this.x, this.y, game.SwitchW1ActivatedBlue.width, game.SwitchW1ActivatedBlue.height)
                 
                 } else {
                     game.context.drawImage(game.SwitchW1Blue, 0, 0, game.SwitchW1Blue.width, game.SwitchW1Blue.height, this.x, this.y, game.SwitchW1Blue.width, game.SwitchW1Blue.height)    
@@ -577,7 +575,7 @@ class Unlock extends GameObject {
             } else if (this.colorNumber == 2) {
             
                 if (this.activated) {
-                game.context.drawImage(game.SwitchW1ActivatedPurple, 0, 0, game.SwitchW1ActivatedPurple.width, game.SwitchW1ActivatedPurple.height, this.x, this.y, game.SwitchW1ActivatedPurple.width, game.SwitchW1ActivatedPurple.height)
+                    game.context.drawImage(game.SwitchW1ActivatedPurple, 0, 0, game.SwitchW1ActivatedPurple.width, game.SwitchW1ActivatedPurple.height, this.x, this.y, game.SwitchW1ActivatedPurple.width, game.SwitchW1ActivatedPurple.height)
                 
                 } else {
                     game.context.drawImage(game.SwitchW1Purple, 0, 0, game.SwitchW1Purple.width, game.SwitchW1Purple.height, this.x, this.y, game.SwitchW1Purple.width, game.SwitchW1Purple.height)    
@@ -656,83 +654,147 @@ class FinishArea extends GameObject {
     }
 };
 
-class Selector extends GameObject{
-    constructor(x, y, width, heigh, Selected, OldY){
-        super(x, y, width, heigh, "gray")
-        this.Selected = false
-        this.x = 0
-        this.OldY = OldY
-        this.y = 0
-        this.width = 850
-        this.height = 200
+class MenuItem {
+    constructor(title, value, color, action) {
+        this.title = title
+        this.value = value
+        this.color = color
+        this.action = action
+    }
+}
 
-    } 
-    Draw() {
-        game.context.fillStyle = this.color1;
-        if (game.gameMode == GameMode.Shop && game.shopMode == ShopMode.ShopMenu && game.gameState == GameState.Rules) {
-            this.height = 300
-            game.context.fillRect(this.x, this.y, this.width, this.height)      
-        } else {
-        //if (game.gameState == GameState.Menu) 
-            this.height = 200
-            game.context.fillRect(this.x, this.y, this.width, this.height)
-        }
-         
+class Menu {
+    constructor(menuItems) {
+        this.menuItems = menuItems;
+        this.selectedIndex = 0
+    }
+    moveUp() {
+        if (this.selectedIndex !== 0){
+            this.selectedIndex = this.selectedIndex - 1
+        }  
     }
 
     moveDown() {
-        if (game.gameState == GameState.Menu) {
-            this.y = this.y + 200
+        const numMenuItems = this.menuItems.length
+        if (this.selectedIndex !== numMenuItems - 1){
+            this.selectedIndex = this.selectedIndex + 1
+        }  
+    }
+
+    selected() {
+        var menuItem = this.menuItems[this.selectedIndex]
+        menuItem.action()
+    }
+
+    Draw() {
+        var self = this
+        const numMenuItems = this.menuItems.length
+        const totalHeight = 600
+        const totalHeight2 = 400
+        const heightPerItem = totalHeight / numMenuItems
+        const heightPerItem2 = totalHeight2 / numMenuItems
+            //if (game.gameMode === GameMode.Shop) {
+                game.context.font = '115px Arial'
+           // }
+            //if (game.gameState === GameState.Menu) {
+                //game.context.font = '115px Arial' 
+           // }
+        this.menuItems.forEach(function(menuItem, index) {
+            if (index === self.selectedIndex && game.gameState !== GameState.Lost && game.gameState !== GameState.WonStage) {
+                game.context.fillStyle = "gray";
+                game.context.fillRect(0, heightPerItem * index, 850, heightPerItem)
+            }
+            else if (index === self.selectedIndex && game.gameState === GameState.Lost || index === self.selectedIndex && game.gameState === GameState.WonStage) {
+                game.context.fillStyle = "gray";
+                game.context.fillRect(0, 200 + heightPerItem2 * index, 850, heightPerItem2)
+            }
         
-        } else if (game.gameState == GameState.Rules && game.gameMode == GameMode.Shop) {
-            this.y = this.y + 300
-        }
-    } 
-    
-    moveUp() {
-        if (game.gameState == GameState.Menu) {
-            this.y = this.y - 200
+            ///
+
+            if (game.gameState === GameState.Lost) {
+                game.context.font = '115px Arial'
+                game.context.fillStyle = menuItem.color
+                game.context.fillText(menuItem.title, 10, 290 + heightPerItem2 * index)
+            }
+
+            else if (game.gameState === GameState.WonStage) {
+                game.context.font = '115px Arial'
+                game.context.fillStyle = menuItem.color
+                game.context.fillText(menuItem.title, 10, 290 + heightPerItem2 * index)
+            }
             
-        } else if (game.gameState == GameState.Rules && game.gameMode == GameMode.Shop) {
-            this.y = this.y - 300    
-        }
+            else {
+                game.context.font = '115px Arial'
+                game.context.fillStyle = menuItem.color
+                game.context.fillText(menuItem.title, 10, 90 + heightPerItem * index)
+            }   
+        })
     }
+}
 
-    updateMenu() {
+var MainMenu = new Menu([
+    new MenuItem("Story Mode", 1, "seagreen", function() {
+        game.gameState = GameState.Rules
+        game.gameMode = GameMode.StoryMode
+    }),
+    new MenuItem("Freeplay", 2, "teal", function() {
+        game.gameState = GameState.Rules
+        game.gameMode = GameMode.Freeplay
+        game.oldLevel = game.currentLevel
+    }),
+    new MenuItem("Shop", 3, "dodgerblue", function() {
+        game.gameState = GameState.Rules
+        game.gameMode = GameMode.Shop
+    }),
+    new MenuItem("Items Info", 4, "blue", function() {
+        game.gameState = GameState.Rules
+        game.gameMode = GameMode.ItemsInfo
+     }),
+    /*new MenuItem("Settings", 5, "darkblue", function() {
+        game.gameState = GameState.Rules
+        game.gameMode = GameMode.Settings
+    })*/
+])
 
-        if (this.y == 0 && game.gameState == GameState.Menu) {
-            game.gameState = GameState.Rules
-            game.gameMode = GameMode.StoryMode
-            this.OldY = this.y
+var ShopMenu = new Menu([
+    new MenuItem("Player", 1, "lightcoral", function() {
+        game.gameState = GameState.Started
+        game.shopMode = ShopMode.Player
+    }),
+    new MenuItem("Background", 2, "gold", function() {
+        game.gameState = GameState.Started
+        game.shopMode =  ShopMode.Backround
+    }),
+])
+   
+var LoseMenu = new Menu([
+    new MenuItem("Retry", 1, "violet", function() {
+        game.SetGameState(GameState.Started)
+        game.Restart()
+        game.loseCounterStop = false
+    }),
+    new MenuItem("Return to menu", 2, "hotpink", function(){
+        game.Restart()
+        game.gameState = GameState.Menu
+        game.loseCounterStop = false
+    })
+])
             
-        }
+var WinMenu = new Menu([
+    new MenuItem("Continue", 1, "rgb(255, 0, 100)", function(){
+        game.NextLevel()
 
-        if (this.y == 200 && game.gameState == GameState.Menu) {
-            game.gameState = GameState.Rules
-            game.gameMode = GameMode.Freeplay
-            this.oldY = this.y
-        }
-
-        if (this.y == 400 && game.gameState == GameState.Menu) {
-            game.gameState = GameState.Rules
-            game.gameMode = GameMode.Shop
-            this.oldY = this.y
-            this.y = 0
-        }
-        
-    }
+    }),
+    new MenuItem("Return to menu", 2, "deeppink", function(){
+        game.reset == true
+        game.NextLevel()
+        game.gameState = GameState.Menu
+    }),               
+])
     
-    updateShop() {
-        if (this.y == 0 && game.gameState == GameState.Rules && game.gameMode == GameMode.Shop) {
-            game.gameState = GameState.Started
-            game.shopMode = ShopMode.Backround
-            this.oldY = this.y
-        }
-        
-        if (this.y == 300 && game.gameState == GameState.Rules && game.gameMode == GameMode.Shop) {
-            game.gameState = GameState.Started
-            game.shopMode = ShopMode.Player
-            this.oldY = this.y
-        }
-    }
-};
+var Menus = [
+    MainMenu,
+    ShopMenu,
+    LoseMenu,
+    WinMenu    
+]

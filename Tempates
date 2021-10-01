@@ -37,3 +37,8 @@ Forest ""
 Sea "lightgreen", "yellowgreen", "rgb(255, 81, 73)"
 Other "rgb(255, 255, 132)", "coral", "rgb(255, 81, 73)"
 Player "lightgreen", "green", "aqua"
+
+Other
+game.context.save()
+game.context.scale(_, _)
+game.context.restore()  
