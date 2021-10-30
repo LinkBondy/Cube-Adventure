@@ -7,6 +7,7 @@ var GameState = {
     Started: 3,
     Lost: 4,
     WonStage: 5,
+    Paused: 6
 }
 
 var GameMode = {
@@ -28,24 +29,25 @@ var PlayerShop = {
     BlueCubeAlien: 2,
     BlueCubeLava: 3,
     BlueCubeWooden: 4,
+    BlueCubeSad: 5,
 }
 
 var BackroundShop = {
-    Classic: 1,
-    Sprite: 2
+    Sprite: 1,
+    Plastic: 2
 }
 
 var game = {
     canvas: undefined,
     context: undefined,
     startTime: new Date(),
-    classicStyle: false,
     spriteStyle: true,
+    plasticStyle: false,
     ///
     gameState: GameState.NotStarted,
     gameMode: GameMode.StoryMode,
     shopMode: ShopMode.ShopMenu,
-    backroundShop: BackroundShop.Classic,
+    backroundShop: BackroundShop.Sprite,
     playerShop: PlayerShop.BlueCube,
     ///
     // Blue Cube
@@ -53,16 +55,19 @@ var game = {
     BlueCubeAlien: new Image(),
     BlueCubeLava: new Image(),
     BlueCubeWooden: new Image(),
+    BlueCubeSad: new Image(),
     // Blue Cube Plastic 
     BlueCubePlastic: new Image(),
     BlueCubeAlienPlastic: new Image(),
     BlueCubeLavaPlastic: new Image(),
     BlueCubeWoodenPlastic: new Image(),
+    BlueCubeSadPlastic: new Image(),
     // Blue Cube 200 x 200
     BlueCube_400x400: new Image(),
     BlueCubeAlien_400x400: new Image(),
     BlueCubeLava_400x400: new Image(),
     BlueCubeWooden_400x400: new Image(), 
+    BlueCubeSad_400x400: new Image(),
     // Red Cube
     RedCube: new Image(),
     RedCube_200x200: new Image(),
@@ -70,6 +75,7 @@ var game = {
     // Wall Grass
     WallGrassV1: new Image(),
     WallGrassV1_200x200: new Image(),
+    WallGrassV1_400x400: new Image(),
     WallGrassV2: new Image(),
     WallGrassV3: new Image(),
     WallGrassTree: new Image(),
@@ -96,22 +102,35 @@ var game = {
     InvisibleWall: new Image(),
     InvisibleWall_200x200: new Image(),
     InvisibleWall_200x200V2: new Image(),
+    // Water
+    Water_Medium2: new Image(),
+    Water_Medium_200x200: new Image(),
     // Items
     LifeJacket: new Image(),
     LifeJacketPlastic: new Image(),
     LifeJacket_200x200: new Image(),
+    // Other Images
+    UpArrow: new Image(),
+    UpArrowShop: new Image(),
+    DownArrow: new Image(),
+    DownArrowShop: new Image(),
+    BackButton: new Image (),
+    MenuButton: new Image (),
     ///
     Music: new Audio(),
     // Other
-    mainScreen: false,
-    reset: false,
     blueCubeWoodenLock: true,
+    blueCubeSadLock: true,
     loseCounterStop: false,
     currentLevel: 0,
     oldLevel: undefined,
     currentLosses: 0,
-    unlockedLevel: 5,
+    unlockedLevel: 1,
     ItemNumber: 1,
+    mobile: false,
+    selectorX: undefined,
+    selectorY: undefined,
+    selectorY2: undefined,
     backround: new Backround(),
 
     SetGameState: function(gameState) {
@@ -135,18 +154,98 @@ var game = {
             unlock.unlockWall.allowMovement = false
             unlock.activated = false    
         })
-        game.reset = false
+    },
+
+    Save: function() {
+        window.localStorage.setItem('level', this.currentLevel)
+        window.localStorage.setItem('PlayerWoodenLock', this.blueCubeWoodenLock)
+        window.localStorage.setItem('PlayerSadLock', this.blueCubeSadLock)
+        window.localStorage.setItem('UnlockedItemInfo', this.unlockedLevel)
+        window.localStorage.setItem('StyleCube', Player.CubeStyle)
+        window.localStorage.setItem('styleSprite', this.spriteStyle)
+        window.localStorage.setItem('stylePlastic', this.plasticStyle)
+    },
+
+    Load: function() {
+        //console.log('Loading, current level is: ', this.currentLevel)
+        var level = Number(window.localStorage.getItem('level'))
+        if (level !== null) {
+            this.currentLevel = level
+        }
+       
+        var WoodenLock = window.localStorage.getItem('PlayerWoodenLock')
+        if (WoodenLock !== null) {
+            if (WoodenLock === 'true') {
+                WoodenLock = true
+            }
+
+            if (WoodenLock === 'false') {
+                WoodenLock = false
+            }
+            this.blueCubeWoodenLock = WoodenLock
+        }
+
+        var SadLock = window.localStorage.getItem('PlayerSadLock')
+        if (SadLock !== null) {
+            if (SadLock === 'true') {
+                SadLock = true
+            }
+
+            if (SadLock === 'false') {
+                SadLock = false
+            }
+            this.blueCubeSadLock = SadLock
+        }
+
+        var UnlockedItemInfo = Number(window.localStorage.getItem('UnlockedItemInfo'))
+        if (UnlockedItemInfo !== null) {
+            this.unlockedLevel = UnlockedItemInfo
+        }
+
+        var styleSprite = window.localStorage.getItem('styleSprite')
+        if (styleSprite !== null) {
+            if (styleSprite === 'true') {
+                styleSprite = true
+            }
+
+            if (styleSprite === 'false') {
+                styleSprite = false
+            }
+            this.spriteStyle = styleSprite
+        }
+
+        var stylePlastic = window.localStorage.getItem('stylePlastic')
+        if (stylePlastic !== null) {
+            if (stylePlastic === 'true') {
+                stylePlastic = true
+            }
+
+            if (stylePlastic === 'false') {
+                stylePlastic = false
+            }
+            this.plasticStyle = stylePlastic
+        }
+
+        var StyleCube = Number(window.localStorage.getItem('StyleCube'))
+        if (StyleCube !== null) {
+            Player.CubeStyle = StyleCube
+        }
+
+        //console.log('Loaded, current level is: ', this.currentLevel)
+        //console.log('The lock is', this.blueCubeWoodenLock)
+        //console.log('Loaded, current level is: ', WoodenLock)
     },
 
     NextLevel: function(){
         game.Restart()
         game.currentLevel = game.currentLevel + 1
+        game.Save()
         if (game.unlockedLevel < 9) {
-        game.unlockedLevel = game.unlockedLevel + 1
+            game.unlockedLevel = game.unlockedLevel + 1
         }
         if (game.currentLevel == 7) {
             game.currentLevel = 0
-            game.reset == true
+            game.Save()
             game.Restart()
             game.SetGameState(GameState.Menu)
         } else {
@@ -201,6 +300,7 @@ var game = {
     },
 
     update: function(){
+        game.Save()
         if  (game.gameState === GameState.Started && game.gameMode === GameMode.StoryMode || game.gameState === GameState.Started && game.gameMode === GameMode.Freeplay) {
             levels[game.currentLevel].boxes.forEach(function(box) {
                 box.update()
@@ -255,11 +355,15 @@ var game = {
         if (game.gameState === GameState.Lost && game.gameMode === GameMode.StoryMode) {
             if (game.loseCounterStop === false) {
                 game.currentLosses = game.currentLosses + 1
+                if (game.currentLosses === 50) {
+                    game.blueCubeSadLock = false
+                }
                 game.loseCounterStop = true
             }   
             LoseMenu.Draw()
             game.DrawLoseText()
-        } else if (game.gameState === GameState.Started && game.gameMode < 3 || game.gameState === GameState.Rules && game.gameMode === GameMode.Freeplay) {
+
+        } else if (game.gameState === GameState.Started && game.gameMode < 3 || game.gameState === GameState.Rules && game.gameMode === GameMode.Freeplay || game.gameState === GameState.Paused && game.gameMode === GameMode.StoryMode) {
 
             levels[game.currentLevel].waters.forEach(function(water) {
                 water.Draw()
@@ -304,46 +408,72 @@ var game = {
                 wall.Draw()
                 }
             },)
-
+        
         } if (game.gameState == GameState.Rules && game.gameMode == GameMode.Freeplay) {
             game.DrawFreeplayLevel()
         } 
         if (game.gameState == GameState.Started && game.gameMode == GameMode.Shop && game.shopMode == ShopMode.Backround) {
-            if (game.backroundShop == BackroundShop.Classic) {
-                game.DrawBackroundClassicShop()   
+            if (game.backroundShop == BackroundShop.Plastic) {
+                game.DrawBackroundPlasticShop()   
             }
-            
             if (game.backroundShop == BackroundShop.Sprite) {
                 game.DrawBackroundSpriteShop()   
+            }
+
+            if (game.mobile === true) {
+                game.context.drawImage(game.UpArrowShop, 0, 0, game.UpArrowShop.width, game.UpArrowShop.height, 10, 450, game.UpArrowShop.width, game.UpArrowShop.height)
+                game.context.drawImage(game.DownArrowShop, 0, 0, game.DownArrowShop.width, game.DownArrowShop.height, 690, 450, game.DownArrowShop.width, game.DownArrowShop.height)
             }  
+
         } if (game.gameState == GameState.Started && game.gameMode == GameMode.Shop && game.shopMode == ShopMode.Player) {
             if (game.playerShop == PlayerShop.BlueCube) {
                 game.DrawBlueCubeShop()   
             }
             
-            if (game.playerShop == PlayerShop.BlueCubeAlien) {
+            if (game.playerShop === PlayerShop.BlueCubeAlien) {
                 game.DrawBlueCubeAlienShop()   
             }
             
-            if (game.playerShop == PlayerShop.BlueCubeLava) {
+            if (game.playerShop === PlayerShop.BlueCubeLava) {
                 game.DrawBlueCubeLavaShop()   
             }
 
-            if (game.playerShop == PlayerShop.BlueCubeWooden) {
+            if (game.playerShop === PlayerShop.BlueCubeWooden) {
                 game.DrawBlueCubeWoodenShop()   
             }
+
+            if (game.playerShop === PlayerShop.BlueCubeSad) {
+                game.DrawBlueCubeSadShop()   
+            }
             
-        } if (game.gameState == GameState.Rules && game.gameMode == GameMode.ItemsInfo) {
+            if (game.mobile === true) {
+                game.context.drawImage(game.UpArrowShop, 0, 0, game.UpArrowShop.width, game.UpArrowShop.height, 10, 450, game.UpArrowShop.width, game.UpArrowShop.height)
+                game.context.drawImage(game.DownArrowShop, 0, 0, game.DownArrowShop.width, game.DownArrowShop.height, 690, 450, game.DownArrowShop.width, game.DownArrowShop.height)
+            }
+            
+        } if (game.gameState === GameState.Rules && game.gameMode == GameMode.ItemsInfo) {
             game.DrawItemsInfo()
-        } else if (game.gameState == GameState.Rules && game.gameMode == GameMode.Shop) {
+        } else if (game.gameState === GameState.Rules && game.gameMode == GameMode.Shop) {
             ShopMenu.Draw()
-        } else if (game.gameState == GameState.Rules && game.gameMode == GameMode.StoryMode) {
+        } else if (game.gameState === GameState.Rules && game.gameMode == GameMode.StoryMode) {
             game.DrawRules()    
-        } else if (game.gameState == GameState.Menu) {
+        } else if (game.gameState === GameState.Menu) {
             MainMenu.Draw()
-        } else if (game.gameState == GameState.NotStarted){
+        } else if (game.gameState === GameState.NotStarted){
             game.DrawTitleSrceen()
             game.DrawLogo()   
+        }
+        if (game.gameState === GameState.Paused && game.gameMode === GameMode.StoryMode) {
+            game.context.fillStyle = "rgba(128, 128, 128, 0.6)"
+            game.context.fillRect(0, 0, 850, 600)
+            PauseMenu.Draw()   
+        }
+        if (game.gameState < 3 && game.gameState > 0 && game.mobile === true || game.gameState === GameState.Started && game.gameMode !== GameMode.StoryMode && game.mobile === true) {
+            game.context.drawImage(game.BackButton, 0, 0, game.BackButton.width, game.BackButton.height, 750, 0, game.BackButton.width, game.BackButton.height) 
+        }
+
+        if (game.gameMode === GameMode.StoryMode && game.gameState === GameState.Started && game.mobile === true) {
+            game.context.drawImage(game.MenuButton, 0, 0, game.MenuButton.width, game.MenuButton.height, 750, 0, game.MenuButton.width, game.MenuButton.height) 
         }
     }, 
     
@@ -369,13 +499,19 @@ var game = {
     DrawRules: function(){
             game.context.font = "175px Arial";
             game.context.fillStyle = 'purple'
-            game.context.fillText("Rules", 175, 175);
+            game.context.fillText("Rules", 200, 175);
             ///
             game.context.font = '45px Arial';
             game.context.fillStyle = 'rgb(2, 0, 139)'
-            game.context.fillText("Get to the pink to beat levels", 125, 275);
-            game.context.fillText("Watch out for enemies", 175, 350);
+            game.context.fillText("Get to the pink to beat levels", 150, 275);
+            game.context.fillText("Watch out for enemies", 200, 350);
+            if (game.mobile === false) {
             game.context.fillText("Use A, D, S, D or Arrow Keys to move", 50, 425);
+            }
+            else if (game.mobile === true) {
+                game.context.font = '35px Arial';
+                game.context.fillText("Tap above, below, to the left or to the right to move", 35, 415);
+            }
             game.context.font = '75px Arial';
             game.context.fillStyle = 'blue'
             game.context.fillText("Press space to start", 80, 550);
@@ -428,6 +564,10 @@ var game = {
         game.context.font = '125px Arial';
         game.context.fillStyle = "rgba(255, 255, 132, 0.788)";
         game.context.fillText("Level " + (game.currentLevel + 1), 225, 575);
+        if (game.mobile === true) {
+            game.context.drawImage(game.UpArrow, 0, 0, game.UpArrow.width, game.UpArrow.height, 10, 450, game.UpArrow.width, game.UpArrow.height)
+            game.context.drawImage(game.DownArrow, 0, 0, game.DownArrow.width, game.DownArrow.height, 690, 450, game.DownArrow.width, game.DownArrow.height)
+        }
         
     },
 
@@ -440,117 +580,215 @@ var game = {
         game.context.fillText("Player", 0, 500)    
     },
 
-    DrawBackroundClassicShop: function(){
-        if (game.classicStyle) {
-            game.context.font = '100px Arial'
-            game.context.fillStyle = 'indianred'
-            game.context.fillText("Classic(Selected)", 30, 550)      
+    DrawBackroundSpriteShop: function(){
+        game.context.drawImage(game.WallGrassV1_400x400, 0, 0, game.WallGrassV1_400x400.width, game.WallGrassV1_400x400.height, 225, 20, game.WallGrassV1_400x400.width, game.WallGrassV1_400x400.height)
+        if (game.spriteStyle) {
+            if (game.mobile === true) {
+                game.context.font = '75px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Sprite(Selected)", 155, 550)  
+            }
+
+            else {
+                game.context.font = '100px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Sprite(Selected)", 65, 550)  
+            }
+        }  
+        
+        else {
+        game.context.font = '175px Arial'
+        game.context.fillStyle = 'indianred'
+        game.context.fillText("Sprite", 190, 550)
+        }
+
+    },
+
+    DrawBackroundPlasticShop: function(){
+        game.context.fillStyle = "rgb(190, 190, 190)"
+        game.context.fillRect(225, 20, 400, 400)
+        if (game.plasticStyle) {
+            if (game.mobile === true) {
+                game.context.font = '75px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Plastic", 300, 500)
+                game.context.fillText("(Selected)", 250, 575)  
+            }
+
+            else {
+                game.context.font = '100px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Plastic(Selected)", 50, 550)   
+            }
+                 
         }
         else {
         game.context.font = '175px Arial'
         game.context.fillStyle = 'indianred'
-        game.context.fillText("Classic", 95, 550)
+        game.context.fillText("Plastic", 165, 575)
         }    
     },
 
-    DrawBackroundSpriteShop: function(){
-        if (game.spriteStyle) {
-            game.context.font = '100px Arial'
-            game.context.fillStyle = 'indianred'
-            game.context.fillText("Sprite(Selected)", 60, 550)      
-        }
-        else {
-        game.context.font = '175px Arial'
-        game.context.fillStyle = 'indianred'
-        game.context.fillText("Sprite", 160, 550)
-        }
-
-    },
-
     DrawBlueCubeShop: function(){
-        game.context.drawImage(game.BlueCube_400x400, 0, 0, game.BlueCube_400x400.width, game.BlueCube_400x400.height, 200, 25, game.BlueCube_400x400.width, game.BlueCube_400x400.height)
+        game.context.drawImage(game.BlueCube_400x400, 0, 0, game.BlueCube_400x400.width, game.BlueCube_400x400.height, 225, 25, game.BlueCube_400x400.width, game.BlueCube_400x400.height)
         if (Player.CubeStyle == CubeStyle.BlueCube) {
-            game.context.font = '100px Arial'
-            game.context.fillStyle = 'indianred'
-            game.context.fillText("Classic(Selected)", 35, 550)      
+            if (game.mobile === true) {
+                game.context.font = '75px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Classic", 300, 500)
+                game.context.fillText("(Selected)", 250, 575)
+            }
+
+            else {
+                game.context.font = '100px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Classic(Selected)", 35, 550)  
+            }
+                
         }
         else {
         game.context.font = '150px Arial'
         game.context.fillStyle = 'indianred'
-        game.context.fillText("Classic", 150, 550)
+        game.context.fillText("Classic", 175, 550)
         }
 
     },
 
     DrawBlueCubeAlienShop: function(){
-        game.context.drawImage(game.BlueCubeAlien_400x400, 0, 0, game.BlueCubeAlien_400x400.width, game.BlueCubeAlien_400x400.height, 200, 25, game.BlueCubeAlien_400x400.width, game.BlueCubeAlien_400x400.height)
+        game.context.drawImage(game.BlueCubeAlien_400x400, 0, 0, game.BlueCubeAlien_400x400.width, game.BlueCubeAlien_400x400.height, 225, 25, game.BlueCubeAlien_400x400.width, game.BlueCubeAlien_400x400.height)
         if (Player.CubeStyle == CubeStyle.Alien) {
-            game.context.font = '100px Arial'
-            game.context.fillStyle = 'indianred'
-            game.context.fillText("Alien(Selected)", 80, 550)      
+            if (game.mobile === true) {
+                game.context.font = '75px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Alien(Selected)", 175, 550)
+            }
+
+            else {
+                game.context.font = '100px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Alien(Selected)", 85, 550)
+            }      
         }
         else {
-        game.context.font = '150px Arial'
-        game.context.fillStyle = 'indianred'
-        game.context.fillText("Alien", 225, 550)
+            game.context.font = '150px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Alien", 260, 550)
         }
     },
 
     DrawBlueCubeLavaShop: function(){
-        game.context.drawImage(game.BlueCubeLava_400x400, 0, 0, game.BlueCubeLava_400x400.width, game.BlueCubeLava_400x400.height, 200, 25, game.BlueCubeLava_400x400.width, game.BlueCubeLava_400x400.height)
+        game.context.drawImage(game.BlueCubeLava_400x400, 0, 0, game.BlueCubeLava_400x400.width, game.BlueCubeLava_400x400.height, 225, 25, game.BlueCubeLava_400x400.width, game.BlueCubeLava_400x400.height)
         if (Player.CubeStyle == CubeStyle.Lava) {
-            game.context.font = '100px Arial'
-            game.context.fillStyle = 'indianred'
-            game.context.fillText("Lava(Selected)", 80, 550)      
+            if (game.mobile === true) {
+                game.context.font = '75px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Lava(Selected)", 175, 550)
+            }
+
+            else {
+                game.context.font = '100px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Lava(Selected)", 87, 550)
+            }      
         }
         else {
-        game.context.font = '150px Arial'
-        game.context.fillStyle = 'indianred'
-        game.context.fillText("Lava", 225, 550)
+            game.context.font = '150px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Lava", 260, 550)
         }
    
     },
 
     DrawBlueCubeWoodenShop: function(){
-        if (game.blueCubeWoodenLock == false) {
-            game.context.drawImage(game.BlueCubeWooden_400x400, 0, 0, game.BlueCubeWooden_400x400.width, game.BlueCubeWooden_400x400.height, 200, 25, game.BlueCubeWooden_400x400.width, game.BlueCubeWooden_400x400.height)
+        if (game.blueCubeWoodenLock === false) {
+            game.context.drawImage(game.BlueCubeWooden_400x400, 0, 0, game.BlueCubeWooden_400x400.width, game.BlueCubeWooden_400x400.height, 225, 25, game.BlueCubeWooden_400x400.width, game.BlueCubeWooden_400x400.height)
         }
 
-        if (Player.CubeStyle == CubeStyle.Wooden && game.blueCubeWoodenLock == false) {
+        if (Player.CubeStyle === CubeStyle.Wooden && game.blueCubeWoodenLock === false) {
+            if (game.mobile === true) {
+                game.context.font = '75px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Wooden(Selected)", 100, 550)
+            }
+
+            else {
             game.context.font = '100px Arial'
             game.context.fillStyle = 'indianred'
-            game.context.fillText("Wooden(Selected)", 15, 550)      
+            game.context.fillText("Wooden(Selected)", 10, 550)
+            }      
         }
-        else if (game.blueCubeWoodenLock == true) {
+        else if (game.blueCubeWoodenLock === true) {
             game.context.font = '75px Arial'
             game.context.fillStyle = 'hotpink'
             game.context.fillText("Find the tree to unlock", 50, 100)
-            game.context.font = '150px Arial'
-            game.context.fillStyle = 'indianred'
-            game.context.fillText("Wooden", 130, 550)
+            
+            if (game.mobile === true) {
+                game.context.font = '125px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Wooden", 195, 550)
+            }
+            else {
+                game.context.font = '150px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Wooden", 140, 550)
+            }
         }
             
         else {
             game.context.font = '150px Arial'
             game.context.fillStyle = 'indianred'
-            game.context.fillText("Wooden", 130, 550)
+            game.context.fillText("Wooden", 140, 550)
+        }
+   
+    },
+
+    DrawBlueCubeSadShop: function(){
+        if (game.blueCubeSadLock === false) {
+            game.context.drawImage(game.BlueCubeSad_400x400, 0, 0, game.BlueCubeSad_400x400.width, game.BlueCubeSad_400x400.height, 225, 25, game.BlueCubeSad_400x400.width, game.BlueCubeSad_400x400.height)
+        }
+
+        if (Player.CubeStyle === CubeStyle.Sad && game.blueCubeSadLock === false) {
+            if (game.mobile === true) {
+                game.context.font = '75px Arial'
+                game.context.fillStyle = 'indianred'
+                game.context.fillText("Sad(Selected)", 180, 550)
+            }
+
+            else {
+            game.context.font = '100px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Sad(Selected)", 120, 550)
+            }      
+        }
+        else if (game.blueCubeSadLock === true) {
+            game.context.font = '300px Arial'
+            game.context.fillStyle = 'hotpink'
+            game.context.fillText("???", 175, 350)
+        }
+            
+        else {
+            game.context.font = '150px Arial'
+            game.context.fillStyle = 'indianred'
+            game.context.fillText("Sad", 285, 550)
         }
    
     },
 
     DrawItemsInfo: function(){
         if (game.ItemNumber === 1) {
-            if (game.unlockedLevel > 1) {
+            if (game.unlockedLevel > 0) {
                 game.context.font = "150px Arial";
                 game.context.fillStyle = 'purple'
                 game.context.fillText("Enemies", 10, 150);
                 ///  
                 game.context.drawImage(game.RedCube_200x200, 0, 0, game.RedCube_200x200.width, game.RedCube_200x200.height, 625, 10, game.RedCube_200x200.width, game.RedCube_200x200.height)
                 ///
-                game.context.font = "45px Arial";
+                game.context.font = "55px Arial";
                 game.context.fillStyle = 'rgb(2, 0, 139)'
-                game.context.fillText("Moves left to right or up to down at a time.", 10, 325);
-                game.context.fillText("Players lose when they touch enemys.", 10, 475);
+                game.context.fillText("Moves left to right or up to down", 10, 300);
+                game.context.fillText("at a time.", 10, 375);
+                game.context.fillText("Players lose when they touch", 10, 475);
+                game.context.fillText("enemys.", 10, 550);
             }
     
             else {
@@ -565,17 +803,17 @@ var game = {
         }
 
         else if (game.ItemNumber === 2) {
-            if (game.unlockedLevel > 2) {
-                game.context.font = "175px Arial";
+            if (game.unlockedLevel > 1) {
+                game.context.font = "200px Arial";
                 game.context.fillStyle = 'purple'
-                game.context.fillText("Walls", 10, 150);
+                game.context.fillText("Walls", 10, 160);
                 ///  
-                game.context.drawImage(game.WallGrassV1_200x200, 0, 0, game.WallGrassV1_200x200.width, game.WallGrassV1_200x200.height, 500, 10, game.WallGrassV1_200x200.width, game.WallGrassV1_200x200.height)
+                game.context.drawImage(game.WallGrassV1_200x200, 0, 0, game.WallGrassV1_200x200.width, game.WallGrassV1_200x200.height, 550, 10, game.WallGrassV1_200x200.width, game.WallGrassV1_200x200.height)
                 ///
-                game.context.font = "50px Arial";
+                game.context.font = "55px Arial";
                 game.context.fillStyle = 'rgb(2, 0, 139)'
                 game.context.fillText("Stops players from going through", 10, 300);
-                game.context.fillText("walls.", 10, 350);
+                game.context.fillText("walls.", 10, 375);
 
                 game.context.fillText("Bounces enemies off of walls.", 10, 475);
             }
@@ -592,7 +830,7 @@ var game = {
         }
 
         else if (game.ItemNumber === 3) {
-            if (game.unlockedLevel > 4) {
+            if (game.unlockedLevel > 3) {
                 game.context.font = "145px Arial";
                 game.context.fillStyle = 'purple'
                 game.context.fillText("Switches", 10, 150);
@@ -619,7 +857,7 @@ var game = {
         }
 
         else if (game.ItemNumber === 4) {
-            if (game.unlockedLevel > 4) {
+            if (game.unlockedLevel > 3) {
                 game.context.font = "120px Arial";
                 game.context.fillStyle = 'purple'
                 game.context.fillText("Unlockable", 10, 100);
@@ -633,7 +871,7 @@ var game = {
                 game.context.fillText("unbroken.", 10, 350);
                 game.context.fillText("When switches are activated they break", 10, 425);
                 game.context.fillText("unlockable rock.", 10, 475);
-                game.context.fillText("Once broken you can go thought them. ", 10, 575);
+                game.context.fillText("Once broken you can go through them. ", 10, 575);
 
             }
 
@@ -649,39 +887,19 @@ var game = {
         }
 
         else if (game.ItemNumber === 5) {
-            /*if (game.unlockedLevel > 5) {
-                game.context.font = "100px Arial";
+            if (game.unlockedLevel > 4) {
+                game.context.font = "120px Arial";
                 game.context.fillStyle = 'purple'
-                game.context.drawImage(game.InvisibleWall_200x200V2, 0, 0, game.InvisibleWall_200x200V2.width, game.InvisibleWall_200x200V2.height, 625, 10, game.InvisibleWall_200x200V2.width, game.InvisibleWall_200x200V2.height)
+                game.context.fillText("Invisible", 10, 100);
+                game.context.fillText("Walls", 10, 200);
+                ///
+                game.context.drawImage(game.InvisibleWall_200x200V2, 0, 0, game.InvisibleWall_200x200V2.width, game.InvisibleWall_200x200V2.height, 505 , 10, game.InvisibleWall_200x200V2.width, game.InvisibleWall_200x200V2.height)
                 ///
                 game.context.font = "55px Arial";
                 game.context.fillStyle = 'rgb(2, 0, 139)'
-            }
-
-            else {
-                game.context.font = "125px Arial";
-                game.context.fillStyle = 'lightcoral'
-                game.context.fillText("Item 5", 200, 200);
-                ///
-                game.context.font = "150px Arial";
-                game.context.fillStyle = 'lime'
-                game.context.fillText("Beat Level 5", 10, 550);
-                    
-            }*/
-                game.context.font = "150px Arial";
-                game.context.fillStyle = 'lightcoral'
-                game.context.fillText("Comming", 75, 250);
-                game.context.fillText("Soon", 225, 375);      
-        }
-
-        /*else if (game.ItemNumber === 5) {
-            if (game.unlockedLevel > 5) {
-                game.context.font = "100px Arial";
-                game.context.fillStyle = 'purple'
-                game.context.drawImage(game.InvisibleWall_200x200V2, 0, 0, game.InvisibleWall_200x200V2.width, game.InvisibleWall_200x200V2.height, 625, 10, game.InvisibleWall_200x200V2.width, game.InvisibleWall_200x200V2.height)
-                ///
-                game.context.font = "55px Arial";
-                game.context.fillStyle = 'rgb(2, 0, 139)'
+                game.context.fillText("Invisible walls look like walls.", 10, 325)
+                game.context.fillText("Players and enemies can go", 10, 450)
+                game.context.fillText("through walls.", 10, 525)
             }
 
             else {
@@ -693,16 +911,22 @@ var game = {
                 game.context.fillStyle = 'lime'
                 game.context.fillText("Beat Level 5", 10, 550);    
             }   
-        }*/
+        }
 
         else if (game.ItemNumber === 6) {
-            if (game.unlockedLevel > 6) {
-                game.context.font = "100px Arial";
+            if (game.unlockedLevel > 5) {
+                game.context.font = "120px Arial";
                 game.context.fillStyle = 'purple'
+                game.context.fillText("Teleporters", 10, 150);
+                ///
                 game.context.drawImage(game.TeleporterTomatoSprite_200x200, 0, 0, game.TeleporterTomatoSprite_200x200.width, game.TeleporterTomatoSprite_200x200.height, 625, 10, game.TeleporterTomatoSprite_200x200.width, game.TeleporterTomatoSprite_200x200.height)
                 ///
                 game.context.font = "55px Arial";
                 game.context.fillStyle = 'rgb(2, 0, 139)'
+                game.context.fillText("When players go on teleporters", 10, 300)
+                game.context.fillText("they teleport to the matching", 10, 375)
+                game.context.fillText("teleporter.", 10, 450)
+                game.context.fillText("Enemies can't use teleporters.", 10, 550)
             }
 
             else {
@@ -717,12 +941,19 @@ var game = {
         }
 
         else if (game.ItemNumber === 7) {
-            if (game.unlockedLevel > 7) {
-                game.context.font = "100px Arial";
+            if (game.unlockedLevel > 6) {
+                game.context.font = "200px Arial";
                 game.context.fillStyle = 'purple'
+                game.context.fillText("Water", 10, 175);
+                ///
+                game.context.drawImage(game.Water_Medium_200x200, 0, 0, game.Water_Medium_200x200.width, game.Water_Medium_200x200.height, 600, 10, game.Water_Medium_200x200.width, game.Water_Medium_200x200.height)
                 ///
                 game.context.font = "55px Arial";
                 game.context.fillStyle = 'rgb(2, 0, 139)'
+                game.context.fillText("Players need life jackets to go in", 10, 300)
+                game.context.fillText("the water.", 10, 375)
+                game.context.fillText("Enemies can go into water but", 10, 475)
+                game.context.fillText("they move at half the speed.", 10, 550)
             }
 
             else {
@@ -737,12 +968,20 @@ var game = {
         }
 
         else if (game.ItemNumber === 8) {
-            if (game.unlockedLevel > 7) {
-                game.context.font = "100px Arial";
+            if (game.unlockedLevel > 6) {
+                game.context.font = "125px Arial";
                 game.context.fillStyle = 'purple'
+                game.context.fillText("Life Jacket", 10, 150);
                 ///
-                game.context.font = "55px Arial";
+                game.context.drawImage(game.LifeJacket_200x200, 0, 0, game.LifeJacket_200x200.width, game.LifeJacket_200x200.height, 625, 10, game.LifeJacket_200x200.width, game.LifeJacket_200x200.height)
+                ///
+                game.context.font = "50px Arial";
                 game.context.fillStyle = 'rgb(2, 0, 139)'
+                game.context.fillText("When players pick up life jackets they", 10, 262.5)
+                game.context.fillText("can go in water.", 10, 337.5)
+                game.context.fillText("When enemies pick up life jackets", 10, 437.5)
+                game.context.fillText("they can move at nomral speed in", 10, 500)
+                game.context.fillText("water.", 10, 562.5)
             }
 
             else {
@@ -756,6 +995,13 @@ var game = {
             }   
         }
 
+        /*else if (game.ItemNumber < 10) {
+            game.context.font = "150px Arial";
+            game.context.fillStyle = 'lightcoral'
+            game.context.fillText("Coming", 140, 250);
+            game.context.fillText("Soon", 225, 375);      
+        }*/
+
         
     }
 }
@@ -764,8 +1010,15 @@ function Loaded(){
     game.canvas = document.getElementById("mycanvas");
     game.context = game.canvas.getContext("2d")
     ///
+    if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i ) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i)){
+            game.mobile = true       
+    } else {
+            game.mobile = false
+    }
+    ///
     game.WallGrassV1.src = "images/WallGrassV1.png";
     game.WallGrassV1_200x200.src = "images/WallGrassV1_200x200.png";
+    game.WallGrassV1_400x400.src = "images/WallGrassV1_400x400.png";
     game.WallGrassV2.src = "images/WallGrassV2.png";
     game.WallGrassV3.src = "images/WallGrassV3.png";
     game.WallGrassTree.src = "images/WallGrassTree.png";
@@ -774,16 +1027,19 @@ function Loaded(){
     game.BlueCubeAlien.src = "images/BlueCubeAlien.png";
     game.BlueCubeLava.src = "images/BlueCubeLava.png";
     game.BlueCubeWooden.src = "images/BlueCubeWooden.png";
+    game.BlueCubeSad.src = "images/BlueCubeSad.png";
     ///
     game.BlueCubePlastic.src = "images/BlueCubePlastic.png";
     game.BlueCubeAlienPlastic.src = "images/BlueCubeAlienPlastic.png";
     game.BlueCubeLavaPlastic.src = "images/BlueCubeLavaPlastic.png";
     game.BlueCubeWoodenPlastic.src = "images/BlueCubeWoodenPlastic.png";
+    game.BlueCubeSadPlastic.src = "images/BlueCubeSadPlastic.png";
     ///
     game.BlueCube_400x400.src = "images/BlueCube_400x400.png";
     game.BlueCubeAlien_400x400.src = "images/BlueCubeAlien_400x400.png";
     game.BlueCubeLava_400x400.src = "images/BlueCubeLava_400x400.png";
     game.BlueCubeWooden_400x400.src = "images/BlueCubeWooden_400x400.png";
+    game.BlueCubeSad_400x400.src = "images/BlueCubeSad_400x400.png";
     ///
     game.RedCube.src = "images/RedCube.png";
     game.RedCube_200x200.src = "images/RedCube_200x200.png";
@@ -806,7 +1062,11 @@ function Loaded(){
     game.InvisibleWall_200x200V2.src = "images/InvisibleWall_200x200V2.png";
     ///
     game.LifeJacket.src = "images/LifeJacket.png"
+    game.LifeJacket_200x200.src = "images/LifeJacket_200x200.png"
     game.LifeJacketPlastic.src = "images/LifeJacketPlastic.png"
+    ///
+    game.Water_Medium2.src = "images/Water_Medium2.png"
+    game.Water_Medium_200x200.src = "images/Water_Medium_200x200.png"
     ///
     game.UnlockRockPurple.src = "images/UnlockRockPurple.png";
     game.UnlockedRockPurple.src = "images/UnlockedRockPurple.png";
@@ -814,7 +1074,18 @@ function Loaded(){
     game.UnlockRockBlue_200x200.src = "images/UnlockRockBlue_200x200.png";
     game.UnlockedRockBlue.src = "images/UnlockedRockBlue.png";
     ///
+    game.UpArrow.src = "images/UpArrow.png"
+    game.DownArrow.src = "images/DownArrow.png"
+    game.UpArrowShop.src = "images/UpArrowShop.png"
+    game.DownArrowShop.src = "images/DownArrowShop.png"
+    ///
+    game.BackButton.src = "images/BackButton.png"
+    game.MenuButton.src = "images/MenuButton.png"
+    ///
     game.Music.src = "Music.mp3"
+
+    game.Load()
+
     ///
     window.setTimeout(game.mainLoop, 100)    
 }

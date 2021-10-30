@@ -3,16 +3,22 @@ var level1 = {
     players: [
         new Player(400, 0, 50, 50),
     ],
+    
     boxes: [
         new Box(800, 400, 50, 50, true, false, 5),
         new Box(0, 200, 50, 50, true, false, 5),
     ],
+
     walls: [],
+
     waters: [],
+
     items: [],
+
     finishAreas: [
         new FinishArea(0, 550, 850, 50), 
     ],
+
     changeDirectionSquares: [],
     
     unlocks: [],
@@ -28,6 +34,7 @@ var level2 = {
     boxes: [
         new Box(400, 500, 50, 50, false, true, 3),
     ],
+
     walls: [
         new Wall(0, 0, 350, 600, "rgb(190, 190, 190)"),
         new Wall(500, 0, 350, 600, "rgb(190, 190, 190)"),
@@ -38,8 +45,11 @@ var level2 = {
         new Wall(450, 100, 50, 200, "rgb(190, 190, 190)"),
         new Wall(450, 400, 50, 50, "rgb(190, 190, 190)")
     ],
+
     waters: [],
+
     items: [],
+
     finishAreas: [
         new FinishArea(350, 550, 150, 50),
     ],
@@ -54,11 +64,13 @@ var level3 = {
     players: [
         new Player(400, 0, 50, 50),
     ],
+
     boxes: [
         new Box(200, 450, 50, 50, true, false, 4),
         new Box(400, 350, 50, 50, true, false, 2.5),
         new Box(600, 50, 50, 50, true, false, 4),
     ],
+
     walls: [
         new Wall(0, 0, 200, 550, "rgb(190, 190, 190)"),
         new Wall(650, 0, 200, 550, "rgb(190, 190, 190)"),
@@ -84,7 +96,9 @@ var level3 = {
     ],
 
     waters: [],
+
     items: [],
+
     finishAreas: [
         new FinishArea(350, 550, 150, 50),
     ],
@@ -154,15 +168,18 @@ var level5_1UnlockWall = new Wall(300, 150, 50, 50, "lightblue", "aqua", false, 
 var level5_2UnlockWall = new Wall(350, 200, 50, 50, "lightblue", "auqa", false, false, true, 1)
 var level5_3UnlockWall = new Wall(450, 50, 50, 50, "plum", "orchid", false, false, true, 2)
 var level5 = {
+
     players: [
         new Player(150, 150, 50, 50),
     ],
+
     boxes: [
         new Box(50, 500, 50, 50, false, true, 2.5),
         new Box(500, 150, 50, 50, true, false, 2.5),
         new Box(500, 300, 50, 50, true, false, 2.5),
         new Box(500, 450, 50, 50, true, false, 2.5),
     ],
+
     walls: [
         // Side Walls
         new Wall(0, 550, 850, 50, "rgb(190, 190, 190)"),
@@ -198,14 +215,19 @@ var level5 = {
         new Wall(800, 50, 50, 500, "rgb(190, 190, 190)", "rgb(195, 195, 195)"),
         
     ],
+
     waters: [],
+
     items: [],
+
     finishAreas: [
         new FinishArea(750, 50, 50, 500),
     ],
+
     changeDirectionSquares: [
         new ChangeDirectionSquare(50, 50, 50, 50)
     ],
+
     unlocks: [
         new Unlock(150, 500, 50, 50, "rgb(180, 180, 180)", "lightblue", level5_1UnlockWall, "aqua", 1),
         new Unlock(150, 500, 50, 50, "rgb(180, 180, 180)", "lightblue", level5_2UnlockWall, "aqua", 1),
@@ -223,10 +245,12 @@ level6_teleporter1.otherTeleporter = level6_teleporter2
 var level6 = {
     players: [ 
         new Player(50, 50, 50, 50),
-],
+    ],
+
     boxes: [
         new Box(700, 500, 50, 50, true, false, 2),    
     ],
+
     walls: [
         new Wall(0, 0, 850, 50, "rgb(190, 190, 190)"),
         new Wall(0, 550, 850, 50, "rgb(190, 190, 190)"),
@@ -262,8 +286,11 @@ var level6 = {
         ///
         new Wall(750, 500, 50, 50, "rgb(190, 190, 190)"),
     ],
+
     waters: [],
+
     items: [],
+
     finishAreas: [
         new FinishArea(150, 50, 50, 500),
     ],
@@ -299,12 +326,14 @@ level7_teleporter1.otherTeleporter = level7_teleporter2
 var level7 = {
     players: [ 
         new Player(150, 50, 50, 50),
-],
+    ],
+
     boxes: [
         new Box(250, 100, 50, 50, true, false, 2.5),
         new Box(50, 250, 50, 50, true, false, 3),
         new Box(250, 400, 50, 50, true, false, 2.5),
     ],
+
     walls: [
         new Wall(0, 0, 50, 600, "rgb(190, 190, 190)"),
         new Wall(50, 0, 250, 50, "rgb(190, 190, 190)"),
@@ -356,28 +385,34 @@ var level7 = {
         new Wall(350, 0, 50, 50, "rgb(190, 190, 190)"),
         new Wall(350, 150, 100, 50, "rgb(190, 190, 190)"),
     ],
+
     waters: [
-        new Water(700, 100, 100, 500, "rgb(0, 162, 255)"),
-        new Water(650, 150, 50, 450, "rgb(0, 162, 255)"),
-        new Water(600, 250, 50, 350, "rgb(0, 162, 255)"),
+        new Water(700, 100, 100, 500, "rgb(0, 175, 235)"),
+        new Water(650, 150, 50, 450, "rgb(0, 175, 235)"),
+        new Water(600, 250, 50, 350, "rgb(0, 175, 235)"),
         ///
-        new Water(550, 300, 50, 300, "rgb(0, 162, 255)"),
-        new Water(500, 350, 50, 250, "rgb(0, 162, 255)"),
-        new Water(450, 450, 50, 150, "rgb(0, 162, 255)"),
-        new Water(400, 550, 50, 50, "rgb(0, 162, 255)"),      
+        new Water(550, 300, 50, 300, "rgb(0, 175, 235)"),
+        new Water(500, 350, 50, 250, "rgb(0, 175, 235)"),
+        new Water(450, 450, 50, 150, "rgb(0, 175, 235)"),
+        new Water(400, 550, 50, 50, "rgb(0, 175, 235)"),      
     ],
+
     items: [
         new Item(500, 0, 50, 50, 1),    
     ],
+
     finishAreas: [
         new FinishArea(800, 200, 50, 150),
     ],
+
     changeDirectionSquares: [],
+
     unlocks: [
         new Unlock(350, 450, 50, 50, "rgb(180, 180, 180)", "lightblue", level7_1UnlockWall, "aqua", 1),
         new Unlock(350, 450, 50, 50, "rgb(180, 180, 180)", "lightblue", level7_2UnlockWall, "aqua", 1),
         new Unlock(350, 450, 50, 50, "rgb(180, 180, 180)", "lightblue", level7_3UnlockWall, "aqua", 1),
     ],
+
     teleporters: [
     level7_teleporter1,
     level7_teleporter2
