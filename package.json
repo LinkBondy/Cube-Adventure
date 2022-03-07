@@ -1,0 +1,19 @@
+{
+  "name": "cube-adventure",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Cube Adventure.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LinkBondy/Cube-Adventure.git"
+  },
+  "author": "Link Bondy",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/LinkBondy/Cube-Adventure/issues"
+  },
+  "homepage": "https://github.com/LinkBondy/Cube-Adventure#readme"
+}
