@@ -1,15 +1,26 @@
 /*new levels
 
-var level_ = {
+var level# = {
     players: [ 
-        new Player(400, 0, 50, 50),
-],
-    boxes: [],
-    walls: [],
-    finishAreas: [
-        new FinishArea(0, 550, 850, 50),
+        new Player(#, #, #, #),
     ],
+    
+    enemies: [],
+
+    walls: [],
+
+    waters: [],
+
+    items: [],
+
+    rocks: [],
+
+    finishAreas: [
+        new FinishArea(#, #, #, #),
+    ],
+
     changeDirectionSquares: [],
+
     unlocks: [],
     teleporters: [],
 }
@@ -32,17 +43,17 @@ class ___ extends GameObject {
     }   
 };
 
-game.context.drawImage(_______, 0, 0, game._______.width, game._______.height, #, #, game._______.width, game._______.height)
+game.context.drawImage(images._______, 0, 0, images._______.width, images._______.height, #, #, images._______.width, images._______.height)
+game.DrawImage(_____, #, #)
+game.DrawImageAdvanced(_____, #, #, #, #, #, #, #, #)
 
 Cube templates
 Forest ""
-Sea "lightgreen", "yellowgreen", "rgb(255, 81, 73)"
 Other "rgb(255, 255, 132)", "coral", "rgb(255, 81, 73)"
 Player "lightgreen", "green", "aqua"
 
 Other
 game.context.save()
 game.context.scale(_, _)
-game.context.restore()  
-
-*/ 
+game.context.restore()
+//console.log('_______', this._______)*/  

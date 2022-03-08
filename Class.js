@@ -1,10 +1,12 @@
 "use strict";
 
-var forward_x = true
-var forward_y = true
-var block_speed = 5
+const { images } = require('./Images')
 
-var CubeStyle = {
+const {
+    GameMode, GameState
+} = require('./GameData')
+
+export var CubeStyle = {
     BlueCube: 0,
     Alien: 1,
     Lava: 2,
@@ -12,8 +14,8 @@ var CubeStyle = {
     Sad: 4,
 }
 
-class GameObject {
-    constructor(x, y, width, height, color1){
+export class GameObject {
+    constructor(x, y, width, height, color1) {
        this.x = x 
        this.y = y 
        this.width = width
@@ -72,7 +74,7 @@ class GameObject {
     
     intersectsAll(otherBox) {
         // Check if the left-top point is inside otherBox
-        if (this.left() == otherBox.left() && this.top() == otherBox.top()){ 
+        if (this.left() === otherBox.left() && this.top() === otherBox.top()) { 
          return true
         }
         return false
@@ -91,13 +93,15 @@ class GameObject {
     }
 };
 
-class Backround {
+export class Backround {
     constructor(color1) {
         this.color1 = color1
     }
     
-    Draw(){
-        if (game.gameState == GameState.Started && game.spriteStyle && game.gameMode != GameMode.Shop || game.gameState == GameState.Rules && game.spriteStyle && game.gameMode == GameMode.Freeplay || game.gameState == GameState.Paused) {
+    Draw() {
+        const { game } = require('./Cube Adventure')
+        
+        if (game.gameState === GameState.Started && game.spriteStyle && game.gameMode !== GameMode.Shop || game.gameState === GameState.Rules && game.spriteStyle && game.gameMode === GameMode.Freeplay || game.gameState === GameState.Paused && game.spriteStyle) {
             this.color1 = "rgb(100, 200, 100)"
         }
         else {
@@ -110,137 +114,225 @@ class Backround {
 
         /*for (var x = 0; x < 850; x = x + 50) {
             for (var y = 0; y < 600; y = y + 50) {
-                game.context.drawImage(game.grass, 0, 0, game.grass.width, game.grass.height, x, y, game.grass.width, game.grass.height) 
+                images.DrawImage(game.grass, x, y) 
             }
         }*/
     }
 
 };
 
-class Box extends GameObject {
-    constructor(x,y, width, height, movesLeftRight, movesUpDown, block_speed = 5) {
+export class Enemy extends GameObject {
+    constructor(x,y, width, height, movesLeft, movesRight, movesUp, movesDown, block_speed) {
         super(x, y, width, height)
         this.forward_x = true
         this.forward_y = false
         this.block_speed = block_speed
         this.original_x = x
         this.original_y = y
-        this.originalMovesLeftRight = movesLeftRight
-        this.originaMovesUpDown = movesUpDown
-        this.movesLeftRight = movesLeftRight
-        this.movesUpDown = movesUpDown
+        this.movesLeft = movesLeft
+        this.movesRight = movesRight
+        this.movesUp = movesUp
+        this.movesDown = movesDown
+        this.originalMovesLeft = this.movesLeft
+        this.originalMovesRight = this.movesRight
+        this.originalMovesUp = this.movesUp
+        this.originalMovesDown = this.movesDown
         this.original_block_speed = block_speed
         this.inWater = undefined
-
+        this.stopHole = false
     }
    
     reset() {
-       this.x = this.original_x 
-       this.y = this.original_y
-       this.movesLeftRight = this.originalMovesLeftRight
-       this.movesUpDown = this.originaMovesUpDown
-       this.block_speed = this.original_block_speed
-       this.inWater = undefined
+        this.x = this.original_x 
+        this.y = this.original_y
+        this.movesLeft = this.originalMovesLeft  
+        this.movesRight = this.originalMovesRight  
+        this.movesUp = this.originalMovesUp
+        this.movesDown = this.originalMovesDown 
+        this.block_speed = this.original_block_speed
+        this.inWater = undefined
     }  
-    update() {
+    update(delta) {
+        const { game } = require('./Cube Adventure')
+        const { levels } = require('./Levels')
         var oldX = this.x
         var oldY = this.y
         var intersectsWall = false
         var intersectsWater = false
-        var enemy = this
-   
-        if (this.movesLeftRight) {
-            if (this.forward_x)
-                this.x = this.x + this.block_speed
-            else 
-                this.x = this.x - this.block_speed
+        var self = this
+        
+        if (this.movesLeft && this.movesRight || this.movesUp && this.movesDown) {
+            var chooseMovement = Math.floor(Math.random() * 2 + 1)
+            //console.log(Math2)
+            if (chooseMovement === 1) {
+                if (this.movesLeft && this.movesRight)
+                this.movesLeft = false
 
-            if (this.x >= 850 - this.width)
-                this.forward_x = false
-            
-            if (this.x <= 0)
-                this.forward_x = true
+                if (this.movesUp && this.movesDown)
+                this.movesUp = false
+                    
+            }
+
+            if (chooseMovement === 2) {
+                if (this.movesLeft && this.movesRight)
+                this.movesRight = false
+                    
+                if (this.movesUp && this.movesDown)
+                this.movesDown = false
+                    
+            }
+        }
+        
+        if (this.movesLeft) {
+            this.x = this.x - this.block_speed * delta
         }
 
-        if (this.movesUpDown) {
-            if (this.forward_y)
-                this.y = this.y + this.block_speed
-            else 
-                this.y = this.y - this.block_speed
-
-            if (this.y >= 600 - this.height)
-                this.forward_y = false
-            
-            if (this.y <= 0)
-                this.forward_y = true
+        if (this.movesRight) { 
+            this.x = this.x + this.block_speed * delta
         }
-             
+
+        if (this.movesUp) {
+            this.y = this.y - this.block_speed * delta
+        }
+
+        if (this.movesDown) { 
+            this.y = this.y + this.block_speed * delta
+        }
         levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
-            if (changeDirectionSquare.intersectsAll(enemy)) {
-                enemy.movesLeftRight = !enemy.movesLeftRight
-                enemy.movesUpDown = !enemy.movesUpDown
+            if (changeDirectionSquare.intersectsAll(self) && changeDirectionSquare.allowDirectionChange) {
+                //console.log("hi")
+                if (changeDirectionSquare.changeLeft && changeDirectionSquare.changeRight || changeDirectionSquare.changeUp && changeDirectionSquare.changeDown) {
+                    var chooseMovementChange = Math.floor(Math.random() * 2 + 1)
+
+                    if (chooseMovementChange === 1) {
+                        if (changeDirectionSquare.changeLeft && changeDirectionSquare.changeRight)
+                        changeDirectionSquare.changeLeft = false
+
+                        if (changeDirectionSquare.changeUp && changeDirectionSquare.changeDown)
+                        changeDirectionSquare.changeUp = false
+                            
+                    }
+
+                    if (chooseMovementChange === 2) {
+                        if (changeDirectionSquare.changeLeft && changeDirectionSquare.changeRight)
+                        changeDirectionSquare.changeRight = false
+                            
+                        if (changeDirectionSquare.changeUp && changeDirectionSquare.changeDown)
+                        changeDirectionSquare.changeDown = false
+                            
+                    }
+                }
+                if (self.movesLeft || self.movesRight) {
+                    if (changeDirectionSquare.changeUp) {
+                        self.movesUp = true
+                    }
+
+                    if (changeDirectionSquare.changeDown) {
+                        self.movesDown = true
+                    }
+                    self.movesLeft = false
+                    self.movesRight = false
+                }
+                
+                else if (self.movesUp || self.movesDown) {
+                    if (changeDirectionSquare.changeLeft) {
+                        self.movesLeft = true
+                    }
+
+                    if (changeDirectionSquare.changeRight) {
+                        self.movesRight = true
+                    }
+                    self.movesUp = false
+                    self.movesDown = false
+                }
             }
         })
 
         levels[game.currentLevel].walls.forEach(function(wall) {
-            if (wall.intersects(enemy) && !wall.allowMovement) {
+            if (wall.intersects(self) && !wall.allowMovement) {
+                intersectsWall = true
+            }
+        })
+
+        levels[game.currentLevel].rocks.forEach(function(rock) {
+            if (!rock.allowMovement && rock.intersects(self)) {
+                intersectsWall = true
+            }
+        })
+
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (!hole.fullHole && hole.intersectsAll(self)) {
+                hole.currentIntersects = hole.currentIntersects + 1
+                self.stopHole = true
+                hole.stopEnemy = true
+            }
+
+            if (hole.stopEnemy && self.stopHole && !hole.intersects(self)) {
+                self.stopHole = false
+                hole.stopEnemy = false      
+            }
+
+            if (hole.fullHole && hole.intersects(self) && self.stopHole === false && hole.stopEnemy === false) {
                 intersectsWall = true
             }
         })
 
         levels[game.currentLevel].waters.forEach(function(water) {
-            if (water.intersects(enemy)) {   
+            if (water.intersects(self)) {   
                 intersectsWater = true
             }
         })
-        if (intersectsWater && (this.inWater === false || this.inWater === undefined)){
+        if (intersectsWater && (this.inWater === false || this.inWater === undefined)) {
             this.block_speed = this.block_speed / 2    
         }
 
-        if (!intersectsWater && this.inWater === true){
+        if (!intersectsWater && this.inWater === true) {
             this.block_speed = this.block_speed * 2    
         }
 
         this.inWater = intersectsWater
 
         levels[game.currentLevel].finishAreas.forEach(function(finishArea) {
-            if (finishArea.intersects(enemy)) {
+            if (finishArea.intersects(self)) {
                 intersectsWall = true
             }
         })
             
-        if (intersectsWall) {
+        if (this.movesRight && this.x >= 850 - this.width || this.movesLeft && this.x <= 0 || (this.movesLeft || this.movesRight) && intersectsWall) {
+            this.movesLeft = !this.movesLeft
+            this.movesRight = !this.movesRight
             this.x = oldX
+        }
+
+        if (this.movesDown && this.y >= 600 - this.height || this.movesUp && this.y <= 0 || (this.movesUp || this.movesDown) && intersectsWall) {
+            this.movesUp = !this.movesUp
+            this.movesDown = !this.movesDown
             this.y = oldY
-            if (this.movesLeftRight)
-                this.forward_x = !this.forward_x 
-            if (this.movesUpDown)
-                this.forward_y = !this.forward_y 
         }
     }
 
     Draw() {
+        const { game } = require('./Cube Adventure')
         if (game.spriteStyle) {
-            game.context.drawImage(game.RedCube, 0, 0, game.RedCube.width, game.RedCube.height, this.x, this.y, game.RedCube.width, game.RedCube.height)
+            images.DrawImage(images.RedCube, this.x, this.y)
         }
         
         else if (game.plasticStyle) {
-            game.context.drawImage(game.RedCubePlastic, 0, 0, game.RedCubePlastic.width, game.RedCubePlastic.height, this.x, this.y, game.RedCubePlastic.width, game.RedCubePlastic.height)
+            images.DrawImage(images.RedCubePlastic, this.x, this.y)
         }
     } 
 };
 
-class Player extends GameObject {
+export class Player extends GameObject {
     constructor(x,y, width, height) {
         super(x, y, width, height)
-        this.forward_x = true
-        this.forward_y = false
-        this.block_speed = block_speed
         this.original_x = x
         this.original_y = y
-        this.allowMovementWater = false
+        this.previousIntersectsHole = false
     }
     moveRight() {
+        const {game } = require ('./Cube Adventure')
+        const { levels } = require('./Levels')
         var oldX = this.x
         this.x = this.x + 50
         var intersectsWall = false
@@ -248,27 +340,64 @@ class Player extends GameObject {
         levels[game.currentLevel].walls.forEach(function(wall) {
             if (!wall.allowMovement && wall.intersects(self)) {
                 intersectsWall = true
+                levels[game.currentLevel].holes.forEach(function(hole) {
+                    hole.stopPlayer = true
+                })
+            }
+        })
+
+        levels[game.currentLevel].rocks.forEach(function(rock) {
+            if (!rock.allowMovement && rock.intersects(self)) {
+                intersectsWall = true
+                levels[game.currentLevel].holes.forEach(function(hole) {
+                    hole.stopPlayer = true
+                })
             }
         })
 
         levels[game.currentLevel].waters.forEach(function(water) {
-            if (!self.allowMovementWater && water.intersects(self)) {
-                intersectsWall = true
+            levels[game.currentLevel].items.forEach(function(item) {
+                if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
+                    intersectsWall = true
+                    levels[game.currentLevel].holes.forEach(function(hole) {
+                        hole.stopPlayer = true
+                    })
+                }
+            })
+            
+        })
+
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (hole.intersects(self) && !hole.fullHole && !hole.stopPlayer) {
+                hole.currentIntersects = hole.currentIntersects + 0.5
+                hole.previousIntersectsHole = true
+            }
+            if (!hole.intersects(self) && hole.previousIntersectsHole && !hole.stopPlayer) {
+                hole.currentIntersects = hole.currentIntersects + 0.5
+                hole.previousIntersectsHole = false
             }
         })
 
         levels[game.currentLevel].items.forEach(function(item) {
-            if (item.intersects(self) && item.typeNumber === 1) {
-                self.allowMovementWater = true     
+            if (item.intersects(self)) {
+                if (item.typeNumber === 1) {
+                    item.allowMovementWater = true
+                }
+                item.collected = true   
             }
         })
 
         if (intersectsWall) {
             this.x = oldX 
         }
-
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (hole.stopPlayer)
+                hole.stopPlayer = false
+        })
     }
     moveLeft() {
+        const { levels } = require('./Levels')
+        const {game } = require ('./Cube Adventure')
         var oldX = this.x
         this.x = this.x - 50
         var intersectsWall = false
@@ -276,26 +405,64 @@ class Player extends GameObject {
         levels[game.currentLevel].walls.forEach(function(wall) {
             if (!wall.allowMovement && wall.intersects(self)) {
                 intersectsWall = true
+                levels[game.currentLevel].holes.forEach(function(hole) {
+                    hole.stopPlayer = true
+                })
+            }
+        })
+
+        levels[game.currentLevel].rocks.forEach(function(rock) {
+            if (!rock.allowMovement && rock.intersects(self)) {
+                intersectsWall = true
+                levels[game.currentLevel].holes.forEach(function(hole) {
+                    hole.stopPlayer = true
+                })
             }
         })
 
         levels[game.currentLevel].waters.forEach(function(water) {
-            if (!self.allowMovementWater && water.intersects(self)) {
-                intersectsWall = true
+            levels[game.currentLevel].items.forEach(function(item) {
+                if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
+                    intersectsWall = true
+                    levels[game.currentLevel].holes.forEach(function(hole) {
+                        hole.stopPlayer = true
+                    })
+                }
+            })
+            
+        })
+
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (hole.intersects(self) && !hole.fullHole && !hole.stopPlayer) {
+                hole.currentIntersects = hole.currentIntersects + 0.5
+                hole.previousIntersectsHole = true
+            }
+            if (!hole.intersects(self) && hole.previousIntersectsHole && !hole.stopPlayer) {
+                hole.currentIntersects = hole.currentIntersects + 0.5
+                hole.previousIntersectsHole = false
             }
         })
 
         levels[game.currentLevel].items.forEach(function(item) {
-            if (item.intersects(self) && item.typeNumber === 1) {
-                self.allowMovementWater = true    
+            if (item.intersects(self)) {
+                if (item.typeNumber === 1) {
+                    item.allowMovementWater = true
+                }
+                item.collected = true   
             }
         })
 
         if (intersectsWall) {
             this.x = oldX 
-        } 
+        }
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (hole.stopPlayer)
+                hole.stopPlayer = false
+        })
     }
     moveDown() {
+        const { levels } = require('./Levels')
+        const {game } = require ('./Cube Adventure')
         var oldY = this.y
         this.y = this.y + 50
         var intersectsWall = false
@@ -303,26 +470,64 @@ class Player extends GameObject {
         levels[game.currentLevel].walls.forEach(function(wall) {
             if (!wall.allowMovement && wall.intersects(self)) {
                 intersectsWall = true
+                levels[game.currentLevel].holes.forEach(function(hole) {
+                    hole.stopPlayer = true
+                })
+            }
+        })
+
+        levels[game.currentLevel].rocks.forEach(function(rock) {
+            if (!rock.allowMovement && rock.intersects(self)) {
+                intersectsWall = true
+                levels[game.currentLevel].holes.forEach(function(hole) {
+                    hole.stopPlayer = true
+                })
             }
         })
 
         levels[game.currentLevel].waters.forEach(function(water) {
-            if (!self.allowMovementWater && water.intersects(self)) {
-                intersectsWall = true
+            levels[game.currentLevel].items.forEach(function(item) {
+                if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
+                    intersectsWall = true
+                    levels[game.currentLevel].holes.forEach(function(hole) {
+                        hole.stopPlayer = true
+                    })
+                }
+            })
+            
+        })
+
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (hole.intersects(self) && !hole.fullHole && !hole.stopPlayer) {
+                hole.currentIntersects = hole.currentIntersects + 0.5
+                hole.previousIntersectsHole = true
+            }
+            if (!hole.intersects(self) && hole.previousIntersectsHole && !hole.stopPlayer) {
+                hole.currentIntersects = hole.currentIntersects + 0.5
+                hole.previousIntersectsHole = false
             }
         })
 
         levels[game.currentLevel].items.forEach(function(item) {
-            if (item.intersects(self) && item.typeNumber === 1) {
-                this.allowMovementWater = true    
+            if (item.intersects(self)) {
+                if (item.typeNumber === 1) {
+                    item.allowMovementWater = true
+                }
+                item.collected = true   
             }
         })
 
         if (intersectsWall) {
             this.y = oldY
-        } 
+        }
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (hole.stopPlayer)
+                hole.stopPlayer = false
+        })
     }
     moveUp() {
+        const { levels } = require('./Levels')
+        const {game } = require ('./Cube Adventure')
         var oldY = this.y
         this.y = this.y - 50
         var intersectsWall = false
@@ -330,122 +535,165 @@ class Player extends GameObject {
         levels[game.currentLevel].walls.forEach(function(wall) {
             if (!wall.allowMovement && wall.intersects(self)) {
                 intersectsWall = true
+                levels[game.currentLevel].holes.forEach(function(hole) {
+                    hole.stopPlayer = true
+                })
+            }
+        })
+
+        levels[game.currentLevel].rocks.forEach(function(rock) {
+            if (!rock.allowMovement && rock.intersects(self)) {
+                intersectsWall = true
+                levels[game.currentLevel].holes.forEach(function(hole) {
+                    hole.stopPlayer = true
+                })
             }
         })
 
         levels[game.currentLevel].waters.forEach(function(water) {
-            if (!self.allowMovementWater && water.intersects(self)) {
-                intersectsWall = true
+            levels[game.currentLevel].items.forEach(function(item) {
+                if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
+                    intersectsWall = true
+                    levels[game.currentLevel].holes.forEach(function(hole) {
+                        hole.stopPlayer = true
+                    })
+                }
+            })
+            
+        })
+
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (hole.intersects(self) && !hole.fullHole && !hole.stopPlayer) {
+                hole.currentIntersects = hole.currentIntersects + 0.5
+                hole.previousIntersectsHole = true
+            }
+            if (!hole.intersects(self) && hole.previousIntersectsHole && !hole.stopPlayer) {
+                hole.currentIntersects = hole.currentIntersects + 0.5
+                hole.previousIntersectsHole = false
             }
         })
 
         levels[game.currentLevel].items.forEach(function(item) {
-            if (item.intersects(self) && item.typeNumber === 1) {
-                self.allowMovementWater = true    
+            if (item.intersects(self)) {
+                if (item.typeNumber === 1) {
+                    item.allowMovementWater = true
+                }
+                item.collected = true   
             }
         })
 
         if (intersectsWall) {
-            this.y = oldY
-        } 
+            this.y = oldY 
+        }
+        levels[game.currentLevel].holes.forEach(function(hole) {
+            if (hole.stopPlayer)
+                hole.stopPlayer = false
+        })
     }
     reset() {
         this.x = this.original_x 
         this.y = this.original_y
-        this.allowMovementWater = false
     }   
     update() {
 
     }   
     Draw() {
+        const { game } = require('./Cube Adventure')
         if (Player.CubeStyle === CubeStyle.BlueCube && game.spriteStyle) {
-            game.context.drawImage(game.BlueCube, 0, 0, game.BlueCube.width, game.BlueCube.height, this.x, this.y, game.BlueCube.width, game.BlueCube.height)
+            images.DrawImage(images.BlueCube, this.x, this.y)
         }
         
         else if (Player.CubeStyle === CubeStyle.Alien && game.spriteStyle) {
-            game.context.drawImage(game.BlueCubeAlien, 0, 0, game.BlueCubeAlien.width, game.BlueCubeAlien.height, this.x, this.y, game.BlueCubeAlien.width, game.BlueCubeAlien.height)
+            images.DrawImage(images.BlueCubeAlien, this.x, this.y)
         }
 
         else if (Player.CubeStyle === CubeStyle.Lava && game.spriteStyle) {
-            game.context.drawImage(game.BlueCubeLava, 0, 0, game.BlueCubeLava.width, game.BlueCubeLava.height, this.x, this.y, game.BlueCubeLava.width, game.BlueCubeLava.height)
+            images.DrawImage(images.BlueCubeLava, this.x, this.y)
         }
 
         else if (Player.CubeStyle === CubeStyle.Wooden && game.spriteStyle) {
-            game.context.drawImage(game.BlueCubeWooden, 0, 0, game.BlueCubeWooden.width, game.BlueCubeWooden.height, this.x, this.y, game.BlueCubeWooden.width, game.BlueCubeWooden.height)
+            images.DrawImage(images.BlueCubeWooden, this.x, this.y)
         }
 
         else if (Player.CubeStyle === CubeStyle.Sad && game.spriteStyle) {
-            game.context.drawImage(game.BlueCubeSad, 0, 0, game.BlueCubeSad.width, game.BlueCubeSad.height, this.x, this.y, game.BlueCubeSad.width, game.BlueCubeSad.height)
+            images.DrawImage(images.BlueCubeSad, this.x, this.y)
         }
 
         else if (Player.CubeStyle === CubeStyle.BlueCube && game.plasticStyle) {
-            game.context.drawImage(game.BlueCubePlastic, 0, 0, game.BlueCubePlastic.width, game.BlueCubePlastic.height, this.x, this.y, game.BlueCubePlastic.width, game.BlueCubePlastic.height)
+            images.DrawImage(images.BlueCubePlastic, this.x, this.y)
         }
         
         else if (Player.CubeStyle === CubeStyle.Alien && game.plasticStyle) {
-            game.context.drawImage(game.BlueCubeAlienPlastic, 0, 0, game.BlueCubeAlienPlastic.width, game.BlueCubeAlienPlastic.height, this.x, this.y, game.BlueCubeAlienPlastic.width, game.BlueCubeAlienPlastic.height)
+            images.DrawImage(images.BlueCubeAlienPlastic, this.x, this.y)        
         }
 
         else if (Player.CubeStyle === CubeStyle.Lava && game.plasticStyle) {
-            game.context.drawImage(game.BlueCubeLavaPlastic, 0, 0, game.BlueCubeLavaPlastic.width, game.BlueCubeLavaPlastic.height, this.x, this.y, game.BlueCubeLavaPlastic.width, game.BlueCubeLavaPlastic.height)
+            images.DrawImage(images.BlueCubeLavaPlastic, this.x, this.y)        
         }
 
         else if (Player.CubeStyle === CubeStyle.Wooden && game.plasticStyle) {
-            game.context.drawImage(game.BlueCubeSadPlastic, 0, 0, game.BlueCubeSadPlastic.width, game.BlueCubeSadPlastic.height, this.x, this.y, game.BlueCubeSadPlastic.width, game.BlueCubeSadPlastic.height)
+            images.DrawImage(images.BlueCubeWoodenPlastic, this.x, this.y)        
+        }
+
+        else if (Player.CubeStyle === CubeStyle.Sad && game.plasticStyle) {
+            images.DrawImage(images.BlueCubeSadPlastic, this.x, this.y)        
         }
     }
 };
 Player.CubeStyle = CubeStyle.BlueCube
 
-class Wall extends GameObject {
-    constructor(x, y, width, height, color1, color2, allowMovement, invisibleWall, drawLast, colorNumber){
+export class Wall extends GameObject {
+    constructor(x, y, width, height, color1, allowMovement, invisibleWall) {
         super(x, y, width, height, color1)
-        this.color2 = color2
         this.allowMovement = allowMovement
-        this.drawLast = drawLast
         this.invisibleWall = invisibleWall
-        this.colorNumber = colorNumber
         this.randomList = Array(100)
         for (var i = 0; i < 100; i++) {
             this.randomList[i] = Math.floor(Math.random() * 1000)
         }
     }
 
-    Draw(){
-        var self = this    
-        if (this.allowMovement && game.plasticStyle) {
-            game.context.fillStyle = this.color2
-            game.context.fillRect(this.x, this.y, this.width, this.height)
+    Draw() {
+        const { game } = require('./Cube Adventure')
+        if (this.invisibleWall && game.spriteStyle) {
+            var i = 0; 
+            for (var x = this.left(); x < this.right(); x = x + 50) {
+                for (var y = this.top(); y < this.bottom(); y = y + 50) {
+                    i++
+                    game.context.save()
+                    game.context.translate(x - 2, y - 2)
+                    ///
+                    if (this.randomList[i] % 15 === 0)
+                    images.DrawImage(images.InvisibleWallV2, 0,  0)
+                    else 
+                    images.DrawImage(images.InvisibleWall, 0,  0)
+                    game.context.restore()
+                }
+            }            
          
-         } else if (this.invisibleWall) {
-             game.context.drawImage(game.InvisibleWall, 0, 0, game.InvisibleWall.width, game.InvisibleWall.height, this.x - 2,  this.y - 2, game.InvisibleWall.width, game.InvisibleWall.height)            
-         
-        } else if (game.spriteStyle && !this.allowMovement && this.colorNumber !== 1 && this.colorNumber !== 2) {
+        } else if (game.spriteStyle && !this.invisibleWall) {
              var i = 0; 
              for (var x = this.left(); x < this.right(); x = x + 50) {
                  for (var y = this.top(); y < this.bottom(); y = y + 50) {
-                     i++
-
+                    i++
+                    ///
                     game.context.save()
-
                     game.context.translate(x - 2, y - 2)
-                    //if (this.randomList[i] % 2 == 0)
+                    //if (this.randomList[i] % 2 === 0)
                         //game.context.rotate(90 * Math.PI / 180)
-                        
-                    
                     if (this.randomList[i] % 40 === 0)
-                        game.context.drawImage(game.WallGrassV3, 0, 0, game.WallGrassV3.width, game.WallGrassV3.height, 0, 0, game.WallGrassV3.width, game.WallGrassV3.height) 
+                       images.DrawImage(images.WallGrassV3, 0, 0) 
                      
                     else if (this.randomList[i] % 9 === 0)
-                        game.context.drawImage(game.WallGrassV2, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height, 0, 0, game.WallGrassV2.width, game.WallGrassV2.height) 
+                       images.DrawImage(images.WallGrassV2, 0, 0) 
                     
                     else if (this.randomList[i] % 998 === 0 && game.gameMode === GameMode.StoryMode) {
-                        game.context.drawImage(game.WallGrassTree, 0, 0, game.WallGrassTree.width, game.WallGrassTree.height, 0, 0, game.WallGrassTree.width, game.WallGrassTree.height)
-                        game.blueCubeWoodenLock = false
+                       images.DrawImage(images.WallGrassTree, 0, 0)
+                        images.blueCubeWoodenLock = false
                     }
  
                     else
-                        game.context.drawImage(game.WallGrassV1, 0, 0, game.WallGrassV1.width, game.WallGrassV1.height, 0, 0, game.WallGrassV1.width, game.WallGrassV1.height) 
+                       images.DrawImage(images.WallGrassV1, 0, 0) 
 
 
                     game.context.restore()
@@ -453,47 +701,22 @@ class Wall extends GameObject {
                 }
             }
             
-            } else if (game.spriteStyle) {
-
-            if (this.colorNumber === 1) {
-                levels[game.currentLevel].unlocks.forEach(function(unlock) {
-                    if (unlock.colorNumber === 1) {
-                        if (unlock.activated) {
-                            game.context.drawImage(game.UnlockedRockBlue, 0, 0, game.UnlockedRockBlue.width, game.UnlockedRockBlue.height, self.x, self.y, game.UnlockedRockBlue.width, game.UnlockedRockBlue.height)
-                        
-                        } else if (!unlock.activated) {
-                            game.context.drawImage(game.UnlockRockBlue, 0, 0, game.UnlockRockBlue.width, game.UnlockRockBlue.height, self.x, self.y, game.UnlockRockBlue.width, game.UnlockRockBlue.height)    
-                        }
-                    }
-                })
-            } else if (this.colorNumber === 2) {
-                levels[game.currentLevel].unlocks.forEach(function(unlock) {
-                    if (unlock.colorNumber === 2) {
-                        if (unlock.activated) {
-                            game.context.drawImage(game.UnlockedRockPurple, 0, 0, game.UnlockedRockPurple.width, game.UnlockedRockPurple.height, self.x, self.y, game.UnlockedRockPurple.width, game.UnlockedRockPurple.height)    
-                    
-                        } else if (!unlock.activated) {
-                            game.context.drawImage(game.UnlockRockPurple, 0, 0, game.UnlockRockPurple.width, game.UnlockRockPurple.height, self.x, self.y, game.UnlockRockPurple.width, game.UnlockRockPurple.height)    
-                        }
-                    }
-                })
-            }       
             } else if (game.plasticStyle) {
                 game.context.fillStyle = this.color1
                 game.context.fillRect(this.x, this.y, this.width, this.height)
-             
-        } 
+            } 
  
     }
 };
 
-class Water extends GameObject {
-    constructor(x, y, width, height, color1){
+export class Water extends GameObject {
+    constructor(x, y, width, height, color1) {
         super(x, y, width, height, color1)
         this.spriteX = 0
     }
 
     Draw() {
+        const { game } = require('./Cube Adventure')
         if (game.spriteStyle === true) {
             if (game.gameState === GameState.Started) {
                 var numMilliseconds = new Date().getTime()
@@ -501,11 +724,9 @@ class Water extends GameObject {
                     this.spriteX = (this.spriteX + 54) % (54*49)
                 }
             }
-            
-
             for (var x = this.left(); x < this.right(); x = x + 50) {
                 for (var y = this.top(); y < this.bottom(); y = y + 50) {
-                    game.context.drawImage(game.Water_Medium2, this.spriteX, 0, 54, game.Water_Medium2.height, x, y, 54, game.Water_Medium2.height)
+                    game.context.drawImage(images.Water_Medium2, this.spriteX, 0, 54, images.Water_Medium2.height, x, y, 54, images.Water_Medium2.height)
                 }
             }
         }
@@ -522,88 +743,191 @@ class Water extends GameObject {
     } 
 };
 
-class Item extends GameObject {
-    constructor(x, y, width, height, typeNumber){
+export class Item extends GameObject {
+    constructor(x, y, width, height, typeNumber) {
         super(x, y, width, height)
         this.typeNumber = typeNumber
+        this.allowMovementWater = false
+        this.collected = false
     }
 
     Draw() {
-    var self = this
-    levels[game.currentLevel].players.forEach(function(player) {
-        if (self.typeNumber === 1 && !player.allowMovementWater && game.spriteStyle) {    
-            game.context.drawImage(game.LifeJacket, 0, 0, game.LifeJacket.width, game.LifeJacket.height, self.x, self.y, game.LifeJacket.width, game.LifeJacket.height)     
+        const { game } = require('./Cube Adventure')
+        if (this.typeNumber === 1 && !this.collected && game.spriteStyle) {    
+           images.DrawImage(images.LifeJacket, this.x, this.y)     
         }
 
-        if (self.typeNumber === 1 && !player.allowMovementWater && game.plasticStyle) {    
-            game.context.drawImage(game.LifeJacketPlastic, 0, 0, game.LifeJacketPlastic.width, game.LifeJacketPlastic.height, self.x, self.y, game.LifeJacketPlastic.width, game.LifeJacketPlastic.height)     
+        if (this.typeNumber === 1 && !this.collected && game.plasticStyle) {    
+           images.DrawImage(images.LifeJacketPlastic, this.x, this.y)     
         }
-    })
+
+        if (this.typeNumber === 2 && !this.collected && game.spriteStyle && game.gameMode === GameMode.StoryMode && images.blueCubeAlienLock) {    
+           images.DrawImage(images.Three_Bead, this.x, this.y)     
+        }
+
+        if (this.typeNumber === 2 && !this.collected && game.plasticStyle && game.gameMode === GameMode.StoryMode && images.blueCubeAlienLock) {    
+           images.DrawImage(images.Three_Bead_Plastic, this.x, this.y)     
+        }
     }
     
-    Update() {
-        
-    }  
+    update() {
+        const { game } = require('./Cube Adventure')
+        if (this.typeNumber === 2 && this.collected && game.gameMode === GameMode.StoryMode) {    
+            images.blueCubeAlienLock = false     
+        }
+    }
+    
+    reset() {
+        this.allowMovementWater = false
+        this.collected = false
+    }
 };
 
-class ChangeDirectionSquare extends GameObject {
-    constructor(x, y, width, height){
+export class ChangeDirectionSquare extends GameObject {
+    constructor(x, y, width, height, changeLeft, changeRight, changeUp, changeDown, allowDirectionChange, title) {
         super(x, y, width, height, "red")
+        this.color2 = "orange"
+        this.allowDirectionChangeOld = allowDirectionChange
+        this.allowDirectionChange = allowDirectionChange
+        this.changeLeft = changeLeft
+        this.changeRight = changeRight
+        this.changeUp = changeUp
+        this.changeDown = changeDown
+        this.title = title
     }
     Draw() {
+        const { game } = require('./Cube Adventure')
+        if (!this.allowDirectionChange)
+        game.context.fillStyle = this.color2
+
+        else 
         game.context.fillStyle = this.color1
         game.context.fillRect(this.x, this.y, this.width, this.height)
     }
+    reset() {
+        this.allowDirectionChange = this.allowDirectionChangeOld
+    }
 };
 
-class Unlock extends GameObject {
-    constructor(x, y, width, height, color1, color2, unlockWall, activatedcolor, colorNumber){
+export class Rock extends GameObject {
+    constructor(x, y, width, height, color1, color2, title, allowMovement, colorNumber, typeNumber) {
         super(x, y, width, height, color1)
         this.color2 = color2
-        this.unlockWall = unlockWall
+        this.title = title
+        this.allowMovement = allowMovement
+        this.colorNumber = colorNumber
+        this.typeNumber = typeNumber
+    }
+
+        Draw() {
+            const { game } = require('./Cube Adventure')
+            const { levels } = require('./Levels')
+            var self = this
+            if (game.spriteStyle && this.typeNumber === 1) {
+                if (this.colorNumber === 1) {
+                    levels[game.currentLevel].unlocks.forEach(function(unlock) {
+                        if (unlock.activated && unlock.title === self.title) {
+                           images.DrawImage(images.UnlockedRockBlue, self.x, self.y)
+                            
+                        } else if (!unlock.activated && unlock.title === self.title) {
+                           images.DrawImage(images.UnlockRockBlue, self.x, self.y)    
+                        }
+                    })
+                } else if (this.colorNumber === 2) {
+                    levels[game.currentLevel].unlocks.forEach(function(unlock) {
+                        if (unlock.activated && unlock.title === self.title) {
+                           images.DrawImage(images.UnlockedRockPurple, self.x, self.y)    
+                        
+                        } else if (!unlock.activated && unlock.title === self.title) {
+                           images.DrawImage(images.UnlockRockPurple, self.x, self.y)    
+                        }
+                    })
+            }       
+            } else if (game.plasticStyle && this.typeNumber === 1) {
+                levels[game.currentLevel].unlocks.forEach(function(unlock) { 
+                    if (!unlock.activated && unlock.title === self.title)
+                        game.context.fillStyle = self.color1
+
+                    if (unlock.activated && unlock.title === self.title)
+                        game.context.fillStyle = self.color2
+                })
+                game.context.fillRect(this.x, this.y, this.width, this.height)
+                 
+            }
+     
+        }
+        
+    
+};
+
+export class Unlock extends GameObject {
+    constructor(x, y, width, height, color1, color2, activatedcolor, title, colorNumber) {
+        super(x, y, width, height, color1)
+        this.color2 = color2
         this.activatedcolor = activatedcolor
+        this.title = title
         this.colorNumber = colorNumber
     }
 
     update() {
+       const { game } = require('./Cube Adventure')
+       const { levels } = require('./Levels')
        var self = this
        levels[game.currentLevel].players.forEach(function(player) {
             if (self.intersectsAll(player)) {
-                self.unlockWall.allowMovement = true
+                levels[game.currentLevel].rocks.forEach(function(rock) {
+                    if (self.title === rock.title) {
+                        rock.allowMovement = true
+                    }
+                })
+                levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
+                    if (self.title === changeDirectionSquare.title) {
+                        changeDirectionSquare.allowDirectionChange = true
+                    }
+                })
                 self.activated = true
             }
         })
 
-       levels[game.currentLevel].boxes.forEach(function(box) {
-            if (self.intersectsAll(box)) {
-                self.unlockWall.allowMovement = true
+       levels[game.currentLevel].enemies.forEach(function(enemy) {
+            if (self.intersectsAll(enemy)) {
+                levels[game.currentLevel].rocks.forEach(function(rock) {
+                    if (self.title === rock.title) {
+                        rock.allowMovement = true
+                    }
+                })
+                levels[game.currentLevel].changeDirectionSquares.forEach(function(changeDirectionSquare) {
+                    if (self.title === changeDirectionSquare.title) {
+                        changeDirectionSquare.allowDirectionChange = true
+                    }
+                })
                 self.activated = true
             }
         })
     }
 
-    Draw(){
-        if (game.spriteStyle == true) {
-            if (this.colorNumber == 1) {
+    Draw() {
+        const { game } = require('./Cube Adventure')
+        if (game.spriteStyle === true) {
+            if (this.colorNumber === 1) {
             
                 if (this.activated) {
-                    game.context.drawImage(game.SwitchW1ActivatedBlue, 0, 0, game.SwitchW1ActivatedBlue.width, game.SwitchW1ActivatedBlue.height, this.x, this.y, game.SwitchW1ActivatedBlue.width, game.SwitchW1ActivatedBlue.height)
+                   images.DrawImage(images.SwitchW1ActivatedBlue, this.x, this.y) 
                 
                 } else {
-                    game.context.drawImage(game.SwitchW1Blue, 0, 0, game.SwitchW1Blue.width, game.SwitchW1Blue.height, this.x, this.y, game.SwitchW1Blue.width, game.SwitchW1Blue.height)    
+                   images.DrawImage(images.SwitchW1Blue, this.x, this.y) 
                 }
             
-            } else if (this.colorNumber == 2) {
+            } else if (this.colorNumber === 2) {
             
                 if (this.activated) {
-                    game.context.drawImage(game.SwitchW1ActivatedPurple, 0, 0, game.SwitchW1ActivatedPurple.width, game.SwitchW1ActivatedPurple.height, this.x, this.y, game.SwitchW1ActivatedPurple.width, game.SwitchW1ActivatedPurple.height)
-                
+                   images.DrawImage(images.SwitchW1ActivatedPurple, this.x, this.y) 
                 } else {
-                    game.context.drawImage(game.SwitchW1Purple, 0, 0, game.SwitchW1Purple.width, game.SwitchW1Purple.height, this.x, this.y, game.SwitchW1Purple.width, game.SwitchW1Purple.height)    
+                   images.DrawImage(images.SwitchW1Purple, this.x, this.y)  
                 }
             }            
         
-        } else if (game.plasticStyle == true) {
+        } else if (game.plasticStyle === true) {
             game.context.fillStyle = this.color1
             game.context.fillRect(this.x, this.y, this.width, this.height)
             if (this.activated) {
@@ -617,8 +941,8 @@ class Unlock extends GameObject {
     }
 };
 
-class Teleporter extends GameObject {
-    constructor(x, y, otherTeleporter, width, height, colorNumber){
+export class Teleporter extends GameObject {
+    constructor(x, y, otherTeleporter, width, height, colorNumber) {
         super(x, y, width, height)
         this.colorNumber = colorNumber
         this.stop = false
@@ -626,6 +950,9 @@ class Teleporter extends GameObject {
     }
 
     update() {
+       const { levels } = require('./Levels')
+       const { game } = require('./Cube Adventure')
+
        var self = this
        levels[game.currentLevel].players.forEach(function(player) {
             if (self.intersectsAll(player) && !self.stop) {   
@@ -640,206 +967,90 @@ class Teleporter extends GameObject {
         })
     }
 
-    Draw(){
+    Draw() {
+        const { game } = require('./Cube Adventure')
+        const { levels } = require('./Levels')
         if (game.spriteStyle) {
-            if (this.colorNumber == 1) {
-                game.context.drawImage(game.TeleporterTomatoSprite, 0, 0, game.TeleporterTomatoSprite.width, game.TeleporterTomatoSprite.height, this.x, this.y, game.TeleporterTomatoSprite.width, game.TeleporterTomatoSprite.height)   
+            if (this.colorNumber === 1) {
+               images.DrawImage(images.TeleporterTomatoSprite, this.x, this.y)   
             }
 
-            if (this.colorNumber == 2) {
-                game.context.drawImage(game.TeleporterPurpleSprite, 0, 0, game.TeleporterPurpleSprite.width, game.TeleporterPurpleSprite.height, this.x, this.y, game.TeleporterPurpleSprite.width, game.TeleporterPurpleSprite.height)   
+            if (this.colorNumber === 2) {
+               images.DrawImage(images.TeleporterPurpleSprite, this.x, this.y)  
             }
         }
 
         else if (game.plasticStyle) {
-            if (this.colorNumber == 1) {
-                game.context.drawImage(game.TeleporterTomato, 0, 0, game.TeleporterTomato.width, game.TeleporterTomato.height, this.x, this.y, game.TeleporterTomato.width, game.TeleporterTomato.height)   
+            if (this.colorNumber === 1) {
+               images.DrawImage(images.TeleporterTomato, this.x, this.y) 
             }
 
-            if (this.colorNumber == 2) {
-                game.context.drawImage(game.TeleporterPurple, 0, 0, game.TeleporterPurple.width, game.TeleporterPurple.height, this.x, this.y, game.TeleporterPurple.width, game.TeleporterPurple.height)   
+            if (this.colorNumber === 2) {
+               images.DrawImage(images.TeleporterPurple, this.x, this.y) 
             }
 
         }
     }   
 };
 
-class FinishArea extends GameObject {
-    constructor(x, y, width, height){
+export class Hole extends GameObject {
+    constructor(x, y, width, height, fullHole, currentIntersects, maxIntersects) {
+        super(x, y, width, height)
+        this.fullHole = fullHole
+        this.currentIntersects = currentIntersects
+        this.maxIntersects = maxIntersects
+        this.previousIntersectsHole = false
+        this.stopPlayer = false
+        this.stopEnemy = false
+        this.DrawingX = undefined
+    }
+
+    Draw() {
+        const { game } = require('./Cube Adventure')
+        const { levels } = require('./Levels')
+        if (this.currentIntersects === 0 ) {
+            this.DrawingX = 0
+        }
+
+        else if (this.currentIntersects < this.maxIntersects) {
+            this.DrawingX = 50 
+        }
+
+        else if (this.fullHole) {
+            this.DrawingX = 100  
+        }
+
+        if (game.spriteStyle) {
+            game.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+        }
+
+        if (game.plasticStyle) {
+            game.context.drawImage(images.HolePlastic, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+     
+        }
+
+    }
+
+    update() {
+        if (this.currentIntersects >= this.maxIntersects) {
+            this.fullHole = true
+        }
+    }
+
+    reset() {
+        this.fullHole = false
+        this.currentIntersects = 0
+    }
+}
+
+export class FinishArea extends GameObject {
+    constructor(x, y, width, height) {
         super(x, y, width, height, "pink")
     }
     
-    Draw(){
+    Draw() {
+        const { game } = require('./Cube Adventure')
         game.context.fillStyle = this.color1;
         game.context.fillRect(this.x, this.y, this.width, this.height)
     }
 };
-
-class MenuItem {
-    constructor(title, value, color, action) {
-        this.title = title
-        this.value = value
-        this.color = color
-        this.action = action
-    }
-}
-
-class Menu {
-    constructor(menuItems) {
-        this.menuItems = menuItems;
-        this.selectedIndex = 0
-    }
-    moveUp() {
-        if (this.selectedIndex !== 0){
-            this.selectedIndex = this.selectedIndex - 1
-        }  
-    }
-
-    moveDown() {
-        const numMenuItems = this.menuItems.length
-        if (this.selectedIndex !== numMenuItems - 1){
-            this.selectedIndex = this.selectedIndex + 1
-        }  
-    }
-
-    selected() {
-        var menuItem = this.menuItems[this.selectedIndex]
-        menuItem.action()
-    }
-
-    Draw() {
-        var self = this
-        const numMenuItems = this.menuItems.length
-        const totalHeight = 600
-        const totalHeight2 = 400
-        const heightPerItem = totalHeight / numMenuItems
-        const heightPerItem2 = totalHeight2 / numMenuItems
-        game.context.font = '115px Arial'
-        this.menuItems.forEach(function(menuItem, index) {
-            if (index === self.selectedIndex && game.gameState !== GameState.Lost && game.gameState !== GameState.WonStage) {
-                game.context.fillStyle = "rgba(128, 128, 128, 0.8)";
-                game.context.fillRect(0, heightPerItem * index, 850, heightPerItem)
-                game.selectorY = heightPerItem * index
-                if (game.gameState === GameState.Menu) {
-                    game.selectorY2 = heightPerItem * index + heightPerItem
-                }
-
-                if (game.gameState === GameState.Paused && game.gameMode === GameMode.StoryMode) {
-                    game.selectorY2 = heightPerItem * index + heightPerItem
-                }
-                
-                if (game.gameState === GameState.Rules && game.gameMode === GameMode.Shop) {
-                    game.selectorY2 = heightPerItem * index + heightPerItem
-                }
-            }
-            else if (index === self.selectedIndex && game.gameState === GameState.Lost || index === self.selectedIndex && game.gameState === GameState.WonStage) {
-                game.context.fillStyle = "rgba(128, 128, 128, 0.8)";
-                game.context.fillRect(0, 200 + heightPerItem2 * index, 850, heightPerItem2)
-                game.selectorY = 200 + heightPerItem2 * index
-                game.selectorY2 = 350 + heightPerItem2 * index
-            }
-        
-            ///
-
-            if (game.gameState === GameState.Lost) {
-                game.context.font = '115px Arial'
-                game.context.fillStyle = menuItem.color
-                game.context.fillText(menuItem.title, 10, 290 + heightPerItem2 * index)
-            }
-
-            else if (game.gameState === GameState.WonStage) {
-                game.context.font = '115px Arial'
-                game.context.fillStyle = menuItem.color
-                game.context.fillText(menuItem.title, 10, 290 + heightPerItem2 * index)
-            }
-            
-            else {
-                game.context.font = '115px Arial'
-                game.context.fillStyle = menuItem.color
-                game.context.fillText(menuItem.title, 10, 90 + heightPerItem * index)
-            }   
-        })
-    }
-}
-
-var MainMenu = new Menu([
-    new MenuItem("Story Mode", 1, "rgb(0, 166, 255)", function() {
-        game.gameState = GameState.Rules
-        game.gameMode = GameMode.StoryMode
-    }),
-    new MenuItem("Freeplay", 2, "rgb(0, 132, 216)", function() {
-        game.gameState = GameState.Rules
-        game.gameMode = GameMode.Freeplay
-        game.oldLevel = game.currentLevel
-    }),
-    new MenuItem("Shop", 3, "rgb(0, 67, 190)", function() {
-        game.gameState = GameState.Rules
-        game.gameMode = GameMode.Shop
-    }),
-    new MenuItem("Items Info", 4, "rgb(0, 0, 139)", function() {
-        game.gameState = GameState.Rules
-        game.gameMode = GameMode.ItemsInfo
-     }),
-    /*new MenuItem("Settings", 5, "darkblue", function() {
-        game.gameState = GameState.Rules
-        game.gameMode = GameMode.Settings
-    })*/
-])
-
-var ShopMenu = new Menu([
-    new MenuItem("Player", 1, "lightcoral", function() {
-        game.gameState = GameState.Started
-        game.shopMode = ShopMode.Player
-    }),
-    new MenuItem("Background", 2, "gold", function() {
-        game.gameState = GameState.Started
-        game.shopMode =  ShopMode.Backround
-    }),
-])
-   
-var LoseMenu = new Menu([
-    new MenuItem("Retry", 1, "violet", function() {
-        game.SetGameState(GameState.Started)
-        game.Restart()
-        game.loseCounterStop = false
-    }),
-    new MenuItem("Return to menu", 2, "hotpink", function(){
-        game.Restart()
-        game.gameState = GameState.Menu
-        game.loseCounterStop = false
-    })
-])
-            
-var WinMenu = new Menu([
-    new MenuItem("Continue", 1, "rgb(255, 0, 100)", function(){
-        game.NextLevel()
-
-    }),
-    new MenuItem("Return to menu", 2, "deeppink", function(){
-        game.NextLevel()
-        game.gameState = GameState.Menu
-    }),               
-])
-
-var PauseMenu = new Menu([
-    new MenuItem("Resume", 1, "rgb(255, 0, 86)", function(){
-        game.SetGameState(GameState.Started)
-
-    }),
-    new MenuItem("Retry", 2, "rgb(255, 105, 0)", function() {
-        game.SetGameState(GameState.Started)
-        game.Restart()
-    }),
-    new MenuItem("Return to menu", 3, "rgb(255, 170, 0)", function(){
-        game.Restart()
-        game.gameState = GameState.Menu
-    }),               
-])
-    
-var Menus = [
-    MainMenu,
-    ShopMenu,
-    LoseMenu,
-    WinMenu,
-    PauseMenu    
-]
