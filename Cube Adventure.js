@@ -46,7 +46,7 @@ export var game = {
                     gameStates.SetGameState(GameState.WonStage)
                 } else {
                     levelTools.Restart()
-                    gameStates.currentLevelIndex = (gameStates.infoController.unlockedLevel + 1)
+                    gameStates.currentLevelIndex = gameStates.infoController.unlockedLevel + 1
                     gameStates.SetGameState(GameState.Rules)
                     levelTools.Restart()
                 }

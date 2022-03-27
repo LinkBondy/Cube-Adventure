@@ -254,7 +254,7 @@ export var dataManagement = {
         if (StyleCube !== null) {
             gameStates.currentCubeStyle = StyleCube
         }
-        if (window.localStorage.getItem('isMax') === null)
+        if (window.localStorage.getItem('isMax') === true)
             gameStates.infoController.unlockedLevel = gameStates.levelController.levels.length
         else
             gameStates.infoController.unlockedLevel = gameStates.currentLevelIndex 

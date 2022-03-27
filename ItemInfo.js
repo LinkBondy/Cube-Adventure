@@ -125,11 +125,8 @@ class ItemImage {
 
     Draw() {
         if (this.fullImage) {
-            console.log(this.imageHeight)
-            console.log(this.image)
             canvas.context.drawImage(this.image, this.imageX, this.imageY, this.imageWidth, this.imageHeight, this.placementX, this.placementY, this.placementWidth, this.placementHeight)
         } else if (!this.fullImage) {  
-            //console.log(this.image)
             draw.DrawImage(this.image, this.placementX, this.placementY) 
         }
     }

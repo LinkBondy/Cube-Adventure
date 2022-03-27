@@ -36,7 +36,7 @@ export function MouseDown(event) {
 
             if (gameStates.currentGameMode === GameMode.Freeplay) {
                 levelTools.Restart()
-                gameStates.currentLevelIndex = (gameStates.infoController.unlockedLevel + 1)
+                gameStates.currentLevelIndex = gameStates.infoController.unlockedLevel
                 levelTools.Restart()   
             }
         
