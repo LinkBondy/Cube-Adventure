@@ -1,31 +1,33 @@
 "use strict";
-console.log("LoadedItemInfo")
-
-const { images } = require('./Images')
+const {images} = require('./Images')
+const {draw} = require('./Draw')
+const {canvas} = require('./Canvas')
+const {gameStates} = require('./GameData');
 
 var LockedFeature = {
     infoEnemy: 1,
     infoEnemy2: 9,
     ///
     infoWall: 2,
+    infoInvisibleWall: 5,
+    infoWater: 7,
     ///
     infoSwitch: 4,
-    ///
-    infoRock: 4,
-    ///
-    infoInvisibleWall: 5,
-    ///
     infoTeleporter: 6,
     ///
-    infoWater: 7,
+    infoRock: 4,
     ///
     infoLifeJacket: 7,
     ///
     infoHole: 8,
 }
 
+export var itemInfoVaribles = {
+    game: undefined
+}
+
 export class InfoController {
-    constructor () {
+    constructor() {
         this.items = [
             new EnemyInfo(),
             new BarrierInfo(),
@@ -99,13 +101,9 @@ class ItemText {
     }
 
     Draw() {
-        const {
-            game,
-        } = require('./Cube Adventure')
-    
-        game.context.font = this.textSize;
-        game.context.fillStyle = this.textColour;
-        game.context.fillText(this.text, this.textX, this.textY);
+        canvas.context.font = this.textSize;
+        canvas.context.fillStyle = this.textColour;
+        canvas.context.fillText(this.text, this.textX, this.textY);
     }
 };
 
@@ -123,21 +121,16 @@ class ItemImage {
         this.placementHeight = placementHeight
         ///
         this.fullImage = fullImage
-        
     }
 
     Draw() {
-        const {
-            game,
-        } = require('./Cube Adventure')
-    
         if (this.fullImage) {
             console.log(this.imageHeight)
             console.log(this.image)
-            game.context.drawImage(this.image, this.imageX, this.imageY, this.imageWidth, this.imageHeight, this.placementX, this.placementY, this.placementWidth, this.placementHeight)
+            canvas.context.drawImage(this.image, this.imageX, this.imageY, this.imageWidth, this.imageHeight, this.placementX, this.placementY, this.placementWidth, this.placementHeight)
         } else if (!this.fullImage) {  
             //console.log(this.image)
-            images.DrawImage(this.image, this.placementX, this.placementY) 
+            draw.DrawImage(this.image, this.placementX, this.placementY) 
         }
     }
 };
@@ -152,28 +145,24 @@ class ItemSlide {
         return unlockedLevel >= this.neededFeature
         
     }
-    Draw() {
-        const {
-            game,
-        } = require('./Cube Adventure')
-    
-        game.context.font = "25px Arial";
-        game.context.fillStyle = 'black'            
-        game.context.fillText(game.infoController.slideIndex + " / " + (game.infoController.items[game.infoController.itemIndex].slides.length - 1), 790, 590);
+    Draw() {    
+        canvas.context.font = "25px Arial";
+        canvas.context.fillStyle = 'black'            
+        canvas.context.fillText(gameStates.infoController.slideIndex + " / " + (gameStates.infoController.items[gameStates.infoController.itemIndex].slides.length - 1), 790, 590);
         ///
-        if (this.ShouldShowSlide(game.infoController.unlockedLevel)) {
+        if (this.ShouldShowSlide(gameStates.infoController.unlockedLevel)) {
             this.items.forEach(function(itemInfo) {
                 itemInfo.Draw()
             })
         } else {
-        game.context.font = "125px Arial";
-        game.context.fillStyle = 'lightcoral'
-        game.context.fillText("Item " + game.infoController.slideIndex, 200, 200);
+        canvas.context.font = "125px Arial";
+        canvas.context.fillStyle = 'lightcoral'
+        canvas.context.fillText("Item " + gameStates.infoController.slideIndex, 200, 200);
         ///
-        game.context.font = "150px Arial";
-        game.context.fillStyle = 'lime'
-        game.context.fillText("Beat Level " + this.neededFeature, 10, 550);   
-        }
+        canvas.context.font = "150px Arial";
+        canvas.context.fillStyle = 'lime'
+        canvas.context.fillText("Beat Level " + this.neededFeature, 10, 550);   
+      }
     }
 };
 

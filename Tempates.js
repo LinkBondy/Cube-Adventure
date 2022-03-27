@@ -43,17 +43,11 @@ class ___ extends GameObject {
     }   
 };
 
-game.context.drawImage(images._______, 0, 0, images._______.width, images._______.height, #, #, images._______.width, images._______.height)
+canvas.context.drawImage(images._______, 0, 0, images._______.width, images._______.height, #, #, images._______.width, images._______.height)
 game.DrawImage(_____, #, #)
 game.DrawImageAdvanced(_____, #, #, #, #, #, #, #, #)
 
-Cube templates
-Forest ""
-Other "rgb(255, 255, 132)", "coral", "rgb(255, 81, 73)"
-Player "lightgreen", "green", "aqua"
-
 Other
-game.context.save()
-game.context.scale(_, _)
-game.context.restore()
-//console.log('_______', this._______)*/  
+canvas.context.save()
+canvas.context.scale(_, _)
+canvas.context.restore()*/  

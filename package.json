@@ -5,6 +5,7 @@
   "main": "Cube Adventure.js",
   "scripts": {
     "pack": "webpack",
+    "watch": "webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
