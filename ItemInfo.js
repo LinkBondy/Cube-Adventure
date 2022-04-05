@@ -22,10 +22,6 @@ var LockedFeature = {
     infoHole: 8,
 }
 
-export var itemInfoVaribles = {
-    game: undefined
-}
-
 export class InfoController {
     constructor() {
         this.items = [
@@ -209,7 +205,7 @@ class BarrierInfo {
         ], LockedFeature.infoWall)
 
         var fakeWallSlide1 = new ItemSlide([
-            new ItemImage(false, images.InvisibleWall_200x200V2, 625, 10),
+            new ItemImage(false, images.InvisibleWall_200x200, 625, 10),
             ///
             new ItemText("Fake Walls", "120px Arial", "purple", 10, 150),
             new ItemText("Fake walls look like walls but", "60px Arial", "rgb(2, 0, 139)", 10, 300),

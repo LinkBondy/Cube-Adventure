@@ -1,5 +1,5 @@
 "use strict";
-const {GameMode, GameState, ShopMode, PlayerStyles, BackgroundStyles, cubeStyle, gameStates, levelTools} = require('./GameData');
+const {gameMode, startingMenusStates, storyModeStates, ShopMode, PlayerStyles, BackgroundStyles, cubeStyle, gameStates, levelTools} = require('./GameData');
 const {canvas} = require('./Canvas')
 const {images} = require('./Images');
 export var draw = {
@@ -13,45 +13,43 @@ export var draw = {
     },
     DrawGame: function() {
         gameStates.background.Draw()
-        if (gameStates.currentGameState < GameState.Rules && gameStates.currentGameState > 0 && gameStates.mobile) 
-            draw.DrawImage(images.BackButton, 750, 0)
-        if (gameStates.currentGameState > GameState.Menu) {
-            if (gameStates.currentGameMode === GameMode.StoryMode)
+        if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
+            if (gameStates.currentGameMode === gameMode.StoryMode)
                 this.StoryModeDraw()
 
-            if (gameStates.currentGameMode === GameMode.Freeplay)
-                this.FreeplayDraw()
-
-            if (gameStates.currentGameMode === GameMode.Shop)
+            if (gameStates.currentGameMode === gameMode.Shop)
                 this.ShopDraw()
 
-            if (gameStates.currentGameMode === GameMode.ItemsInfo)
+            if (gameStates.currentGameMode === gameMode.ItemsInfo)
                 gameStates.infoController.Draw()
 
-            /*if (gameStates.currentGameMode === GameMode.Settings)
+            /*if (gameStates.currentGameMode === gameMode.Settings)
                 this.SettingsDraw()*/
         } else {
-            if (gameStates.currentGameState === GameState.NotStarted)
+            if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted)
                 this.StartingSreenDraw()
-            if (gameStates.currentGameState === GameState.Menu)
+            if (gameStates.currentStartingMenusState === startingMenusStates.Menu)
                 gameStates.menuController.MainMenu.Draw()
         }
+        if ((gameStates.currentStartingMenusState === startingMenusStates.Selected && gameStates.currentStoryModeState === storyModeStates.Selecting || gameStates.currentStartingMenusState === startingMenusStates.Menu) && gameStates.mobile) 
+            draw.DrawImage(images.BackButton, 750, 0)
     },
     StoryModeDraw: function() {
-        if (gameStates.currentGameState === GameState.Started || gameStates.currentGameState === GameState.Paused) {
+        if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelController.CheckLocked()) {
             this.LevelsDraw()
         }
 
-        if (gameStates.currentGameState === GameState.Rules)
-            this.DrawRules()
+        if (gameStates.currentStoryModeState === storyModeStates.Selecting)
+            this.DrawSelectLevel()
+            //this.DrawRules()
 
-        if (gameStates.currentGameState === GameState.WonStage) {
+        if (gameStates.currentStoryModeState === storyModeStates.WonStage) {
             gameStates.menuController.WinMenu.Draw()
             this.DrawFinishText()
             return
         }
             
-        if (gameStates.currentGameState === GameState.Lost) {
+        if (gameStates.currentStoryModeState === storyModeStates.Lost) {
             if (levelTools.loseCounterStop === false) {
                 levelTools.currentLosses = levelTools.currentLosses + 1
                 if (levelTools.currentLosses === 50) {
@@ -64,57 +62,51 @@ export var draw = {
 
         }
 
-        if (gameStates.currentGameState === GameState.Paused) {
+        if (gameStates.currentStoryModeState === storyModeStates.Paused) {
             canvas.context.fillStyle = "rgba(128, 128, 128, 0.6)"
             canvas.context.fillRect(0, 0, 850, 600)
             gameStates.menuController.PauseMenu.Draw()
         }
-    },  
-    FreeplayDraw: function() {
-        this.LevelsDraw()
-        if (gameStates.currentGameState === GameState.Rules)
-        this.DrawFreeplayLevel()
-    },
+    },      
     ShopDraw: function() {
-        if (gameStates.currentGameState === GameState.Rules)
+        if (gameStates.currentShopMode === ShopMode.ShopMenu)
             gameStates.menuController.ShopMenu.Draw()
         
-            if (gameStates.currentGameState === GameState.Started)  {
-                if (gameStates.currentShopMode === ShopMode.Backround) {
-                    if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-                        this.DrawBackroundPlasticShop()   
-                    }
-                    if (gameStates.currentBackgroundStyle === BackgroundStyles.Sprite) {
-                        this.DrawBackroundSpriteShop()   
-                    }
-                }
+        if (gameStates.currentShopMode === ShopMode.Backround) {
+            if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+                this.DrawBackroundPlasticShop()   
+            }
 
-                if (gameStates.currentShopMode === ShopMode.Player) {
-                    if (gameStates.currentPlayerStyle === PlayerStyles.BlueCube) {
-                        this.DrawBlueCubeShop()   
-                    }
-                    
-                    if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeAlien) {
-                        this.DrawBlueCubeAlienShop()   
-                    }
-                    
-                    if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeLava) {
-                        this.DrawBlueCubeLavaShop()   
-                    }
-    
-                    if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeWooden) {
-                        this.DrawBlueCubeWoodenShop()   
-                    }
-    
-                    if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeSad) {
-                        this.DrawBlueCubeSadShop()   
-                    }
-                }
+            if (gameStates.currentBackgroundStyle === BackgroundStyles.Sprite) {
+                this.DrawBackroundSpriteShop()   
+            }
+        }
 
-                if (gameStates.mobile) {
-                    draw.DrawImage(images.UpArrowShop, 10, 450)
-                    draw.DrawImage(images.DownArrowShop, 690, 450)
+            if (gameStates.currentShopMode === ShopMode.Player) {
+                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCube) {
+                    this.DrawBlueCubeShop()   
                 }
+                    
+                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeAlien) {
+                    this.DrawBlueCubeAlienShop()   
+                }
+                    
+                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeLava) {
+                    this.DrawBlueCubeLavaShop()   
+                }
+                
+                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeWooden) {
+                    this.DrawBlueCubeWoodenShop()   
+                }
+                
+                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeSad) {
+                    this.DrawBlueCubeSadShop()   
+                }
+            }
+
+            if (gameStates.mobile && (gameStates.currentShopMode === ShopMode.Player || gameStates.currentShopMode === ShopMode.Backround)) {
+                draw.DrawImage(images.UpArrowShop, 10, 450)
+                draw.DrawImage(images.DownArrowShop, 690, 450)
             }
     },
     StartingSreenDraw: function() {
@@ -214,10 +206,16 @@ export var draw = {
         canvas.context.fillText("Losses", 575, 75);
         canvas.context.fillText((levelTools.currentLosses), 675, 150);
     },
-    DrawFreeplayLevel: function() {
+    DrawSelectLevel: function() {
         canvas.context.font = '125px Arial';
         canvas.context.fillStyle = "rgba(255, 255, 132, 0.788)";
         canvas.context.fillText("Level " + (gameStates.currentLevelIndex + 1), 225, 575);
+        if (!gameStates.levelController.CheckLocked()) {
+            canvas.context.font = '175px Arial';
+            canvas.context.fillStyle = "rgba(255, 255, 132)";
+            canvas.context.fillText("Locked", 10, 275);
+            draw.DrawImage(images.LockedIcon, 562.5, 10)
+        }
         if (gameStates.mobile === true) {
             draw.DrawImage(images.UpArrow, 10, 450)
             draw.DrawImage(images.DownArrow, 690, 450)
@@ -357,7 +355,8 @@ export var draw = {
             if (gameStates.mobile === true) {
                 canvas.context.font = '75px Arial'
                 canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Wooden(Selected)", 100, 550)
+                canvas.context.fillText("Wooden", 280, 500)
+                canvas.context.fillText("(Selected)", 250, 575)
             }
 
             else {

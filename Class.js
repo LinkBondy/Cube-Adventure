@@ -1,7 +1,7 @@
 "use strict";
 const {images} = require('./Images')
 const {draw} = require('./Draw')
-const {GameMode, GameState, cubeStyle, gameStates} = require('./GameData')
+const {gameMode, startingMenusStates, storyModeStates, cubeStyle, gameStates} = require('./GameData')
 const {canvas} = require('./Canvas')
 
 export class GameObject {
@@ -88,7 +88,7 @@ export class Background {
     }
     
     Draw() {
-        if (gameStates.currentGameState === GameState.Started && draw.spriteStyle && gameStates.currentGameMode !== GameMode.Shop || gameStates.currentGameState === GameState.Rules && draw.spriteStyle && gameStates.currentGameMode === GameMode.Freeplay || gameStates.currentGameState === GameState.Paused && draw.spriteStyle) {
+        if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && draw.spriteStyle) {
             this.color1 = "rgb(100, 200, 100)"
         }
         else {
@@ -635,7 +635,13 @@ export class Wall extends GameObject {
                     canvas.context.restore()
                 }
             }            
-         
+        /*} else if (this.x > 800) {
+            for (var x = this.left(); x < this.right(); x = x + 50) {
+                for (var y = this.top(); y < this.bottom(); y = y + 50) {
+            draw.DrawImage(images.WallGrassEdgeY, )
+                }
+            }*/
+        
         } else if (draw.spriteStyle && !this.invisibleWall) {
              var i = 0; 
              for (var x = this.left(); x < this.right(); x = x + 50) {
@@ -652,7 +658,7 @@ export class Wall extends GameObject {
                     else if (this.randomList[i] % 9 === 0)
                        draw.DrawImage(images.WallGrassV2, 0, 0) 
                     
-                    else if (this.randomList[i] % 998 === 0 && gameStates.currentGameMode === GameMode.StoryMode) {
+                    else if (this.randomList[i] % 998 === 0 && gameStates.currentGameMode === gameMode.StoryMode) {
                        draw.DrawImage(images.WallGrassTree, 0, 0)
                         draw.blueCubeWoodenLock = false
                     }
@@ -682,7 +688,7 @@ export class Water extends GameObject {
 
     Draw() {
         if (draw.spriteStyle === true) {
-            if (gameStates.currentGameState === GameState.Started) {
+            if (gameStates.currentStoryModeState === storyModeStates.Playing) {
                 var numMilliseconds = new Date().getTime()
                 if (numMilliseconds % 5 === 4) {
                     this.spriteX = (this.spriteX + 54) % (54*49)
@@ -724,17 +730,17 @@ export class Item extends GameObject {
            draw.DrawImage(images.LifeJacketPlastic, this.x, this.y)     
         }
 
-        if (this.typeNumber === 2 && !this.collected && draw.spriteStyle && gameStates.currentGameMode === GameMode.StoryMode && draw.blueCubeAlienLock) {    
+        if (this.typeNumber === 2 && !this.collected && draw.spriteStyle && gameStates.currentGameMode === gameMode.StoryMode && draw.blueCubeAlienLock) {    
            draw.DrawImage(images.Three_Bead, this.x, this.y)     
         }
 
-        if (this.typeNumber === 2 && !this.collected && draw.plasticStyle && gameStates.currentGameMode === GameMode.StoryMode && draw.blueCubeAlienLock) {    
+        if (this.typeNumber === 2 && !this.collected && draw.plasticStyle && gameStates.currentGameMode === gameMode.StoryMode && draw.blueCubeAlienLock) {    
            draw.DrawImage(images.Three_Bead_Plastic, this.x, this.y)     
         }
     }
     
     update() {
-        if (this.typeNumber === 2 && this.collected && gameStates.currentGameMode === GameMode.StoryMode) {    
+        if (this.typeNumber === 2 && this.collected && gameStates.currentGameMode === gameMode.StoryMode) {    
             draw.blueCubeAlienLock = false     
         }
     }

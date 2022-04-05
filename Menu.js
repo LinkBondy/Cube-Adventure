@@ -1,15 +1,12 @@
 "use strict";
-const {GameMode, GameState, ShopMode, gameStates, levelTools} = require('./GameData')
+const {gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools} = require('./GameData')
 const {canvas} = require('./Canvas')
-export var menusVaribles = {
-    game: undefined
-}
-
 class MenuItem {
-    constructor(title, value, color, action) {
+    constructor(title, value, color, size, action) {
         this.title = title
         this.value = value
         this.color = color
+        this.size = size
         this.action = action
     }
 }
@@ -41,7 +38,7 @@ class Menu {
     Draw(textBody) {
         var self = this
         const heightPerItem = (this.negativeOffsetY - this.offsetY) / this.menuItems.length
-        canvas.context.font = '115px Arial'
+        //canvas.context.font = '115px Arial'
         if (textBody !== undefined)
             textBody()
         this.menuItems.forEach(function(menuItem, index) {
@@ -52,7 +49,7 @@ class Menu {
             gameStates.selectorYBottom = heightPerItem * (index + 1) + self.offsetY
             }
             ///
-            canvas.context.font = '115px Arial'
+            canvas.context.font = menuItem.size
             canvas.context.fillStyle = menuItem.color
             canvas.context.fillText(menuItem.title, 10, 90 + self.offsetY + heightPerItem * index)
             
@@ -65,76 +62,106 @@ class Menu {
     constructor() {
         this.menus = []
         this.menus.push(this.MainMenu = new Menu([
-            new MenuItem("Story Mode", 1, "rgb(0, 166, 255)", function() {
-                gameStates.currentGameState = GameState.Rules
-                gameStates.currentGameMode = GameMode.StoryMode
+            new MenuItem("Story Mode", 1, "rgb(0, 166, 255)", '115px Arial', function() {
+                gameStates.currentStartingMenusState = startingMenusStates.Selected
+                gameStates.currentGameMode = gameMode.StoryMode
             }),
-            new MenuItem("Freeplay", 2, "rgb(0, 132, 216)", function() {
-                gameStates.currentGameState = GameState.Rules
-                gameStates.currentGameMode = GameMode.Freeplay
+            new MenuItem("Shop", 2, "rgb(0, 132, 216)", '115px Arial', function() {
+                gameStates.currentStartingMenusState = startingMenusStates.Selected
+                gameStates.currentGameMode = gameMode.Shop
             }),
-            new MenuItem("Shop", 3, "rgb(0, 67, 190)",function() {
-                gameStates.currentGameState = GameState.Rules
-                gameStates.currentGameMode = GameMode.Shop
-            }),
-            new MenuItem("Items Info", 4, "rgb(0, 0, 139)",function() {
-                gameStates.currentGameState = GameState.Rules
-                gameStates.currentGameMode = GameMode.ItemsInfo
+            new MenuItem("Items Info", 3, "rgb(0, 67, 190)", '115px Arial', function() {
+                gameStates.currentStartingMenusState = startingMenusStates.Selected
+                gameStates.currentGameMode = gameMode.ItemsInfo
              }),
-            /*new MenuItem("Settings", 5, "darkblue", 0, function() {
-                gameStates.currentGameState = GameState.Rules
-                gameStates.currentGameMode = GameMode.Settings
-            })*/
+            new MenuItem("Coming Soon", 4, "rgb(0, 0, 139)", '115px Arial', function() {
+                //gameStates.currentStartingMenusState = startingMenusStates.Selected
+                //gameStates.currentGameMode = gameMode.Settings
+            })
         ], 0, 600))
         
         this.menus.push(this.ShopMenu = new Menu([
-            new MenuItem("Player", 1, "lightcoral", function() {
-                gameStates.currentGameState = GameState.Started
+            new MenuItem("Player", 1, "lightcoral", '115px Arial', function() {
                 gameStates.currentShopMode = ShopMode.Player
             }),
-            new MenuItem("Background", 2, "gold", function() {
-                gameStates.currentGameState = GameState.Started
+            new MenuItem("Background", 2, "gold", '115px Arial', function() {
                 gameStates.currentShopMode =  ShopMode.Backround
             }),
         ], 0, 600))
            
         this.menus.push(this.LoseMenu = new Menu([
-            new MenuItem("Retry", 1, "violet", function() {  
-                gameStates.SetGameState(GameState.Started)
-                levelTools.Restart()
+            new MenuItem("Retry", 1,"rgb(120, 0, 225)", '115px Arial', function() {
+                levelTools.Restart()  
+                gameStates.SetGameState(storyModeStates.Playing, "StoryMode")
                 levelTools.loseCounterStop = false
             }),
-            new MenuItem("Return to menu", 2, "hotpink", function() {
+            new MenuItem("Selection Menu", 2, "rgb(90, 0, 225)", '115px Arial', function() {
                 levelTools.Restart()
-                gameStates.currentGameState = GameState.Menu
+                gameStates.SetGameState(storyModeStates.Selecting, "StoryMode")
+                levelTools.loseCounterStop = false
+            }),
+            new MenuItem("Main Menu", 3, "rgb(60, 0, 225)", '115px Arial', function() {
+                levelTools.Restart()
+                gameStates.SetGameState(storyModeStates.Selecting, "StoryMode")
+                gameStates.currentStartingMenusState = startingMenusStates.Menu
                 levelTools.loseCounterStop = false
             })
-        ], 200, 600))
+        ], 175, 600))
                     
         this.menus.push(this.WinMenu = new Menu([
-            new MenuItem("Continue", 1, "rgb(255, 0, 100)", function() {
-                levelTools.NextLevel()
-        
+            new MenuItem("Continue", 1, "rgb(255, 0, 75)", '115px Arial', function() {
+                if (gameStates.currentLevelIndex !== 7) {
+                    levelTools.NextLevel()
+                    gameStates.currentLevelIndex++
+                    gameStates.SetGameState(storyModeStates.Playing, "StoryMode")
+                }
             }),
-            new MenuItem("Return to menu", 2, "deeppink", function() {
+            new MenuItem("Selection Menu", 2, "rgb(255, 5, 115)", '115px Arial', function() {
                 levelTools.NextLevel()
-                gameStates.currentGameState = GameState.Menu
+                gameStates.SetGameState(storyModeStates.Selecting, "StoryMode")
+            }),
+            new MenuItem("Main Menu", 3, "rgb(255, 10, 150)", '115px Arial', function() {
+                levelTools.NextLevel()
+                gameStates.SetGameState(storyModeStates.Selecting, "StoryMode")
+                gameStates.currentStartingMenusState = startingMenusStates.Menu
             }),               
-        ], 200, 600))
+        ], 150, 600))
         
         this.menus.push(this.PauseMenu = new Menu([
-            new MenuItem("Resume", 1, "rgb(255, 0, 86)", function() {
-                gameStates.SetGameState(GameState.Started)
+            new MenuItem("Resume", 1, "rgb(255, 0, 86)", '115px Arial', function() {
+                gameStates.SetGameState(storyModeStates.Playing, "StoryMode")
         
             }),
-            new MenuItem("Retry", 2, "rgb(255, 105, 0)", function() {
-                gameStates.SetGameState(GameState.Started)
+            new MenuItem("Retry", 2, "rgb(255, 85, 20)", '115px Arial', function() {
                 levelTools.Restart()
+                gameStates.SetGameState(storyModeStates.Playing, "StoryMode")
             }),
-            new MenuItem("Return to menu", 3, "rgb(255, 170, 0)", function() {
+            new MenuItem("Selection Menu", 3, "rgb(255, 124, 0)", '115px Arial', function() {
                 levelTools.Restart()
-                gameStates.currentGameState = GameState.Menu
+                gameStates.SetGameState(storyModeStates.Selecting, "StoryMode")
+            }),
+            new MenuItem("Main Menu", 4, "rgb(255, 170, 0)", '115px Arial', function() {
+                levelTools.Restart()
+                gameStates.currentStartingMenusState = startingMenusStates.Menu
             }),               
         ], 0, 600))
     }
+    CheckMenu() {
+        if (gameStates.currentStartingMenusState === startingMenusStates.Menu)
+            return 0
+        ///
+        if (gameStates.currentShopMode === ShopMode.ShopMenu && gameStates.currentGameMode === gameMode.Shop && gameStates.currentStartingMenusState === startingMenusStates.Selected)
+            return 1
+        ///
+        if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
+            if (gameStates.currentStoryModeState === storyModeStates.Lost)
+                return 2
+                ///
+            if (gameStates.currentStoryModeState === storyModeStates.WonStage)
+                return 3
+                ///
+            if (gameStates.currentStoryModeState === storyModeStates.Paused) 
+                return 4
+        }
+    }   
 }

@@ -1,19 +1,19 @@
 "use strict";
-const {MenuController, menusVaribles} = require('./Menu');
+const {MenuController} = require('./Menu');
 const {LevelController} = require('./Levels')
 const {Background} = require('./Class')
 const {InfoController} = require ('./ItemInfo');
 const {images} = require('./Images');
 const {draw} = require('./Draw');
-const {Keydown} = require('./Keydown');
-const {MouseDown} = require ('./MouseDown');
-const {GameMode, GameState, gameStates, levelTools, dataManagement} = require('./GameData');
+const {storyModeStates, gameStates, levelTools, dataManagement} = require('./GameData');
 const {canvas} = require('./Canvas')
+const {Keydown} = require('./Keydown')
+const {MouseDown} = require('./MouseDown')
 var audio = {
     //MusicW1: new Audio(),
 
     SetMusic: function() {
-        /*if (gameStates.currentGameState === GameState.Started)
+        /*if (gameStates.currentStoryModeState === storyModeStates.Playing)
             audio.MusicW1.play();
         else
             audio.MusicW1.pause();
@@ -40,30 +40,15 @@ export var game = {
         dataManagement.Save(draw)
         levelTools.update(delta)
         draw.DrawGame()
-        if (levelTools.checkWin() && gameStates.currentGameState !== GameState.WonStage ) {
+        if (levelTools.checkWin() && gameStates.currentStoryModeState !== storyModeStates.WonStage ) {
             setTimeout(function() {
-                if (gameStates.currentGameMode === GameMode.StoryMode) {
-                    gameStates.SetGameState(GameState.WonStage)
-                } else {
-                    levelTools.Restart()
-                    gameStates.currentLevelIndex = gameStates.infoController.unlockedLevel + 1
-                    gameStates.SetGameState(GameState.Rules)
-                    levelTools.Restart()
-                }
-
+                gameStates.SetGameState(storyModeStates.WonStage , "StoryMode")
             }, 300)
 
-        } else if(levelTools.checkLose() && gameStates.currentGameState !== GameState.Lost) {
+        } else if(levelTools.checkLose() && gameStates.currentStoryModeState !== storyModeStates.Lost) {
             setTimeout(function() {
-                if (gameStates.currentGameMode === GameMode.StoryMode) {
-                    gameStates.SetGameState(GameState.Lost)
-                }
-
-                if (gameStates.currentGameMode === GameMode.Freeplay) {
-                    levelTools.Restart()
-                    gameStates.SetGameState(GameState.Rules)
-                }
-              }, 30)
+                gameStates.SetGameState(storyModeStates.Lost , "StoryMode")
+            }, 30)
         }
         window.setTimeout(game.mainLoop, 1000 / 120)
         //window.requestAnimationFrame(game.mainLoop)
@@ -92,8 +77,6 @@ function ImageLoadingLoop() {
 
 function StartGame() {
     canvas.createCanvasContext();
-    draw.game = game
-    menusVaribles.game = game
     gameStates.levelController = new LevelController()
     gameStates.background = new Background()
     gameStates.infoController = new InfoController()
@@ -105,16 +88,12 @@ function StartGame() {
 
 function LoadGame() {
     ///
-    if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i ) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i)) {
-            gameStates.mobile = true       
-    } else {
-            gameStates.mobile = false
-    }
+    if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i ) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i))
+        gameStates.mobile = true       
+    else
+        gameStates.mobile = false
     images.LoadImages()
-    ///
     //audio.MusicW1.src = "musicName";
-    //
-    ///
     ImageLoadingLoop()
 }
 

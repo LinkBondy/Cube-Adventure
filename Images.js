@@ -18,6 +18,8 @@ export var images = {
         images.WallGrassV2 = LoadImage("images/WallGrassV2.png")
         images.WallGrassV3 = LoadImage("images/WallGrassV3.png")
         images.WallGrassTree = LoadImage("images/WallGrassTree.png")
+        images.WallGrassEdgeY = LoadImage("images/WallGrassEdgeY.png")
+        //images.WallGrassEdgeX = LoadImage("images/WallGrassV1.png")
         ///
         images.BlueCube = LoadImage("images/BlueCube.png")
         images.BlueCubeAlien = LoadImage("images/BlueCubeAlien.png")
@@ -57,7 +59,6 @@ export var images = {
         images.InvisibleWall = LoadImage("images/InvisibleWall.png")
         images.InvisibleWallV2 = LoadImage("images/InvisibleWallV2.png")
         images.InvisibleWall_200x200 = LoadImage("images/InvisibleWall_200x200.png")
-        images.InvisibleWall_200x200V2 = LoadImage("images/InvisibleWall_200x200V2.png")
         ///
         images.LifeJacket = LoadImage("images/LifeJacket.png")
         images.LifeJacket_200x200 = LoadImage("images/LifeJacket_200x200.png")
@@ -84,6 +85,7 @@ export var images = {
         images.DownArrow = LoadImage("images/DownArrow.png")
         images.UpArrowShop = LoadImage("images/UpArrowShop.png")
         images.DownArrowShop = LoadImage("images/DownArrowShop.png")
+        images.LockedIcon = LoadImage("images/LockedIcon.png")
         ///
         images.BackButton = LoadImage("images/BackButton.png")
         images.MenuButton = LoadImage("images/MenuButton.png")
