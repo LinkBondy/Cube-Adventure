@@ -18,8 +18,6 @@ export var images = {
         images.WallGrassV2 = LoadImage("images/WallGrassV2.png")
         images.WallGrassV3 = LoadImage("images/WallGrassV3.png")
         images.WallGrassTree = LoadImage("images/WallGrassTree.png")
-        images.WallGrassEdgeY = LoadImage("images/WallGrassEdgeY.png")
-        //images.WallGrassEdgeX = LoadImage("images/WallGrassV1.png")
         ///
         images.BlueCube = LoadImage("images/BlueCube.png")
         images.BlueCubeAlien = LoadImage("images/BlueCubeAlien.png")

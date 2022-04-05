@@ -182,7 +182,7 @@ export var draw = {
         canvas.context.fillText("Get to the pink to beat levels", 150, 275);
         canvas.context.fillText("Watch out for enemies", 200, 350);
         if (!gameStates.mobile) {
-            canvas.context.fillText("Use A, D, S, D or Arrow Keys to move", 50, 425);
+            canvas.context.fillText("Use A, W, S, D or Arrow Keys to move", 50, 425);
         }
         else if (gameStates.mobile) {
             canvas.context.font = '35px Arial';
