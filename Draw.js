@@ -12,7 +12,7 @@ export var draw = {
         canvas.context.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height)
     },
     DrawGame: function() {
-        gameStates.background.Draw()
+        gameStates.background.DrawBackround()
         if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
             if (gameStates.currentGameMode === gameMode.StoryMode)
                 this.StoryModeDraw()
@@ -31,8 +31,11 @@ export var draw = {
             if (gameStates.currentStartingMenusState === startingMenusStates.Menu)
                 gameStates.menuController.MainMenu.Draw()
         }
-        if ((gameStates.currentStartingMenusState === startingMenusStates.Selected && gameStates.currentStoryModeState === storyModeStates.Selecting || gameStates.currentStartingMenusState === startingMenusStates.Menu) && gameStates.mobile) 
-            draw.DrawImage(images.BackButton, 750, 0)
+        gameStates.background.DrawToolBar()
+        if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused)
+        draw.DrawImage(images.MenuButton, 900, 475)
+        else if (gameStates.currentStoryModeState !== storyModeStates.Lost && gameStates.currentStoryModeState !== storyModeStates.WonStage && gameStates.currentStartingMenusState !== startingMenusStates.NotStarted)
+        draw.DrawImage(images.BackButton, 900, 475)
     },
     StoryModeDraw: function() {
         if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelController.CheckLocked()) {
@@ -128,6 +131,8 @@ export var draw = {
         canvas.context.fillRect(600 + 20, 50 + 130, 160, 40)
     },
     LevelsDraw: function() {
+        canvas.context.save()
+        canvas.context.translate(0 - 850 * (gameStates.CurrentLevel().currentX - 1), 0 - 600 * (gameStates.CurrentLevel().currentY - 1))
         gameStates.CurrentLevel().waters.forEach(function(water) {
             water.Draw()
         },)
@@ -171,6 +176,7 @@ export var draw = {
         gameStates.CurrentLevel().walls.forEach(function(wall) {
             wall.Draw()
         },)
+        canvas.context.restore()
     },
     DrawRules: function() {
         canvas.context.font = "175px Arial";

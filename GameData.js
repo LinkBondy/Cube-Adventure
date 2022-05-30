@@ -88,6 +88,7 @@ export var levelTools = {
             })
             gameStates.CurrentLevel().players.forEach(function(player) {
                 player.update(delta)
+                player.changeSlideVariables()
             })
             gameStates.CurrentLevel().unlocks.forEach(function(unlock) {
                 unlock.update(delta)
@@ -141,33 +142,51 @@ export var levelTools = {
     },
 
     Restart: function() {
+        gameStates.CurrentLevel().finishAreas.forEach(function(finishArea) {
+            finishArea.reset()
+        },)
+
         gameStates.CurrentLevel().enemies.forEach(function(enemy) {
-            enemy.reset() 
-        })
+            enemy.reset()
+        },)
 
         gameStates.CurrentLevel().players.forEach(function(player) {
-            player.reset()
-        })
+            player.reset()        
+        },)
+
+        gameStates.CurrentLevel().waters.forEach(function(water) {
+            water.reset()
+        },)
+
+        gameStates.CurrentLevel().holes.forEach(function(hole) {  
+            hole.reset()
+        },)
 
         gameStates.CurrentLevel().unlocks.forEach(function(unlock) {
-            unlock.activated = false    
-        })
+            unlock.reset()
+        },)
 
-        gameStates.CurrentLevel().rocks.forEach(function(rock) {
-            rock.allowMovement = false
-        })
-
-        gameStates.CurrentLevel().holes.forEach(function(hole) {
-            hole.reset()
+        gameStates.CurrentLevel().teleporters.forEach(function(teleporter) {
+            teleporter.reset()
         })
 
         gameStates.CurrentLevel().items.forEach(function(item) {
             item.reset()
         })
 
+        gameStates.CurrentLevel().rocks.forEach(function(rock) {  
+            rock.reset()
+        },)
+
         gameStates.CurrentLevel().changeDirectionSquares.forEach(function(changeDirectionSquare) {
             changeDirectionSquare.reset()
-        })
+        },)
+        
+        gameStates.CurrentLevel().walls.forEach(function(wall) {
+            wall.reset()
+        },)
+        gameStates.CurrentLevel().currentX = gameStates.CurrentLevel().startingX
+        gameStates.CurrentLevel().currentY = gameStates.CurrentLevel().startingY
     },
 
 }
@@ -176,8 +195,10 @@ export var dataManagement = {
     Save: function(draw) {
         window.localStorage.setItem('level', gameStates.infoController.unlockedLevel)
         window.localStorage.setItem('newUpdate', false)
-        if (gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex)    
+        if (gameStates.infoController.unlockedLevel !== gameStates.levelController.levels.length && gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex - 1) {
             window.localStorage.setItem('stateGame', gameStates.currentStoryModeState)
+        } else
+            window.localStorage.setItem('stateGame', -1)
         window.localStorage.setItem('PlayerAlienLock', draw.blueCubeAlienLock)
         window.localStorage.setItem('PlayerWoodenLock', draw.blueCubeWoodenLock)
         window.localStorage.setItem('PlayerSadLock', draw.blueCubeSadLock)
@@ -193,7 +214,7 @@ export var dataManagement = {
             var stateGame = Number(window.localStorage.getItem('stateGame'))
             if (level !== null) {
                 gameStates.infoController.unlockedLevel = level
-                if (stateGame === storyModeStates.WonStage) {
+                if (stateGame == storyModeStates.WonStage) {
                     gameStates.infoController.unlockedLevel++
                 }
             }

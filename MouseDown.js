@@ -1,45 +1,102 @@
 "use strict";
-var exitNumber = 0
 const {draw} = require('./Draw')
 const {startingMenusStates, storyModeStates, gameMode, ShopMode, PlayerStyles, BackgroundStyles, cubeStyle, gameStates} = require ('./GameData')
 
 export function MouseDown(event) {
+    var isTouching = function(x, y, width, height, mouseX, mouseY, mouseWidth, mouseHeight) {
+        var boxLeft = x
+        var boxRight = x + width
+        var boxTop = y
+        var boxBottom = y + height
+        var mouseLeft = mouseX
+        var mouseRight = mouseX + mouseWidth
+        var mouseTop = mouseY
+        var mouseBottom = mouseY + mouseHeight
+        if (boxLeft >= mouseLeft && boxLeft < mouseRight &&
+            boxTop >= mouseTop && boxTop < mouseBottom) {
+            return true
+        }
+        // Check if the right-top point is inside otherBox
+        if (boxRight > mouseLeft && boxRight < mouseRight &&
+            boxTop >= mouseTop && boxTop < mouseBottom) {
+            return true
+        } 
+        // Check if the right-bottom point is inside otherBox
+        if (boxRight > mouseLeft && boxRight < mouseRight &&
+            boxBottom > mouseTop && boxBottom < mouseBottom) {
+            return true
+        }
+
+        // Check if the left-bottom point is inside otherBox
+        if (boxLeft >= mouseLeft && boxLeft < mouseRight &&
+            boxBottom > mouseTop && boxBottom < mouseBottom) {
+            return true
+        }
+
+        ////////////////////////
+
+        // Check if the left-top point is inside otherBox
+        if (mouseLeft >= boxLeft && mouseLeft < boxRight &&
+            mouseTop >= boxTop && mouseTop < boxBottom) {
+            return true
+        }
+        // Check if the right-top point is inside otherBox
+        if (mouseRight > boxLeft && mouseRight < boxRight &&
+            mouseTop >= boxTop && mouseTop < boxBottom) {
+            return true
+        }
+        // Check if the right-bottom point is inside otherBox
+        if (mouseRight > boxLeft && mouseRight < boxRight &&
+            mouseBottom > boxTop && mouseBottom < boxBottom) {
+            return true
+        }
+
+        // Check if the left-bottom point is inside otherBox
+        if (mouseLeft >= boxLeft && mouseLeft < boxRight &&
+            mouseBottom > boxTop && mouseBottom < boxBottom) {
+            return true
+        }
+        return false
+    }
+    
     // Start Game "Menu"
-    if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted && event.offsetY > 500 && event.offsetY < 600 && event.offsetX < 850) {
+    if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted && isTouching(0, 500, 850, 100, event.offsetX, event.offsetY, 1, 1)) {
         gameStates.SetGameState(startingMenusStates.Menu, "Starting")
         return
     }
 
-    function CheckExit() {
-        gameStates.CurrentLevel().players.forEach(function(player) { 
-            if (event.offsetX < player.x + 50 && event.offsetX > player.x && event.offsetY < player.y + 50 && event.offsetY > player.y && gameStates.currentGameMode < 3 && gameStates.currentStoryModeState === storyModeStates.Playing) {
-                exitNumber++
-            }
-        })
-        if (exitNumber === 2) {
-            exitNumber = 0
-            return true
-        } else {
-            return false
+    if (isTouching(900, 475, 100, 100, event.offsetX, event.offsetY, 1, 1)) {
+        if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStoryModeState === storyModeStates.Playing) {
+            gameStates.SetGameState(storyModeStates.Paused, "StoryMode")
+            gameStates.CurrentLevel().enemies.forEach(function(enemy) {    
+                window.clearTimeout(enemy.timeoutID)
+                enemy.pausedDate = new Date()
+            })
+            return 
+        }
+
+        if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStoryModeState === storyModeStates.Paused) {
+            gameStates.SetGameState(storyModeStates.Playing, "StoryMode")
+                gameStates.CurrentLevel().enemies.forEach(function(enemy) {
+                    if (enemy.timeoutID !== null || enemy.timeoutID !== undefined) {
+                        enemy.timeoutID = setTimeout(function() {
+                            enemy.action()
+                        }, enemy.waitTime - (enemy.pausedDate - enemy.oldDate))
+                    }   
+                })
+            return 
+        }
+
+        else if (gameStates.currentShopMode > 1) {
+            gameStates.currentShopMode = ShopMode.ShopMenu
+            return    
+        }
+
+        else if (gameStates.currentStartingMenusState >= startingMenusStates.Menu && gameStates.currentStoryModeState === storyModeStates.Selecting) {
+            gameStates.SetGameState(gameStates.currentStartingMenusState - 1, "Starting")
+            return
         }
     }
-
-        if (event.offsetY > 0 && event.offsetY < 100 && event.offsetX < 850 && event.offsetX > 750 && gameStates.mobile || CheckExit()) {
-            if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.storyModeStates === storyModeStates.Playing) {
-                gameStates.SetGameState(storyModeStates.Paused, "StoryMode")
-                return 
-            }
-
-            else if (gameStates.currentShopMode > 1) {
-                gameStates.currentShopMode = ShopMode.ShopMenu
-                return    
-            }
-
-            else if (gameStates.currentStartingMenusState >= startingMenusStates.Menu && gameStates.currentStoryModeState === storyModeStates.Selecting) {
-                gameStates.SetGameState(gameStates.currentStartingMenusState - 1, "Starting")
-                return
-            }
-        }
 
     // Down "Menus"
     if (event.offsetY > gameStates.selectorYBottom && event.offsetY < 600 && event.offsetX < 850 && gameStates.menuController.CheckMenu() !== undefined)
@@ -130,33 +187,27 @@ export function MouseDown(event) {
         }
         
         if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
-            // "Right" Arrow /// "d" Key (Right)
-            gameStates.CurrentLevel().players.forEach(function(player) {    
-                if (event.offsetX > player.x + 50 && event.offsetY > player.y - 50 && event.offsetY < player.y + 100 && player.x < 800 && event.offsetY < 600 && event.offsetX < 850)
-                player.moveRight()
-                return
-            })
-
-            
-                // "Down" Arrow / "s" Key (Down)
-            gameStates.CurrentLevel().players.forEach(function(player) {    
-                if (event.offsetY > player.y + 50 && event.offsetX > player.x - 50 && event.offsetX < player.x + 100 && player.y < 550 && event.offsetY < 600 && event.offsetX < 850)
-                player.moveDown()
-                return
-            })
-            
-                // "Up" Arrow / "w" Key (Up)
-                gameStates.CurrentLevel().players.forEach(function(player) {    
-                if (event.offsetY < player.y && event.offsetX > player.x - 50 && event.offsetX < player.x + 100 && player.y !== 0 && event.offsetY < 600 && event.offsetX < 850)
-                player.moveUp()
-                return
-            })
-
-                // "Left" Arrow / "a" Key (Left)
             gameStates.CurrentLevel().players.forEach(function(player) {
-                if (event.offsetX < player.x && event.offsetY > player.y - 50 && event.offsetY < player.y + 100 && player.x !== 0 && event.offsetY < 600 && event.offsetX < 850)
-                player.moveLeft()
-                return
+                var leftOffset = player.x + player.width / 2 - 850 * (gameStates.CurrentLevel().currentX - 1) - event.offsetX
+                var rightOffset = event.offsetX - (player.x + player.width / 2 - 850 * (gameStates.CurrentLevel().currentX - 1))
+                var topOffset = player.y + player.height / 2 - 600 * (gameStates.CurrentLevel().currentY - 1) - event.offsetY 
+                var bottomOffset = event.offsetY - (player.y + player.height / 2 - 600 * (gameStates.CurrentLevel().currentY - 1))
+                if (leftOffset > rightOffset && leftOffset > topOffset && leftOffset > bottomOffset) {
+                    player.moveLeft()
+                    return
+                }
+                if (rightOffset > leftOffset && rightOffset > topOffset && rightOffset > bottomOffset) {
+                    player.moveRight()
+                    return
+                }
+                if (topOffset > bottomOffset && topOffset > leftOffset && topOffset > rightOffset) {
+                    player.moveUp()
+                    return
+                }
+                if (bottomOffset > topOffset && bottomOffset > leftOffset && bottomOffset > rightOffset) {
+                    player.moveDown()
+                    return
+                }
             })
         }
     }

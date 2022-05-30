@@ -2,8 +2,7 @@
 const {images} = require('./Images')
 const {draw} = require('./Draw')
 const {gameMode, startingMenusStates, storyModeStates, cubeStyle, gameStates} = require('./GameData')
-const {canvas} = require('./Canvas')
-
+const {canvas} = require('./Canvas') 
 export class GameObject {
     constructor(x, y, width, height, color1) {
        this.x = x 
@@ -80,50 +79,105 @@ export class GameObject {
     bottom() {
         return this.y + this.height
     }
+    changeSlideVariables() {
+        gameStates.CurrentLevel().players.forEach(function(player) {
+            if (player.x < 850 * (gameStates.CurrentLevel().currentX - 1)) {
+                if (gameStates.CurrentLevel().currentX !== 1) {
+                    gameStates.CurrentLevel().currentX -= 1
+                } else {
+                    player.x += 50
+                }
+                return
+            }
+
+            if (player.x > 850 * gameStates.CurrentLevel().currentX - 50) {
+                if (gameStates.CurrentLevel().currentX !== gameStates.CurrentLevel().width) {
+                    gameStates.CurrentLevel().currentX += 1
+                } else {
+                    player.x -= 50
+                }
+                return
+            }
+
+            if (player.y < 600 * (gameStates.CurrentLevel().currentY - 1)) {
+                if (gameStates.CurrentLevel().currentY !== 1) {
+                    gameStates.CurrentLevel().currentY -= 1
+                } else {
+                    player.y += 50
+                }
+                return
+            }
+
+            if (player.y > 600 * gameStates.CurrentLevel().currentY - 50) {
+                if (gameStates.CurrentLevel().currentY !== gameStates.CurrentLevel().height) {
+                    gameStates.CurrentLevel().currentY += 1
+                } else {
+                    player.y -= 50
+                }
+                return
+            }
+        },)
+    } 
 };
 
 export class Background {
-    constructor( color1) {
+    constructor(color1, color2) {
         this.color1 = color1
+        this.color2 = color2
     }
     
-    Draw() {
+    DrawBackround() {
         if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && draw.spriteStyle) {
             this.color1 = "rgb(100, 200, 100)"
         }
         else {
             this.color1 = "lightgray"
         }
+        
         canvas.context.clearRect(0, 0, canvas.width, canvas.height);
         canvas.context.fillStyle = this.color1;
-        canvas.context.fillRect(0,0, canvas.width, canvas.height) 
+        canvas.context.fillRect(0, 0, canvas.width - 200, canvas.height)
+    }
+
+    DrawToolBar() {
+        this.color2 = "lightgray"
+        canvas.context.fillStyle = this.color2;
+        canvas.context.fillRect(850, 0, 200, canvas.height) 
+        canvas.context.fillStyle = "black"
+        canvas.context.fillRect(850, 0, 2, canvas.height) 
     }
 
 };
 
 export class Enemy extends GameObject {
-    constructor(x, y, width, height, movesLeft, movesRight, movesUp, movesDown, block_speed) {
+    constructor(x, y, width, height, movesLeft, movesRight, movesUp, movesDown, block_speed, waitTime) {
         super(x, y, width, height)
-        this.forward_x = true
-        this.forward_y = false
-        this.block_speed = block_speed
-        this.original_x = x
-        this.original_y = y
+        // Moving
         this.movesLeft = movesLeft
         this.movesRight = movesRight
         this.movesUp = movesUp
         this.movesDown = movesDown
+        this.block_speed = block_speed
+        // Waiting
+        this.waitTime = waitTime
+        this.timeoutID = undefined
+        this.oldDate = undefined
+        this.pausedDate = undefined 
+        // Original variables for reseting
+        this.original_x = this.x
+        this.original_y = this.y
         this.originalMovesLeft = this.movesLeft
         this.originalMovesRight = this.movesRight
         this.originalMovesUp = this.movesUp
         this.originalMovesDown = this.movesDown
         this.original_block_speed = block_speed
+        // Other
         this.inWater = undefined
-        this.stopHole = false
+        this.stopHole = false        
     }
-   
     reset() {
-        this.x = this.original_x 
+        window.clearTimeout(this.timeoutID)
+        this.x = this.original_x
         this.y = this.original_y
         this.movesLeft = this.originalMovesLeft  
         this.movesRight = this.originalMovesRight  
@@ -131,6 +185,18 @@ export class Enemy extends GameObject {
         this.movesDown = this.originalMovesDown 
         this.block_speed = this.original_block_speed
         this.inWater = undefined
+    }
+    setTimer() {
+        if (this.timeoutID !== null && this.timeoutID !== undefined) {
+            this.timeoutID = setTimeout((function() {
+                this.action()
+            }).bind(this), this.waitTime - (this.pausedDate - this.oldDate))
+        }
+    }
+    stopTimer() {
+        window.clearTimeout(this.timeoutID)
+        this.pausedDate = new Date()
+       
     }  
     update(delta) {
         var oldX = this.x
@@ -146,8 +212,7 @@ export class Enemy extends GameObject {
                     this.movesLeft = false
 
                     if (this.movesUp && this.movesDown)
-                    this.movesUp = false
-                        
+                    this.movesUp = false    
                 }
 
                 if (chooseMovement === 2) {
@@ -156,9 +221,9 @@ export class Enemy extends GameObject {
                         
                     if (this.movesUp && this.movesDown)
                     this.movesDown = false
-                        
                 }
             }
+        // Move Enemy
         if (this.movesLeft) {
             this.x = this.x - this.block_speed * delta
         }
@@ -174,6 +239,7 @@ export class Enemy extends GameObject {
         if (this.movesDown) { 
             this.y = this.y + this.block_speed * delta
         }
+        // Check if touching changeDirectionSquares
         gameStates.CurrentLevel().changeDirectionSquares.forEach(function(changeDirectionSquare) {
             if (changeDirectionSquare.intersectsAll(self) && changeDirectionSquare.allowDirectionChange) {
                 //console.log("hi")
@@ -224,18 +290,21 @@ export class Enemy extends GameObject {
             }
         })
 
+        // Check if touching walls
         gameStates.CurrentLevel().walls.forEach(function(wall) {
             if (wall.intersects(self) && !wall.allowMovement) {
                 intersectsWall = true
             }
         })
 
+        // Check if touching rocks
         gameStates.CurrentLevel().rocks.forEach(function(rock) {
             if (!rock.allowMovement && rock.intersects(self)) {
                 intersectsWall = true
             }
         })
 
+        // Check if touching holes
         gameStates.CurrentLevel().holes.forEach(function(hole) {
             if (!hole.fullHole && hole.intersectsAll(self)) {
                 hole.currentIntersects = hole.currentIntersects + 1
@@ -253,11 +322,13 @@ export class Enemy extends GameObject {
             }
         })
 
+        // Check if touching waters
         gameStates.CurrentLevel().waters.forEach(function(water) {
             if (water.intersects(self)) {   
                 intersectsWater = true
             }
         })
+        // Chnage speed if in water
         if (intersectsWater && (this.inWater === false || this.inWater === undefined)) {
             this.block_speed = this.block_speed / 2    
         }
@@ -265,28 +336,91 @@ export class Enemy extends GameObject {
         if (!intersectsWater && this.inWater === true) {
             this.block_speed = this.block_speed * 2    
         }
-
         this.inWater = intersectsWater
 
+        // Check if touching finishAreas
         gameStates.CurrentLevel().finishAreas.forEach(function(finishArea) {
             if (finishArea.intersects(self)) {
                 intersectsWall = true
             }
         })
-            
-        if (this.movesRight && this.x >= 850 - this.width || this.movesLeft && this.x <= 0 || (this.movesLeft || this.movesRight) && intersectsWall) {
-            this.movesLeft = !this.movesLeft
-            this.movesRight = !this.movesRight
+ 
+        if (this.movesLeft && this.x <= 0 + 850 * (gameStates.CurrentLevel().width - 1) || this.movesLeft && intersectsWall) {
+            this.movesLeft = false
             this.x = oldX
+            if (this.waitTime !== undefined && this.waitTime !== null) {
+                this.oldDate = new Date()
+                this.action = function() {
+                    self.movesRight = true
+                    self.timeoutId = undefined
+                    //self.action = undefined
+                }
+                this.timeoutID = setTimeout(function() {
+                    self.action()
+                }, self.waitTime)
+            } else {
+                this.movesRight = true 
+            }
+            return
         }
 
-        if (this.movesDown && this.y >= 600 - this.height || this.movesUp && this.y <= 0 || (this.movesUp || this.movesDown) && intersectsWall) {
-            this.movesUp = !this.movesUp
-            this.movesDown = !this.movesDown
+        if (this.movesRight && this.x >= 850 * gameStates.CurrentLevel().width - this.width || this.movesRight && intersectsWall) {
+            this.movesRight = false
+            this.x = oldX
+            if (this.waitTime !== undefined) {
+                this.oldDate = new Date()
+                this.action = function() {
+                    self.movesLeft = true
+                    self.timeoutId = undefined
+                    //self.action = undefined
+                }
+                this.timeoutID = setTimeout(function() {
+                    self.action()
+                }, self.waitTime)
+            } else {
+                this.movesLeft = true 
+            }
+            return
+        }
+
+        if (this.movesUp && this.y <= 600 * (gameStates.CurrentLevel().height - 1) || this.movesUp && intersectsWall) {
+            this.movesUp = false
             this.y = oldY
+            if (this.waitTime !== undefined) {
+                this.oldDate = new Date()
+                this.action = function() {
+                    self.movesDown = true
+                    self.timeoutId = undefined
+                    //self.action = undefined
+                }
+                this.timeoutID = setTimeout(function() {
+                    self.action()
+                }, self.waitTime)
+            } else {
+                this.movesDown = true 
+            }
+            return
         }
-    }
 
+        if (this.movesDown && this.y >= 600 * gameStates.CurrentLevel().height - this.height || this.movesDown && intersectsWall) {
+            this.movesDown = false
+            this.y = oldY
+            if (this.waitTime !== undefined) {
+                this.oldDate = new Date()
+                this.action = function() {
+                    self.movesUp = true
+                    self.timeoutId = undefined
+                    //self.action = undefined
+                }
+                this.timeoutId = setTimeout(function() {
+                    self.action()
+                }, self.waitTime)
+            } else {
+                this.movesUp = true 
+            }
+            return
+        }
+    }   
     Draw() {
         if (draw.spriteStyle) {
             draw.DrawImage(images.RedCube, this.x, this.y)
@@ -301,8 +435,10 @@ export class Enemy extends GameObject {
 export class Player extends GameObject {
     constructor(x, y, width, height) {
         super(x, y, width, height)
-        this.original_x = x
-        this.original_y = y
+        // Original variables for reseting
+        this.original_x = this.x
+        this.original_y = this.y
+        // Other
         this.previousIntersectsHole = false
     }
     moveRight() {
@@ -558,11 +694,10 @@ export class Player extends GameObject {
         })
     }
     reset() {
-        this.x = this.original_x 
+        this.x = this.original_x
         this.y = this.original_y
     }   
     update() {
-
     }   
     Draw() {
         if (gameStates.currentCubeStyle === cubeStyle.BlueCube && draw.spriteStyle) {
@@ -611,6 +746,8 @@ gameStates.currentCubeStyle = cubeStyle.BlueCube
 export class Wall extends GameObject {
     constructor(x, y, width, height, color1, allowMovement, invisibleWall) {
         super(x, y, width, height, color1)
+        this.original_x = this.x
+        this.original_y = this.y
         this.allowMovement = allowMovement
         this.invisibleWall = invisibleWall
         this.randomList = Array(100)
@@ -658,7 +795,7 @@ export class Wall extends GameObject {
                     else if (this.randomList[i] % 9 === 0)
                        draw.DrawImage(images.WallGrassV2, 0, 0) 
                     
-                    else if (this.randomList[i] % 998 === 0 && gameStates.currentGameMode === gameMode.StoryMode) {
+                    else if (this.randomList[i] % 997 === 0) {
                        draw.DrawImage(images.WallGrassTree, 0, 0)
                         draw.blueCubeWoodenLock = false
                     }
@@ -678,11 +815,18 @@ export class Wall extends GameObject {
             } 
  
     }
+
+    reset() {
+        this.x = this.original_x
+        this.y = this.original_y
+    }
 };
 
 export class Water extends GameObject {
     constructor(x, y, width, height, color1) {
         super(x, y, width, height, color1)
+        this.original_x = this.x
+        this.original_y = this.y
         this.spriteX = 0
     }
 
@@ -709,13 +853,17 @@ export class Water extends GameObject {
         
     }
     
-    reset() {  
-    } 
+    reset() {
+        this.x = this.original_x
+        this.y = this.original_y
+    }
 };
 
 export class Item extends GameObject {
     constructor(x, y, width, height, typeNumber) {
         super(x, y, width, height)
+        this.original_x = this.x
+        this.original_y = this.y
         this.typeNumber = typeNumber
         this.allowMovementWater = false
         this.collected = false
@@ -746,14 +894,18 @@ export class Item extends GameObject {
     }
     
     reset() {
+        this.x = this.original_x
+        this.y = this.original_y
         this.allowMovementWater = false
-        this.collected = false
+        this.collected = false 
     }
 };
 
 export class ChangeDirectionSquare extends GameObject {
     constructor(x, y, width, height, changeLeft, changeRight, changeUp, changeDown, allowDirectionChange, title) {
         super(x, y, width, height, "red")
+        this.original_x = this.x
+        this.original_y = this.y
         this.color2 = "orange"
         this.allowDirectionChangeOld = allowDirectionChange
         this.allowDirectionChange = allowDirectionChange
@@ -772,55 +924,66 @@ export class ChangeDirectionSquare extends GameObject {
         canvas.context.fillRect(this.x, this.y, this.width, this.height)
     }
     reset() {
-        this.allowDirectionChange = this.allowDirectionChangeOld
+         this.x = this.original_x
+        this.y = this.original_y
+        this.allowDirectionChange = this.allowDirectionChangeOld 
     }
 };
 
 export class Rock extends GameObject {
     constructor(x, y, width, height, color1, color2, title, allowMovement, colorNumber, typeNumber) {
         super(x, y, width, height, color1)
+        this.original_x = this.x
+        this.original_y = this.y
         this.color2 = color2
         this.title = title
         this.allowMovement = allowMovement
+        this.originalAllowMovement = this.allowMovement
         this.colorNumber = colorNumber
         this.typeNumber = typeNumber
     }
 
-        Draw() {
-            var self = this
-            if (draw.spriteStyle && this.typeNumber === 1) {
-                if (this.colorNumber === 1) {
-                    gameStates.CurrentLevel().unlocks.forEach(function(unlock) {
-                        if (unlock.activated && unlock.title === self.title) {
-                           draw.DrawImage(images.UnlockedRockBlue, self.x, self.y)
-                            
-                        } else if (!unlock.activated && unlock.title === self.title) {
-                           draw.DrawImage(images.UnlockRockBlue, self.x, self.y)    
-                        }
-                    })
-                } else if (this.colorNumber === 2) {
-                    gameStates.CurrentLevel().unlocks.forEach(function(unlock) {
-                        if (unlock.activated && unlock.title === self.title) {
-                           draw.DrawImage(images.UnlockedRockPurple, self.x, self.y)    
-                        
-                        } else if (!unlock.activated && unlock.title === self.title) {
-                           draw.DrawImage(images.UnlockRockPurple, self.x, self.y)    
-                        }
-                    })
-            }       
-            } else if (draw.plasticStyle && this.typeNumber === 1) {
-                gameStates.CurrentLevel().unlocks.forEach(function(unlock) { 
-                    if (!unlock.activated && unlock.title === self.title)
-                        canvas.context.fillStyle = self.color1
+    Draw() {
+        var self = this
+        if (draw.spriteStyle && this.typeNumber === 1) {
+            if (this.colorNumber === 1) {
+                gameStates.CurrentLevel().unlocks.forEach(function(unlock) {
+                    if (self.allowMovement && unlock.title === self.title) {
+                       draw.DrawImage(images.UnlockedRockBlue, self.x, self.y)
 
-                    if (unlock.activated && unlock.title === self.title)
-                        canvas.context.fillStyle = self.color2
+                    } else if (!self.allowMovement && unlock.title === self.title) {
+                       draw.DrawImage(images.UnlockRockBlue, self.x, self.y)    
+                    }
                 })
-                canvas.context.fillRect(this.x, this.y, this.width, this.height)
+            } else if (this.colorNumber === 2) {
+                gameStates.CurrentLevel().unlocks.forEach(function(unlock) {
+                    if (self.allowMovement && unlock.title === self.title) {
+                       draw.DrawImage(images.UnlockedRockPurple, self.x, self.y)    
+
+                    } else if (!self.allowMovement && unlock.title === self.title) {
+                       draw.DrawImage(images.UnlockRockPurple, self.x, self.y)    
+                    }
+                })
+        }       
+        } else if (draw.plasticStyle && this.typeNumber === 1) {
+            gameStates.CurrentLevel().unlocks.forEach(function(unlock) { 
+                if (!self.allowMovement && unlock.title === self.title)
+                    canvas.context.fillStyle = self.color1
+
+                if (self.allowMovement && unlock.title === self.title)
+                    canvas.context.fillStyle = self.color2
+            })
+            canvas.context.fillRect(this.x, this.y, this.width, this.height)
                  
-            }
-     
         }
+     
+    }
+
+    reset() {
+        this.x = this.original_x
+        this.y = this.original_y
+        this.allowMovement = this.originalAllowMovement
+    }
         
     
 };
@@ -828,6 +991,8 @@ export class Rock extends GameObject {
 export class Unlock extends GameObject {
     constructor(x, y, width, height, color1, color2, activatedcolor, title, colorNumber) {
         super(x, y, width, height, color1)
+        this.original_x = this.x
+        this.original_y = this.y
         this.color2 = color2
         this.activatedcolor = activatedcolor
         this.title = title
@@ -836,11 +1001,11 @@ export class Unlock extends GameObject {
 
     update() {
        var self = this
-       gameStates.CurrentLevel().players.forEach(function(player) {
+        gameStates.CurrentLevel().players.forEach(function(player) {
             if (self.intersectsAll(player)) {
                 gameStates.CurrentLevel().rocks.forEach(function(rock) {
-                    if (self.title === rock.title) {
-                        rock.allowMovement = true
+                    if (self.title === rock.title && rock.allowMovement === rock.originalAllowMovement) {
+                        rock.allowMovement = !rock.allowMovement
                     }
                 })
                 gameStates.CurrentLevel().changeDirectionSquares.forEach(function(changeDirectionSquare) {
@@ -852,11 +1017,11 @@ export class Unlock extends GameObject {
             }
         })
 
-       gameStates.CurrentLevel().enemies.forEach(function(enemy) {
+        gameStates.CurrentLevel().enemies.forEach(function(enemy) {
             if (self.intersectsAll(enemy)) {
                 gameStates.CurrentLevel().rocks.forEach(function(rock) {
-                    if (self.title === rock.title) {
-                        rock.allowMovement = true
+                    if (self.title === rock.title && rock.allowMovement === rock.originalAllowMovement) {
+                        rock.allowMovement = !rock.allowMovement
                     }
                 })
                 gameStates.CurrentLevel().changeDirectionSquares.forEach(function(changeDirectionSquare) {
@@ -872,57 +1037,66 @@ export class Unlock extends GameObject {
     Draw() {
         if (draw.spriteStyle === true) {
             if (this.colorNumber === 1) {
-            
-                if (this.activated) {
+                if (this.activated)
                    draw.DrawImage(images.SwitchW1ActivatedBlue, this.x, this.y) 
                 
-                } else {
+                else
                    draw.DrawImage(images.SwitchW1Blue, this.x, this.y) 
-                }
             
             } else if (this.colorNumber === 2) {
-            
-                if (this.activated) {
+                if (this.activated)
                    draw.DrawImage(images.SwitchW1ActivatedPurple, this.x, this.y) 
-                } else {
+                else
                    draw.DrawImage(images.SwitchW1Purple, this.x, this.y)  
-                }
             }            
         
         } else if (draw.plasticStyle === true) {
             canvas.context.fillStyle = this.color1
             canvas.context.fillRect(this.x, this.y, this.width, this.height)
-            if (this.activated) {
+            if (this.activated)
                 canvas.context.fillStyle = this.activatedcolor
-            
-            } else {
+            else
                  canvas.context.fillStyle = this.color2    
-            }
             canvas.context.fillRect(this.x + 10, this.y + 10, 30, 30)
+            
         }
+    }
+
+    reset() {
+        this.x = this.original_x
+        this.y = this.original_y
+        this.activated = false    
     }
 };
 
 export class Teleporter extends GameObject {
-    constructor(x, y, otherTeleporter, width, height, colorNumber) {
+    constructor(x, y, width, height, teleportTo, colorNumber) {
         super(x, y, width, height)
+        this.original_x = this.x
+        this.original_y = this.y
+        this.originalTeleportingX = undefined
+        this.originalTeleportingY = undefined
+        this.original_y = this.y
         this.colorNumber = colorNumber
         this.stop = false
-        this.otherTeleporter = otherTeleporter
+        this.teleportTo = teleportTo
     }
 
     update() {
        var self = this
        gameStates.CurrentLevel().players.forEach(function(player) {
-            if (self.intersectsAll(player) && !self.stop) {   
-                self.otherTeleporter.stop = true
-                player.y = self.otherTeleporter.y
-                player.x = self.otherTeleporter.x
-            
-            }
-            if (!self.intersects(player) && self.stop) {
-                self.stop = false        
-            }
+            gameStates.CurrentLevel().teleporters.forEach(function(teleporter) {
+                if (self.intersects(player) && !self.stop) { 
+                    if (self.teleportTo === teleporter.teleportTo && self.colorNumber === teleporter.colorNumber && self !== teleporter) {        
+                        teleporter.stop = true
+                        player.y = teleporter.y
+                        player.x = teleporter.x
+                    }
+                }
+                if (!teleporter.intersects(player) && teleporter.stop) {
+                    self.stop = false        
+                }
+            })  
         })
     }
 
@@ -947,14 +1121,22 @@ export class Teleporter extends GameObject {
             }
 
         }
-    }   
+    }
+    
+    reset() {
+        this.x = this.original_x
+        this.y = this.original_y
+    }
 };
 
 export class Hole extends GameObject {
     constructor(x, y, width, height, fullHole, currentIntersects, maxIntersects) {
         super(x, y, width, height)
+        this.original_x = this.x
+        this.original_y = this.y
         this.fullHole = fullHole
         this.currentIntersects = currentIntersects
+        this.originalCurrentIntersects = this.currentIntersects
         this.maxIntersects = maxIntersects
         this.previousIntersectsHole = false
         this.stopPlayer = false
@@ -990,18 +1172,27 @@ export class Hole extends GameObject {
     }
 
     reset() {
+        this.x = this.original_x
+        this.y = this.original_y
         this.fullHole = false
-        this.currentIntersects = 0
+        this.currentIntersects = this.originalCurrentIntersects
     }
 }
 
 export class FinishArea extends GameObject {
     constructor(x, y, width, height) {
         super(x, y, width, height, "pink")
+        this.original_x = this.x
+        this.original_y = this.y
     }
     
     Draw() {
         canvas.context.fillStyle = this.color1;
         canvas.context.fillRect(this.x, this.y, this.width, this.height)
+    }
+
+    reset() {
+        this.x = this.original_x
+        this.y = this.original_y
     }
 };

@@ -38,7 +38,6 @@ class Menu {
     Draw(textBody) {
         var self = this
         const heightPerItem = (this.negativeOffsetY - this.offsetY) / this.menuItems.length
-        //canvas.context.font = '115px Arial'
         if (textBody !== undefined)
             textBody()
         this.menuItems.forEach(function(menuItem, index) {
@@ -110,7 +109,7 @@ class Menu {
                     
         this.menus.push(this.WinMenu = new Menu([
             new MenuItem("Continue", 1, "rgb(255, 0, 75)", '115px Arial', function() {
-                if (gameStates.currentLevelIndex !== 7) {
+                if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1) {
                     levelTools.NextLevel()
                     gameStates.currentLevelIndex++
                     gameStates.SetGameState(storyModeStates.Playing, "StoryMode")
@@ -130,7 +129,9 @@ class Menu {
         this.menus.push(this.PauseMenu = new Menu([
             new MenuItem("Resume", 1, "rgb(255, 0, 86)", '115px Arial', function() {
                 gameStates.SetGameState(storyModeStates.Playing, "StoryMode")
-        
+                gameStates.CurrentLevel().enemies.forEach(function(enemy) {
+                    enemy.setTimer()   
+                })
             }),
             new MenuItem("Retry", 2, "rgb(255, 85, 20)", '115px Arial', function() {
                 levelTools.Restart()
@@ -142,6 +143,7 @@ class Menu {
             }),
             new MenuItem("Main Menu", 4, "rgb(255, 170, 0)", '115px Arial', function() {
                 levelTools.Restart()
+                gameStates.SetGameState(storyModeStates.Selecting, "StoryMode")
                 gameStates.currentStartingMenusState = startingMenusStates.Menu
             }),               
         ], 0, 600))

@@ -112,37 +112,39 @@ export function Keydown(event) {
         // Game to Pause Menu
         if ((event.key === " " || event.key === "Enter") && gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
             gameStates.SetGameState(storyModeStates.Paused, "StoryMode")
+            gameStates.CurrentLevel().enemies.forEach(function(enemy) {
+                enemy.stopTimer()    
+            })
             return
         }
 
         if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
-            //console.log('key pressed/')
-                // "Right" Arrow || "d" Key
             gameStates.CurrentLevel().players.forEach(function(player) {    
-                if ((event.keyCode === 39 || event.key === "d") && player.x < 800)
-                player.moveRight()
-                return
-            })
+                // "Right" Arrow || "d" Key
+                if (event.keyCode === 39 || event.key === "d") {
+                    player.moveRight()
+                    return
+                }
             
                 // "Down" Arrow || "s" Key
-            gameStates.CurrentLevel().players.forEach(function(player) {    
-                if ((event.keyCode === 40 || event.key === "s") && player.y < 550)
-                player.moveDown()
-                return
-            })
+                if (event.keyCode === 40 || event.key === "s") {
+                    player.moveDown()
+                    return
+                }
             
                 // "Up" Arrow || "w" Key
-            gameStates.CurrentLevel().players.forEach(function(player) {    
-                if ((event.keyCode === 38 || event.key === "w") && player.y !== 0)
-                player.moveUp()
-                return
-            })
+                if (event.keyCode === 38 || event.key === "w") {
+                    player.moveUp()
+                    return
+                }
+
             
                 // "Left" Arrow || "a" Key
-            gameStates.CurrentLevel().players.forEach(function(player) {
-                if ((event.keyCode === 37 || event.key === "a") && player.x !== 0)
-                player.moveLeft()
-                return
+                if (event.keyCode === 37 || event.key === "a") {
+                    player.moveLeft()
+                    return
+                }
+                player.changeSlideVariables()
             })
         }
     }       

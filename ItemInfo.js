@@ -5,8 +5,10 @@ const {canvas} = require('./Canvas')
 const {gameStates} = require('./GameData');
 
 var LockedFeature = {
-    infoEnemy: 1,
-    infoEnemy2: 9,
+    infoCuber: 1,
+    infoCuber2: 9,
+    infoCuber3: 10,
+    infoRollphant1: 11,
     ///
     infoWall: 2,
     infoInvisibleWall: 5,
@@ -18,6 +20,8 @@ var LockedFeature = {
     infoRock: 4,
     ///
     infoLifeJacket: 7,
+    infoFinishItems: 10,
+    infoFireShard: 10,
     ///
     infoHole: 8,
 }
@@ -63,9 +67,9 @@ export class InfoController {
             // Forward   
             if (event.offsetY > 150 && event.offsetY < 450) {
                 if ((this.items[this.itemIndex].slides.length - 1) === this.slideIndex) 
-                this.slideIndex = 0
+                    this.slideIndex = 0
                 else
-                this.slideIndex++
+                    this.slideIndex++
                 return
             }
 
@@ -152,9 +156,14 @@ class ItemSlide {
         canvas.context.fillStyle = 'lightcoral'
         canvas.context.fillText("Item " + gameStates.infoController.slideIndex, 200, 200);
         ///
-        canvas.context.font = "150px Arial";
         canvas.context.fillStyle = 'lime'
-        canvas.context.fillText("Beat Level " + this.neededFeature, 10, 550);   
+        if (this.neededFeature >= 10) {
+            canvas.context.font = "125px Arial";
+            canvas.context.fillText("Beat Level " + this.neededFeature, 35, 550);   
+        } else {
+            canvas.context.font = "150px Arial";
+            canvas.context.fillText("Beat Level " + this.neededFeature, 10, 550);   
+        }
       }
     }
 };
@@ -163,28 +172,46 @@ class EnemyInfo {
     constructor() {
         var titleSlide = new ItemSlide([
             new ItemText("Enemies", "200px Arial", "purple", 10, 400),
-            ], 0)
+        ], 0)
 
         var slide1 = new ItemSlide([
-            new ItemImage(false, images.RedCube_200x200, 625, 10),
+            new ItemImage(false, images.RedCube_200x200, 562.5, 10),
             ///
             new ItemText("Cubers", "150px Arial", "purple", 10, 150),
             new ItemText("Cubers move left to right or up to", "50px Arial", "rgb(2, 0, 139)", 10, 275),
             new ItemText("down at a time.", "50px Arial", "rgb(2, 0, 139)", 10, 350),
             new ItemText("Players lose when they touch a cuber.", "48px Arial", "rgb(2, 0, 139)", 10, 450),
-            new ItemText("Cubers can move at different speeds.", "48px Arial", "rgb(2, 0, 139)", 10, 525),
-            ], LockedFeature.infoEnemy)
+            new ItemText("Cubers can move at different speeds.", "48px Arial", "rgb(2, 0, 139)", 10, 550),
+        ], LockedFeature.infoCuber)
 
         var slide2 = new ItemSlide([
-            new ItemImage(false, images.RedCube_200x200, 625, 10),
+            new ItemImage(false, images.RedCube_200x200, 562.5, 10),
             /// 
             new ItemText("Cubers", "150px Arial", "purple", 10, 150),
-            new ItemText("Cubers can activate switches.", "50px Arial", "rgb(2, 0, 139)", 10, 275),
-            new ItemText("Cubers move at normal speed in", "50px Arial", "rgb(2, 0, 139)", 10, 375),
-            new ItemText("water when they collect life jackets.", "50px Arial", "rgb(2, 0, 139)", 15, 450)
-        ], LockedFeature.infoEnemy2)
+            new ItemText("Cubers may wait when they touch", "50px Arial", "rgb(2, 0, 139)", 10, 262.5),
+            new ItemText("walls or change direction.", "50px Arial", "rgb(2, 0, 139)", 15, 337.5),
+            new ItemText("Cuber may only wait when moving", "50px Arial", "rgb(2, 0, 139)", 10, 425),
+            new ItemText("certain directions.", "50px Arial", "rgb(2, 0, 139)", 10, 500),
+            new ItemText("Cubers can wait different times.", "50px Arial", "rgb(2, 0, 139)", 10, 587.5),
+        ], LockedFeature.infoCuber2)
 
-        this.slides = [titleSlide, slide1, slide2]
+        var slide3 = new ItemSlide([
+            new ItemImage(false, images.RedCube_200x200, 562.5, 10),
+            /// 
+            new ItemText("Cubers", "150px Arial", "purple", 10, 150),
+            new ItemText("Cubers can activate switches.", "60px Arial", "rgb(2, 0, 139)", 10, 275),
+            new ItemText("Cubers can be defeated.", "60px Arial", "rgb(2, 0, 139)", 10, 375),
+            new ItemText("Cubers may drop items when", "60px Arial", "rgb(2, 0, 139)", 10, 475),
+            new ItemText("defeated.", "60px Arial", "rgb(2, 0, 139)", 10, 550),
+        ], LockedFeature.infoCuber3)
+
+        var slide4 = new ItemSlide([
+            new ItemImage(false, images.RedCube_200x200/*images.Rollphant_200x200*/, 600, 10),
+            /// 
+            new ItemText("Rollphant", "125px Arial", "purple", 10, 150),
+        ], LockedFeature.infoRollphant1)
+
+        this.slides = [titleSlide, slide1, slide2, slide3, slide4]
     }
 };
 
@@ -192,7 +219,7 @@ class BarrierInfo {
     constructor() {
         var titleSlide = new ItemSlide([
             new ItemText("Barriers", "200px Arial", "purple", 10, 400),
-            ], 0)
+        ], 0)
         
         var cuberSlide1 = new ItemSlide([
             new ItemImage(false, images.WallGrassV1_200x200, 550, 10),
@@ -235,23 +262,27 @@ class IntractableInfo {
             ], 0)
 
         var switchSlide1 = new ItemSlide([
-            new ItemImage(false, images.SwitchW1Blue_200x200, 630, 10),
+            new ItemImage(false, images.SwitchW1Blue_200x200, 550, 10),
             ///
-            new ItemText("Switches", "145px Arial", "purple", 10, 150),
-            new ItemText("Players and ememies can go on switches.", "45px Arial", "rgb(2, 0, 139)", 10, 275),
-            new ItemText("When players and ememies go on a", "45px Arial", "rgb(2, 0, 139)", 10, 375),
-            new ItemText("switch it activates.", "45px Arial", "rgb(2, 0, 139)", 10, 425),
-            new ItemText("Different switches can have different", "45px Arial", "rgb(2, 0, 139)", 10, 525),
+            new ItemText("Reverse", "125px Arial", "purple", 10, 100),
+            new ItemText("Tiles", "125px Arial", "purple", 75, 220),
+            new ItemText("Players and ememies can go on reverse", "45px Arial", "rgb(2, 0, 139)", 10, 275),
+            new ItemText("tiles.", "45px Arial", "rgb(2, 0, 139)", 10, 325),
+            new ItemText("When players and ememies go on a", "45px Arial", "rgb(2, 0, 139)", 10, 400),
+            new ItemText("reverse tile it activates.", "45px Arial", "rgb(2, 0, 139)", 10, 450),
+            new ItemText("Different reverse tiles can have different", "45px Arial", "rgb(2, 0, 139)", 10, 525),
             new ItemText("colours.", "45px Arial", "rgb(2, 0, 139)", 10, 575),
         ], LockedFeature.infoSwitch)
 
         var switchSlide2 = new ItemSlide([
-            new ItemImage(false, images.SwitchW1Purple_200x200, 630, 10),
+            new ItemImage(false, images.SwitchW1Purple_200x200, 550, 10),
             /// 
-            new ItemText("Switches", "145px Arial", "purple", 10, 150),
-            new ItemText("When a switch gets activated,", "55px Arial", "rgb(2, 0, 139)", 10, 275),
-            new ItemText("unlockable rocks with the same", "55px Arial", "rgb(2, 0, 139)", 10, 350),
-            new ItemText("colour breaks apart.", "55px Arial", "rgb(2, 0, 139)", 10, 425)
+            new ItemText("Reverse", "125px Arial", "purple", 10, 100),
+            new ItemText("Tiles", "125px Arial", "purple", 75, 220),
+            new ItemText("When a reverse tile is activated,", "55px Arial", "rgb(2, 0, 139)", 10, 300),
+            new ItemText("rocks with the same, colour", "55px Arial", "rgb(2, 0, 139)", 10, 375),
+            new ItemText("breaks if they're altogether and", "55px Arial", "rgb(2, 0, 139)", 10, 450),
+            new ItemText("become altogether if they're apart.", "55px Arial", "rgb(2, 0, 139)", 10, 525)
         ], LockedFeature.infoSwitch)
 
         var teleporterSlide1 = new ItemSlide([
@@ -274,28 +305,20 @@ class UnlockableInfo {
     constructor() {
         var titleSlide = new ItemSlide([
             new ItemText("Unlockables", "150px Arial", "purple", 10, 400),
-            ], 0)
+        ], 0)
 
         var slide1 = new ItemSlide([
             new ItemImage(false, images.UnlockRockBlue_200x200, 625, 10),
             ///
             new ItemText("Rocks", "200px Arial", "purple", 10, 175),
-            new ItemText("Rocks act as barriers when altogether.", "45px Arial", "rgb(2, 0, 139)", 10, 300),
-            new ItemText("Different rocks can have different colours.", "45px Arial", "rgb(2, 0, 139)", 10, 400),
-            new ItemText("When switches activate they break rocks", "45px Arial", "rgb(2, 0, 139)", 10, 500),
-            new ItemText("with the same colour.", "45px Arial", "rgb(2, 0, 139)", 10, 550),
+            new ItemText("Rocks act as barriers when altogether.", "49px Arial", "rgb(2, 0, 139)", 10, 275),
+            new ItemText("When rocks are broken, anything can", "50px Arial", "rgb(2, 0, 139)", 10, 375),
+            new ItemText("go through them.", "50px Arial", "rgb(2, 0, 139)", 10, 425),
+            new ItemText("Different rocks can have different", "50px Arial", "rgb(2, 0, 139)", 10, 525),
+            new ItemText("colours.", "50px Arial", "rgb(2, 0, 139)", 10, 575)
+            
         ], LockedFeature.infoRock)
-
-        var slide2 = new ItemSlide([
-            new ItemImage(false, images.UnlockRockPurple_200x200, 625, 10),
-            ///
-            new ItemText("Rocks", "200px Arial", "purple", 10, 175),
-            new ItemText("Once broken players and", "65px Arial", "rgb(2, 0, 139)", 10, 300),
-            new ItemText("cubers can go through", "65px Arial", "rgb(2, 0, 139)", 10, 375),
-            new ItemText("them.", "65px Arial", "rgb(2, 0, 139)", 10, 450),
-
-        ], LockedFeature.infoRock)
-        this.slides = [titleSlide, slide1, slide2]
+        this.slides = [titleSlide, slide1]
     }
 };
 
@@ -303,19 +326,29 @@ class CollectableInfo {
     constructor() {
         var titleSlide = new ItemSlide([
             new ItemText("Collectables", "150px Arial", "purple", 10, 400),
-            ], 0)
+        ], 0)
 
         var slide1 = new ItemSlide([
             new ItemImage(false, images.LifeJacket_200x200, 625, 10),
             //
-            new ItemText("Life Jacket", "120px Arial", "purple", 10, 150),
+            new ItemText("Life Jackets", "120px Arial", "purple", 10, 150),
             new ItemText("When players pick up life jackets they", "50px Arial", "rgb(2, 0, 139)", 10, 262.5),
             new ItemText("can go in water.", "50px Arial", "rgb(2, 0, 139)", 10, 337.5),
-            new ItemText("When cubers pick up life jackets", "50px Arial", "rgb(2, 0, 139)", 10, 437.5),
+            new ItemText("When cubers pick up life jackets", "50px Arial", "rgb(2, 0, 139)", 10, 425),
             new ItemText("they can move at nomral speed in", "50px Arial", "rgb(2, 0, 139)", 10, 500),
-            new ItemText("water.", "50px Arial", "rgb(2, 0, 139)", 10, 562.5)
+            new ItemText("water.", "50px Arial", "rgb(2, 0, 139)", 10, 575)
         ], LockedFeature.infoLifeJacket)
-        this.slides = [titleSlide, slide1]
+        var slide2 = new ItemSlide([
+            new ItemImage(false, images.LifeJacket_200x200/*images.YellowKey_200x200*/, 625, 10),
+            //
+            new ItemText(" ", "120px Arial", "purple", 10, 150),
+        ], LockedFeature.infoFinishItems)
+        var slide3 = new ItemSlide([
+            new ItemImage(false, images.LifeJacket_200x200/*images.FireShard_200x200*/, 625, 10),
+            //
+            new ItemText("", "120px Arial", "purple", 10, 150),
+        ], LockedFeature.infoFireShard)
+        this.slides = [titleSlide, slide1, slide2, slide3]
     }
 };
 
