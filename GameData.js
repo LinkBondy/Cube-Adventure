@@ -10,7 +10,7 @@ export var gameMode = {
     StoryMode: 1,
     Shop: 2,
     ItemsInfo: 3,
-    Setting: 4
+    Settings: 4
 }
 
 export var storyModeStates = {
@@ -27,31 +27,22 @@ export var ShopMode/*shopStates*/ = {
     Player: 3
 }
 
-export var PlayerStyles = {
-    BlueCube: 1,
-    BlueCubeAlien: 2,
-    BlueCubeLava: 3,
-    BlueCubeWooden: 4,
-    BlueCubeSad: 5,
-}
-
 export var BackgroundStyles = {
-    Sprite: 1,
-    Plastic: 2
+    Classic: 0,
+    Plastic: 1
 }
 
 export var cubeStyle = {
-    BlueCube: 0,
+    Classic: 0,
     Alien: 1,
-    Lava: 2,
-    Wooden: 3,
-    Sad: 4,
+    Sad: 2,
+    Happy: 3,
 }
 
-var settingStates = {
+export var settingStates = {
     Selecting: 1,
     Keybinds: 2,
-    Brightness: 3,
+    ThemeColourSelection: 3,
     Sound: 4
 }
  
@@ -61,9 +52,9 @@ export var gameStates = {
     currentSettingState: settingStates.Selecting,
     currentGameMode: gameMode.StoryMode,
     currentShopMode: ShopMode.ShopMenu,
-    currentBackgroundStyle: BackgroundStyles.Sprite,
-    currentPlayerStyle: PlayerStyles.BlueCube,
+    currentBackgroundStyle: BackgroundStyles.Classic,
     currentCubeStyle: cubeStyle.BlueCube,
+    currentThemeColour: "lightgray",
     currentLevelIndex: 0,
     mobile: false,
     CurrentLevel: function() {
@@ -75,14 +66,60 @@ export var gameStates = {
         gameStates.currentStartingMenusState = gameState
         if (type === "StoryMode")
         gameStates.currentStoryModeState = gameState
+        if (type === "Settings")
+        gameStates.currentSettingState = gameState
     }
+}
+
+export var drawUpdate = {
+    highestLevelLock: true,
+    blueCubeSadLock: true,
+    blueCubeAlienLock: true,
 }
 
 export var levelTools = {
     currentLosses: 0,
     loseCounterStop: false,
-    update: function(delta) {
-        if  (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
+    UpdateGame: function(delta) {
+        if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode)
+            this.updateLevels(delta)
+
+        if (gameStates.arrayChartController.findCurrentArrayChart() !== false)
+            this.chartUpdate()
+        
+        if (gameStates.currentSettingState === settingStates.Keybinds && gameStates.currentGameMode === gameMode.Settings)
+            this.keybindUpdate()
+
+        this.checkWinLose()
+        this.drawUpdate()
+       
+        
+    },
+
+    chartUpdate: function() {
+        var numberDrew = 0
+        for (var col = 0; col < gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].loopHeight; col++) {
+            for (var row = 0; row < gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].loopWidth; row++){
+                gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].items[numberDrew].Update()
+                numberDrew++
+            }
+        }
+        gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].update()
+    },
+
+    keybindUpdate: function() {
+        gameStates.keybindController.keybinds.forEach(function(keybind) {  
+            keybind.Update()
+        },)
+    },
+
+    drawUpdate: function() {
+        if (gameStates.infoController.unlockedLevel === gameStates.levelController.levels.length)
+            drawUpdate.highestLevelLock = false
+    },
+
+    updateLevels: function(delta) {
+        if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
             gameStates.CurrentLevel().enemies.forEach(function(enemy) {
                 enemy.update(delta)
             })
@@ -102,6 +139,19 @@ export var levelTools = {
             gameStates.CurrentLevel().teleporters.forEach(function(teleporter) {
                 teleporter.update(delta)
             })
+        }
+    },
+
+    checkWinLose: function() {
+        if (levelTools.checkWin() && gameStates.currentStoryModeState !== storyModeStates.WonStage ) {
+            setTimeout(function() {
+                gameStates.SetGameState(storyModeStates.WonStage , "StoryMode")
+            }, 300)
+
+        } else if(levelTools.checkLose() && gameStates.currentStoryModeState !== storyModeStates.Lost) {
+            setTimeout(function() {
+                gameStates.SetGameState(storyModeStates.Lost , "StoryMode")
+            }, 30)
         }
     },
 
@@ -130,8 +180,7 @@ export var levelTools = {
                     lose = true
                 }
             })
-        })
-            
+        })  
         return lose
     },
 
@@ -199,17 +248,24 @@ export var dataManagement = {
             window.localStorage.setItem('stateGame', gameStates.currentStoryModeState)
         } else
             window.localStorage.setItem('stateGame', -1)
-        window.localStorage.setItem('PlayerAlienLock', draw.blueCubeAlienLock)
+        window.localStorage.setItem('PlayerAlienLock', drawUpdate.blueCubeAlienLock)
         window.localStorage.setItem('PlayerWoodenLock', draw.blueCubeWoodenLock)
-        window.localStorage.setItem('PlayerSadLock', draw.blueCubeSadLock)
+        window.localStorage.setItem('PlayerSadLock', drawUpdate.blueCubeSadLock)
         window.localStorage.setItem('StyleCube', gameStates.currentCubeStyle)
-        window.localStorage.setItem('styleSprite', draw.spriteStyle)
-        window.localStorage.setItem('stylePlastic', draw.plasticStyle)
+        window.localStorage.setItem('backgroundStyle', gameStates.currentBackgroundStyle)
+        window.localStorage.setItem('currentThemeColourSelection', gameStates.arrayChartController.arrayCharts[0].currentSelection)
+        ///
+        //var keybindArray = gameStates.keybindController.keybinds
+        //var savingArrayKeybind = []
+        //for(var pushed = 0; pushed < 7; pushed++) {
+            //savingArrayKeybind.push(keybindArray[pushed])
+        //}
+        window.localStorage.setItem('keybindArray', JSON.stringify(gameStates.keybindController.keybinds))
     },
 
     Load: function(draw) {
         var newUpdate = window.localStorage.getItem('newUpdate')    
-        if (newUpdate !== null) {
+        if (newUpdate !== null && newUpdate !== NaN) {
             var level = Number(window.localStorage.getItem('level'))
             var stateGame = Number(window.localStorage.getItem('stateGame'))
             if (level !== null) {
@@ -221,7 +277,7 @@ export var dataManagement = {
         }
        
         var WoodenLock = window.localStorage.getItem('PlayerWoodenLock')
-        if (WoodenLock !== null) {
+        if (WoodenLock !== null && WoodenLock !== NaN) {
             if (WoodenLock === 'true')
                 WoodenLock = true
 
@@ -232,52 +288,41 @@ export var dataManagement = {
         }
 
         var SadLock = window.localStorage.getItem('PlayerSadLock')
-        if (SadLock !== null) {
+        if (SadLock !== null && SadLock !== NaN) {
             if (SadLock === 'true') 
                 SadLock = true
             
             if (SadLock === 'false')
                 SadLock = false
             
-            draw.blueCubeSadLock = SadLock
+            drawUpdate.blueCubeSadLock = SadLock
         }
 
         var AlienLock = window.localStorage.getItem('PlayerAlienLock')
-        if (AlienLock !== null) {
+        if (AlienLock !== null && AlienLock !== NaN) {
             if (AlienLock === 'true') 
                 AlienLock = true
             
             if (AlienLock === 'false')
                 AlienLock = false
             
-            draw.blueCubeAlienLock = AlienLock
+            drawUpdate.blueCubeAlienLock = AlienLock
         }
 
-        var styleSprite = window.localStorage.getItem('styleSprite')
-        if (styleSprite !== null) {
-            if (styleSprite === 'true')
-                styleSprite = true
+        var BackgroundStyle = Number(window.localStorage.getItem('backgroundStyle'))
+            gameStates.currentBackgroundStyle = BackgroundStyle
 
-            if (styleSprite === 'false') 
-                styleSprite = false
-
-            draw.spriteStyle = styleSprite
-        }
-
-        var stylePlastic = window.localStorage.getItem('stylePlastic')
-        if (stylePlastic !== null) {
-            if (stylePlastic === 'true')
-                stylePlastic = true
-
-            if (stylePlastic === 'false')
-                stylePlastic = false
-
-            draw.plasticStyle = stylePlastic
+        var currentThemeColourSelection = window.localStorage.getItem('currentThemeColourSelection')
+        if (currentThemeColourSelection !== null && currentThemeColourSelection !== NaN) {
+            gameStates.currentThemeColour = gameStates.arrayChartController.arrayCharts[0].items[currentThemeColourSelection].value
+            gameStates.arrayChartController.arrayCharts[0].currentSelection = currentThemeColourSelection
         }
 
         var StyleCube = Number(window.localStorage.getItem('StyleCube'))
-        if (StyleCube !== null) {
             gameStates.currentCubeStyle = StyleCube
-        }
+
+        var loadArrayKeybind = JSON.parse(window.localStorage.getItem('keybindArray'))
+        if (loadArrayKeybind !== null)
+            gameStates.keybindController.load(loadArrayKeybind)  
     },
 }

@@ -246,7 +246,7 @@ class BarrierInfo {
             ///
             new ItemText("Water", "200px Arial", "purple", 10, 175),
             new ItemText("Players need life jackets to go in", "55px Arial", "rgb(2, 0, 139)", 10, 300),
-            new ItemText("the water.", "55px Arial", "rgb(2, 0, 139)", 10, 375),
+            new ItemText("water.", "55px Arial", "rgb(2, 0, 139)", 10, 375),
             new ItemText("Cubers can go into water but,", "55px Arial", "rgb(2, 0, 139)", 10, 475),
             new ItemText("they move at half the speed.", "55px Arial", "rgb(2, 0, 139)", 10, 550)
         ], LockedFeature.infoWater)
@@ -266,12 +266,11 @@ class IntractableInfo {
             ///
             new ItemText("Reverse", "125px Arial", "purple", 10, 100),
             new ItemText("Tiles", "125px Arial", "purple", 75, 220),
-            new ItemText("Players and ememies can go on reverse", "45px Arial", "rgb(2, 0, 139)", 10, 275),
-            new ItemText("tiles.", "45px Arial", "rgb(2, 0, 139)", 10, 325),
-            new ItemText("When players and ememies go on a", "45px Arial", "rgb(2, 0, 139)", 10, 400),
-            new ItemText("reverse tile it activates.", "45px Arial", "rgb(2, 0, 139)", 10, 450),
-            new ItemText("Different reverse tiles can have different", "45px Arial", "rgb(2, 0, 139)", 10, 525),
-            new ItemText("colours.", "45px Arial", "rgb(2, 0, 139)", 10, 575),
+            new ItemText("Players can only go on reverse tiles.", "50px Arial", "rgb(2, 0, 139)", 10, 275),
+            new ItemText("When players go on a reverse tile, it ", "50px Arial", "rgb(2, 0, 139)", 10, 375),
+            new ItemText("activates.", "50px Arial", "rgb(2, 0, 139)", 10, 425),
+            new ItemText("Different reverse tiles can have", "50px Arial", "rgb(2, 0, 139)", 10, 525 ),
+            new ItemText("different colours.", "50px Arial", "rgb(2, 0, 139)", 10, 575),
         ], LockedFeature.infoSwitch)
 
         var switchSlide2 = new ItemSlide([
@@ -281,7 +280,7 @@ class IntractableInfo {
             new ItemText("Tiles", "125px Arial", "purple", 75, 220),
             new ItemText("When a reverse tile is activated,", "55px Arial", "rgb(2, 0, 139)", 10, 300),
             new ItemText("rocks with the same, colour", "55px Arial", "rgb(2, 0, 139)", 10, 375),
-            new ItemText("breaks if they're altogether and", "55px Arial", "rgb(2, 0, 139)", 10, 450),
+            new ItemText("break if they're altogether and", "55px Arial", "rgb(2, 0, 139)", 10, 450),
             new ItemText("become altogether if they're apart.", "55px Arial", "rgb(2, 0, 139)", 10, 525)
         ], LockedFeature.infoSwitch)
 
@@ -331,7 +330,7 @@ class CollectableInfo {
         var slide1 = new ItemSlide([
             new ItemImage(false, images.LifeJacket_200x200, 625, 10),
             //
-            new ItemText("Life Jackets", "120px Arial", "purple", 10, 150),
+            new ItemText("Life Jackets", "115px Arial", "purple", 10, 150),
             new ItemText("When players pick up life jackets they", "50px Arial", "rgb(2, 0, 139)", 10, 262.5),
             new ItemText("can go in water.", "50px Arial", "rgb(2, 0, 139)", 10, 337.5),
             new ItemText("When cubers pick up life jackets", "50px Arial", "rgb(2, 0, 139)", 10, 425),

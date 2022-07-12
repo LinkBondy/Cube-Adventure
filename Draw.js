@@ -1,13 +1,8 @@
 "use strict";
-const {gameMode, startingMenusStates, storyModeStates, ShopMode, PlayerStyles, BackgroundStyles, cubeStyle, gameStates, levelTools} = require('./GameData');
+const {gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates, drawUpdate} = require('./GameData');
 const {canvas} = require('./Canvas')
 const {images} = require('./Images');
 export var draw = {
-    blueCubeWoodenLock: true,
-    blueCubeSadLock: true,
-    blueCubeAlienLock: true,
-    spriteStyle: true,
-    plasticStyle: false,
     DrawImage: function(image, x, y) {
         canvas.context.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height)
     },
@@ -23,8 +18,11 @@ export var draw = {
             if (gameStates.currentGameMode === gameMode.ItemsInfo)
                 gameStates.infoController.Draw()
 
-            /*if (gameStates.currentGameMode === gameMode.Settings)
-                this.SettingsDraw()*/
+            if (gameStates.currentGameMode === gameMode.Settings)
+                this.SettingsDraw()
+
+            if (gameStates.arrayChartController.findCurrentArrayChart() !== false)
+                this.DrawCharts()
         } else {
             if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted)
                 this.StartingSreenDraw()
@@ -33,9 +31,9 @@ export var draw = {
         }
         gameStates.background.DrawToolBar()
         if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused)
-        draw.DrawImage(images.MenuButton, 900, 475)
+            draw.DrawImage(images.MenuButton, 900, 475)
         else if (gameStates.currentStoryModeState !== storyModeStates.Lost && gameStates.currentStoryModeState !== storyModeStates.WonStage && gameStates.currentStartingMenusState !== startingMenusStates.NotStarted)
-        draw.DrawImage(images.BackButton, 900, 475)
+            draw.DrawImage(images.BackButton, 900, 475)
     },
     StoryModeDraw: function() {
         if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelController.CheckLocked()) {
@@ -56,7 +54,7 @@ export var draw = {
             if (levelTools.loseCounterStop === false) {
                 levelTools.currentLosses = levelTools.currentLosses + 1
                 if (levelTools.currentLosses === 50) {
-                    draw.blueCubeSadLock = false
+                    drawUpdate.blueCubeSadLock = false
                 }
                 levelTools.loseCounterStop = true
             }   
@@ -74,43 +72,6 @@ export var draw = {
     ShopDraw: function() {
         if (gameStates.currentShopMode === ShopMode.ShopMenu)
             gameStates.menuController.ShopMenu.Draw()
-        
-        if (gameStates.currentShopMode === ShopMode.Backround) {
-            if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-                this.DrawBackroundPlasticShop()   
-            }
-
-            if (gameStates.currentBackgroundStyle === BackgroundStyles.Sprite) {
-                this.DrawBackroundSpriteShop()   
-            }
-        }
-
-            if (gameStates.currentShopMode === ShopMode.Player) {
-                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCube) {
-                    this.DrawBlueCubeShop()   
-                }
-                    
-                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeAlien) {
-                    this.DrawBlueCubeAlienShop()   
-                }
-                    
-                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeLava) {
-                    this.DrawBlueCubeLavaShop()   
-                }
-                
-                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeWooden) {
-                    this.DrawBlueCubeWoodenShop()   
-                }
-                
-                if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeSad) {
-                    this.DrawBlueCubeSadShop()   
-                }
-            }
-
-            if (gameStates.mobile && (gameStates.currentShopMode === ShopMode.Player || gameStates.currentShopMode === ShopMode.Backround)) {
-                draw.DrawImage(images.UpArrowShop, 10, 450)
-                draw.DrawImage(images.DownArrowShop, 690, 450)
-            }
     },
     StartingSreenDraw: function() {
         canvas.context.font = '275px Arial';
@@ -121,11 +82,11 @@ export var draw = {
         canvas.context.fillText("Adventure", 120, 400);
         canvas.context.font = '60px Arial';
         canvas.context.fillStyle = 'darkred'
-        canvas.context.fillText("Press Space to Begin", 120, 550);
+        canvas.context.fillText("Press Enter to Begin", 120, 550);
         ///
         canvas.context.fillStyle = "black"
         canvas.context.fillRect(600, 50, 200, 200)
-        canvas.context.fillStyle = "lightgray"
+        canvas.context.fillStyle = gameStates.currentThemeColour
         canvas.context.fillRect(600 + 20, 50 + 40, 40, 40)
         canvas.context.fillRect(600 + 140, 50 + 40, 40, 40)
         canvas.context.fillRect(600 + 20, 50 + 130, 160, 40)
@@ -228,203 +189,73 @@ export var draw = {
         }
         
     },
-    DrawBackroundSpriteShop: function() {
-        draw.DrawImage(images.WallGrassV1_400x400, 225, 20)
-        if (draw.spriteStyle) {
-            if (gameStates.mobile === true) {
-                canvas.context.font = '75px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Sprite(Selected)", 155, 550)  
-            }
+    SettingsDraw: function() {
+        if (gameStates.currentSettingState === settingStates.Selecting)
+            gameStates.menuController.SettingsMenu.Draw()
 
-            else {
-                canvas.context.font = '100px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Sprite(Selected)", 65, 550)  
-            }
-        }  
-        
-        else {
-        canvas.context.font = '175px Arial'
-        canvas.context.fillStyle = 'indianred'
-        canvas.context.fillText("Sprite", 190, 550)
+        if (gameStates.keybindController.seletingKeybind === true) {
+            this.DrawRebindingText()
+
+        } else if (gameStates.currentSettingState === settingStates.Keybinds) {
+            gameStates.menuController.KeybindsSelector.Draw()
+            gameStates.keybindController.keybinds.forEach(function(keybind) {  
+                keybind.Draw()
+            },)
         }
+            
+    },
+    DrawCharts: function() {
+        var numberDrew = 0
+        for (var col = 0; col < gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].loopHeight; col++) {
+            for (var row = 0; row < gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].loopWidth; row++){
+                gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].items[numberDrew].Draw(row, col)
+                numberDrew++
+            }
+        }
+        numberDrew = 0
+        gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].Draw()
 
     },
-    DrawBackroundPlasticShop: function() {
-        canvas.context.fillStyle = "rgb(190, 190, 190)"
-        canvas.context.fillRect(225, 20, 400, 400)
-        if (draw.plasticStyle) {
-            if (gameStates.mobile === true) {
-                canvas.context.font = '75px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Plastic", 300, 500)
-                canvas.context.fillText("(Selected)", 250, 575)  
-            }
+    DrawRebindingText: function() {
+        // Set Alignment
+        canvas.context.textAlign = 'center'
+        // Set font and size
+        canvas.context.font = '80px Arial';
+        // Set font colour
+        canvas.context.fillStyle = "rgb(97, 97, 117)";
+        // Draw text
+        canvas.context.fillText("Select an unused key", 410, 120);
+        canvas.context.fillText("to replace:", 410, 220);
+        canvas.context.fillStyle = gameStates.currentThemeColour;
+                canvas.context.font = '80px Arial';
+                canvas.context.shadowColor = 'black'
+                canvas.context.shadowOffsetX = 5;
+                canvas.context.shadowOffsetY = 5;
+        switch (gameStates.keybindController.currentType) {
+            case "A":
+                canvas.context.fillStyle = gameStates.currentThemeColour;
+                canvas.context.fillText(gameStates.keybindController.currentKeybind.displayNameA, 410, 320);
+                canvas.context.shadowOffsetX = 0;
+                canvas.context.shadowOffsetY = 0;
+                canvas.context.strokeText(gameStates.keybindController.currentKeybind.displayNameA, 410, 320)
+            break
 
-            else {
-                canvas.context.font = '100px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Plastic(Selected)", 50, 550)   
-            }
-                 
-        }
-        else {
-            canvas.context.font = '175px Arial'
-            canvas.context.fillStyle = 'indianred'
-            canvas.context.fillText("Plastic", 165, 575)
-        }    
-    },
-    DrawBlueCubeShop: function() {
-        draw.DrawImage(images.BlueCube_400x400, 225, 25)
-        if (gameStates.currentCubeStyle === cubeStyle.BlueCube) {
-            if (gameStates.mobile === true) {
-                canvas.context.font = '75px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Classic", 300, 500)
-                canvas.context.fillText("(Selected)", 250, 575)
-            }
-
-            else {
-                canvas.context.font = '100px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Classic(Selected)", 35, 550)  
-            }
+            case "B":
                 
+                canvas.context.fillText(gameStates.keybindController.currentKeybind.displayNameB, 410, 320);
+                canvas.context.shadowOffsetX = 0;
+                canvas.context.shadowOffsetY = 0;
+                canvas.context.strokeText(gameStates.keybindController.currentKeybind.displayNameB, 410, 320)
+            break
         }
-        else {
-        canvas.context.font = '150px Arial'
-        canvas.context.fillStyle = 'indianred'
-        canvas.context.fillText("Classic", 175, 550)
-        }
-
+        canvas.context.shadowOffsetX = 0;
+        canvas.context.shadowOffsetY = 0;
+        canvas.context.fillStyle = "rgb(97, 97, 117)";
+        if (gameStates.keybindController.triedRebinding)
+            canvas.context.fillText("Try Again", 410, 420);
+        canvas.context.font = '60px Arial';
+        canvas.context.fillText("Click the back arrow to exit", 410, 575);
+        // Reset Alignment
+        canvas.context.textAlign = 'left'
     },
-    DrawBlueCubeAlienShop: function() {
-        if (draw.blueCubeAlienLock === false) {
-            draw.DrawImage(images.BlueCubeAlien_400x400, 225, 25)
-        }
-        if (gameStates.currentCubeStyle === cubeStyle.Alien && draw.blueCubeAlienLock === false) {
-            if (gameStates.mobile === true) {
-                canvas.context.font = '75px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Alien(Selected)", 175, 550)
-            }
-
-            else {
-                canvas.context.font = '100px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Alien(Selected)", 85, 550)
-            }      
-        }
-
-        else if (draw.blueCubeAlienLock === true) {
-            canvas.context.font = '90px Arial'
-            canvas.context.fillStyle = 'hotpink'
-            canvas.context.fillText("Get the Three Bead", 25, 100)
-            canvas.context.fillText("to unlock", 245, 225)
-        }
-
-        if (gameStates.currentCubeStyle !== cubeStyle.Alien) {
-            canvas.context.font = '150px Arial'
-            canvas.context.fillStyle = 'indianred'
-            canvas.context.fillText("Alien", 260, 550)
-        }
-    },
-    DrawBlueCubeLavaShop: function() {
-        draw.DrawImage(images.BlueCubeLava_400x400, 225, 25)
-        if (gameStates.currentCubeStyle === cubeStyle.Lava) {
-            if (gameStates.mobile === true) {
-                canvas.context.font = '75px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Lava(Selected)", 175, 550)
-            }
-
-            else {
-                canvas.context.font = '100px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Lava(Selected)", 87, 550)
-            }      
-        }
-        else {
-            canvas.context.font = '150px Arial'
-            canvas.context.fillStyle = 'indianred'
-            canvas.context.fillText("Lava", 260, 550)
-        }
-   
-    },
-    DrawBlueCubeWoodenShop: function() {
-        if (draw.blueCubeWoodenLock === false) {
-            draw.DrawImage(images.BlueCubeWooden_400x400, 225, 25)
-        }
-
-        if (gameStates.currentCubeStyle === cubeStyle.Wooden && draw.blueCubeWoodenLock === false) {
-            if (gameStates.mobile === true) {
-                canvas.context.font = '75px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Wooden", 280, 500)
-                canvas.context.fillText("(Selected)", 250, 575)
-            }
-
-            else {
-            canvas.context.font = '100px Arial'
-            canvas.context.fillStyle = 'indianred'
-            canvas.context.fillText("Wooden(Selected)", 10, 550)
-            }      
-        }
-        else if (draw.blueCubeWoodenLock === true) {
-            canvas.context.font = '75px Arial'
-            canvas.context.fillStyle = 'hotpink'
-            canvas.context.fillText("Find the tree to unlock", 50, 100)
-            
-            if (gameStates.mobile === true) {
-                canvas.context.font = '125px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Wooden", 195, 550)
-            }
-            else {
-                canvas.context.font = '150px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Wooden", 140, 550)
-            }
-        }
-            
-        else {
-            canvas.context.font = '150px Arial'
-            canvas.context.fillStyle = 'indianred'
-            canvas.context.fillText("Wooden", 140, 550)
-        }
-   
-    },
-    DrawBlueCubeSadShop: function() {
-        if (draw.blueCubeSadLock === false) {
-            draw.DrawImage(images.BlueCubeSad_400x400, 225, 25)
-        }
-
-        if (gameStates.currentCubeStyle === cubeStyle.Sad && draw.blueCubeSadLock === false) {
-            if (gameStates.mobile === true) {
-                canvas.context.font = '75px Arial'
-                canvas.context.fillStyle = 'indianred'
-                canvas.context.fillText("Sad(Selected)", 180, 550)
-            }
-
-            else {
-            canvas.context.font = '100px Arial'
-            canvas.context.fillStyle = 'indianred'
-            canvas.context.fillText("Sad(Selected)", 120, 550)
-            }      
-        }
-        else if (draw.blueCubeSadLock === true) {
-            canvas.context.font = '300px Arial'
-            canvas.context.fillStyle = 'hotpink'
-            canvas.context.fillText("???", 175, 350)
-        }
-            
-        else {
-            canvas.context.font = '150px Arial'
-            canvas.context.fillStyle = 'indianred'
-            canvas.context.fillText("Sad", 285, 550)
-        }
-   
-    },
-    //SettingsDraw: function() {},
 }

@@ -1,13 +1,15 @@
 "use strict";
+const {KeybindController} = require ('./Keybinds');
+const {ArrayChartController} = require('./SeletionArea');
 const {MenuController} = require('./Menu');
 const {LevelController} = require('./Levels')
 const {Background} = require('./Class')
 const {InfoController} = require ('./ItemInfo');
 const {images} = require('./Images');
 const {draw} = require('./Draw');
-const {storyModeStates, gameStates, levelTools, dataManagement} = require('./GameData');
+const {gameStates, levelTools, dataManagement} = require('./GameData');
 const {canvas} = require('./Canvas')
-const {Keydown} = require('./Keydown')
+const {Keydown, KeyUp} = require('./Keydown')
 const {MouseDown} = require('./MouseDown')
 var audio = {
     //MusicW1: new Audio(),
@@ -38,18 +40,8 @@ export var game = {
         delta = 1*/
         var delta = 1
         dataManagement.Save(draw)
-        levelTools.update(delta)
+        levelTools.UpdateGame(delta)
         draw.DrawGame()
-        if (levelTools.checkWin() && gameStates.currentStoryModeState !== storyModeStates.WonStage ) {
-            setTimeout(function() {
-                gameStates.SetGameState(storyModeStates.WonStage , "StoryMode")
-            }, 300)
-
-        } else if(levelTools.checkLose() && gameStates.currentStoryModeState !== storyModeStates.Lost) {
-            setTimeout(function() {
-                gameStates.SetGameState(storyModeStates.Lost , "StoryMode")
-            }, 30)
-        }
         window.setTimeout(game.mainLoop, 1000 / 120)
         //window.requestAnimationFrame(game.mainLoop)
     },
@@ -81,6 +73,8 @@ function StartGame() {
     gameStates.background = new Background()
     gameStates.infoController = new InfoController()
     gameStates.menuController = new MenuController()
+    gameStates.arrayChartController = new ArrayChartController()
+    gameStates.keybindController = new KeybindController()
     gameStates.levelController.createLevels()
     dataManagement.Load(draw)
     game.mainLoop()
@@ -100,4 +94,5 @@ function LoadGame() {
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 document.addEventListener('DOMContentLoaded', LoadGame)
 document.addEventListener('keydown', Keydown/*.bind(undefined, game)*/)
+document.addEventListener('keyup', KeyUp/*.bind(undefined, game)*/)
 document.addEventListener('mousedown', MouseDown/*.bind(undefined, game)*/)

@@ -20,22 +20,16 @@ export var images = {
         images.WallGrassTree = LoadImage("images/WallGrassTree.png")
         ///
         images.BlueCube = LoadImage("images/BlueCube.png")
-        images.BlueCubeAlien = LoadImage("images/BlueCubeAlien.png")
-        images.BlueCubeLava = LoadImage("images/BlueCubeLava.png")
+        images.BlueCubePyro = LoadImage("images/BlueCubePyro.png")
         images.BlueCubeWooden = LoadImage("images/BlueCubeWooden.png")
-        images.BlueCubeSad = LoadImage("images/BlueCubeSad.png")
+        images.BlueCubePoison = LoadImage("images/BlueCubePoison.png")
         ///
         images.BlueCubePlastic = LoadImage("images/BlueCubePlastic.png")
-        images.BlueCubeAlienPlastic = LoadImage("images/BlueCubeAlienPlastic.png")
-        images.BlueCubeLavaPlastic = LoadImage("images/BlueCubeLavaPlastic.png")
+        images.BlueCubePyroPlastic = LoadImage("images/BlueCubePyroPlastic.png")
         images.BlueCubeWoodenPlastic = LoadImage("images/BlueCubeWoodenPlastic.png")
-        images.BlueCubeSadPlastic = LoadImage("images/BlueCubeSadPlastic.png")
+        images.BlueCubePoisonPlastic = LoadImage("images/BlueCubePoisonPlastic.png")
         ///
         images.BlueCube_400x400 = LoadImage("images/BlueCube_400x400.png")
-        images.BlueCubeAlien_400x400 = LoadImage("images/BlueCubeAlien_400x400.png")
-        images.BlueCubeLava_400x400 = LoadImage("images/BlueCubeLava_400x400.png")
-        images.BlueCubeWooden_400x400 = LoadImage("images/BlueCubeWooden_400x400.png")
-        images.BlueCubeSad_400x400 = LoadImage("images/BlueCubeSad_400x400.png")
         ///
         images.RedCube = LoadImage("images/RedCube.png")
         images.RedCube_200x200 = LoadImage("images/RedCube_200x200.png")

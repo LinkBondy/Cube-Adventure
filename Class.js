@@ -1,7 +1,7 @@
 "use strict";
 const {images} = require('./Images')
 const {draw} = require('./Draw')
-const {gameMode, startingMenusStates, storyModeStates, cubeStyle, gameStates} = require('./GameData')
+const {gameMode, startingMenusStates, storyModeStates, cubeStyle, gameStates, BackgroundStyles, drawUpdate} = require('./GameData')
 const {canvas} = require('./Canvas') 
 export class GameObject {
     constructor(x, y, width, height, color1) {
@@ -127,11 +127,11 @@ export class Background {
     }
     
     DrawBackround() {
-        if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && draw.spriteStyle) {
+        if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
             this.color1 = "rgb(100, 200, 100)"
         }
         else {
-            this.color1 = "lightgray"
+            this.color1 = 'lightgray'
         }
         
         canvas.context.clearRect(0, 0, canvas.width, canvas.height);
@@ -140,7 +140,7 @@ export class Background {
     }
 
     DrawToolBar() {
-        this.color2 = "lightgray"
+        this.color2 = gameStates.currentThemeColour
         canvas.context.fillStyle = this.color2;
         canvas.context.fillRect(850, 0, 200, canvas.height) 
         canvas.context.fillStyle = "black"
@@ -422,11 +422,11 @@ export class Enemy extends GameObject {
         }
     }   
     Draw() {
-        if (draw.spriteStyle) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
             draw.DrawImage(images.RedCube, this.x, this.y)
         }
         
-        else if (draw.plasticStyle) {
+        else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
             draw.DrawImage(images.RedCubePlastic, this.x, this.y)
         }
     } 
@@ -700,45 +700,25 @@ export class Player extends GameObject {
     update() {
     }   
     Draw() {
-        if (gameStates.currentCubeStyle === cubeStyle.BlueCube && draw.spriteStyle) {
-            draw.DrawImage(images.BlueCube, this.x, this.y)
-        }
-        
-        else if (gameStates.currentCubeStyle === cubeStyle.Alien && draw.spriteStyle) {
-            draw.DrawImage(images.BlueCubeAlien, this.x, this.y)
+        if (gameStates.currentCubeStyle === cubeStyle.Classic)
+            this.drawX = 0  
+
+        else if (gameStates.currentCubeStyle === cubeStyle.Alien)
+            this.drawX = 50  
+
+        else if (gameStates.currentCubeStyle === cubeStyle.Sad)
+            this.drawX = 100 
+
+        else if (gameStates.currentCubeStyle === cubeStyle.Happy)
+            this.drawX = 150 
+    
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+            canvas.context.drawImage(images.BlueCube, this.drawX, 0, 50, images.BlueCube.height, this.x, this.y, 50, images.BlueCube.height)
         }
 
-        else if (gameStates.currentCubeStyle === cubeStyle.Lava && draw.spriteStyle) {
-            draw.DrawImage(images.BlueCubeLava, this.x, this.y)
-        }
-
-        else if (gameStates.currentCubeStyle === cubeStyle.Wooden && draw.spriteStyle) {
-            draw.DrawImage(images.BlueCubeWooden, this.x, this.y)
-        }
-
-        else if (gameStates.currentCubeStyle === cubeStyle.Sad && draw.spriteStyle) {
-            draw.DrawImage(images.BlueCubeSad, this.x, this.y)
-        }
-
-        else if (gameStates.currentCubeStyle === cubeStyle.BlueCube && draw.plasticStyle) {
-            draw.DrawImage(images.BlueCubePlastic, this.x, this.y)
-        }
-        
-        else if (gameStates.currentCubeStyle === cubeStyle.Alien && draw.plasticStyle) {
-            draw.DrawImage(images.BlueCubeAlienPlastic, this.x, this.y)        
-        }
-
-        else if (gameStates.currentCubeStyle === cubeStyle.Lava && draw.plasticStyle) {
-            draw.DrawImage(images.BlueCubeLavaPlastic, this.x, this.y)        
-        }
-
-        else if (gameStates.currentCubeStyle === cubeStyle.Wooden && draw.plasticStyle) {
-            draw.DrawImage(images.BlueCubeWoodenPlastic, this.x, this.y)        
-        }
-
-        else if (gameStates.currentCubeStyle === cubeStyle.Sad && draw.plasticStyle) {
-            draw.DrawImage(images.BlueCubeSadPlastic, this.x, this.y)        
-        }
+        else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+            canvas.context.drawImage(images.BlueCubePlastic, this.drawX, 0, 50, images.BlueCubePlastic.height, this.x, this.y, 50, images.BlueCubePlastic.height)
+        }    
     }
 };
 gameStates.currentCubeStyle = cubeStyle.BlueCube
@@ -757,7 +737,7 @@ export class Wall extends GameObject {
     }
 
     Draw() {
-        if (this.invisibleWall && draw.spriteStyle) {
+        if (this.invisibleWall && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
             var i = 0; 
             for (var x = this.left(); x < this.right(); x = x + 50) {
                 for (var y = this.top(); y < this.bottom(); y = y + 50) {
@@ -779,7 +759,7 @@ export class Wall extends GameObject {
                 }
             }*/
         
-        } else if (draw.spriteStyle && !this.invisibleWall) {
+        } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic && !this.invisibleWall) {
              var i = 0; 
              for (var x = this.left(); x < this.right(); x = x + 50) {
                  for (var y = this.top(); y < this.bottom(); y = y + 50) {
@@ -809,7 +789,7 @@ export class Wall extends GameObject {
                 }
             }
             
-            } else if (draw.plasticStyle) {
+            } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
                 canvas.context.fillStyle = this.color1
                 canvas.context.fillRect(this.x, this.y, this.width, this.height)
             } 
@@ -831,7 +811,7 @@ export class Water extends GameObject {
     }
 
     Draw() {
-        if (draw.spriteStyle === true) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
             if (gameStates.currentStoryModeState === storyModeStates.Playing) {
                 var numMilliseconds = new Date().getTime()
                 if (numMilliseconds % 5 === 4) {
@@ -844,7 +824,7 @@ export class Water extends GameObject {
                 }
             }
         }
-        if (draw.plasticStyle === true) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
             canvas.context.fillStyle = this.color1;
             canvas.context.fillRect(this.x, this.y, this.width, this.height)
         }
@@ -870,26 +850,26 @@ export class Item extends GameObject {
     }
 
     Draw() {
-        if (this.typeNumber === 1 && !this.collected && draw.spriteStyle) {    
+        if (this.typeNumber === 1 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {    
            draw.DrawImage(images.LifeJacket, this.x, this.y)     
         }
 
-        if (this.typeNumber === 1 && !this.collected && draw.plasticStyle) {    
+        if (this.typeNumber === 1 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {    
            draw.DrawImage(images.LifeJacketPlastic, this.x, this.y)     
         }
 
-        if (this.typeNumber === 2 && !this.collected && draw.spriteStyle && gameStates.currentGameMode === gameMode.StoryMode && draw.blueCubeAlienLock) {    
+        if (this.typeNumber === 2 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic && gameStates.currentGameMode === gameMode.StoryMode && drawUpdate.blueCubeAlienLock) {    
            draw.DrawImage(images.Three_Bead, this.x, this.y)     
         }
 
-        if (this.typeNumber === 2 && !this.collected && draw.plasticStyle && gameStates.currentGameMode === gameMode.StoryMode && draw.blueCubeAlienLock) {    
+        if (this.typeNumber === 2 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Plastic && gameStates.currentGameMode === gameMode.StoryMode && drawUpdate.blueCubeAlienLock) {    
            draw.DrawImage(images.Three_Bead_Plastic, this.x, this.y)     
         }
     }
     
     update() {
         if (this.typeNumber === 2 && this.collected && gameStates.currentGameMode === gameMode.StoryMode) {    
-            draw.blueCubeAlienLock = false     
+            drawUpdate.blueCubeAlienLock = false     
         }
     }
     
@@ -945,7 +925,7 @@ export class Rock extends GameObject {
 
     Draw() {
         var self = this
-        if (draw.spriteStyle && this.typeNumber === 1) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic && this.typeNumber === 1) {
             if (this.colorNumber === 1) {
                 gameStates.CurrentLevel().unlocks.forEach(function(unlock) {
                     if (self.allowMovement && unlock.title === self.title) {
@@ -965,7 +945,7 @@ export class Rock extends GameObject {
                     }
                 })
         }       
-        } else if (draw.plasticStyle && this.typeNumber === 1) {
+        } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic && this.typeNumber === 1) {
             gameStates.CurrentLevel().unlocks.forEach(function(unlock) { 
                 if (!self.allowMovement && unlock.title === self.title)
                     canvas.context.fillStyle = self.color1
@@ -973,7 +953,9 @@ export class Rock extends GameObject {
                 if (self.allowMovement && unlock.title === self.title)
                     canvas.context.fillStyle = self.color2
             })
-            canvas.context.fillRect(this.x, this.y, this.width, this.height)
+            canvas.context.beginPath();
+            canvas.context.arc(this.x + 25, this.y + 25, 25, 0, 360);
+            canvas.context.fill()
                  
         }
      
@@ -1035,7 +1017,7 @@ export class Unlock extends GameObject {
     }
 
     Draw() {
-        if (draw.spriteStyle === true) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
             if (this.colorNumber === 1) {
                 if (this.activated)
                    draw.DrawImage(images.SwitchW1ActivatedBlue, this.x, this.y) 
@@ -1050,7 +1032,7 @@ export class Unlock extends GameObject {
                    draw.DrawImage(images.SwitchW1Purple, this.x, this.y)  
             }            
         
-        } else if (draw.plasticStyle === true) {
+        } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
             canvas.context.fillStyle = this.color1
             canvas.context.fillRect(this.x, this.y, this.width, this.height)
             if (this.activated)
@@ -1101,7 +1083,7 @@ export class Teleporter extends GameObject {
     }
 
     Draw() {
-        if (draw.spriteStyle) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
             if (this.colorNumber === 1) {
                draw.DrawImage(images.TeleporterTomatoSprite, this.x, this.y)   
             }
@@ -1111,7 +1093,7 @@ export class Teleporter extends GameObject {
             }
         }
 
-        else if (draw.plasticStyle) {
+        else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
             if (this.colorNumber === 1) {
                draw.DrawImage(images.TeleporterTomato, this.x, this.y) 
             }
@@ -1154,11 +1136,11 @@ export class Hole extends GameObject {
         else
             this.DrawingX = 0
 
-        if (draw.spriteStyle) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
             canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
         }
 
-        if (draw.plasticStyle) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
             canvas.context.drawImage(images.HolePlastic, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
      
         }

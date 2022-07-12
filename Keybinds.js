@@ -1,0 +1,142 @@
+"use strict";
+const {canvas} = require('./Canvas')
+const {gameStates} = require('./GameData')
+
+export class KeybindController {
+    constructor() {
+        this.keybinds = [
+            new Keybind("Left", 1, "ArrowLeft", "a"), 
+            new Keybind("Right", 2, "ArrowRight", "d"),
+            new Keybind("Up", 3, "ArrowUp", "w"),
+            new Keybind("Down", 4, "ArrowDown", "s"),
+            new Keybind("Select", 5, " ", "Enter", "Space"),
+            new Keybind("Back", 6, "Backspace", "b"),
+            new Keybind("Use", 7, "Shift", "u")
+        ]
+        
+        this.originalKeybinds = [
+            new Keybind("Left", 1, "ArrowLeft", "a"), 
+            new Keybind("Right", 2, "ArrowRight", "d"),
+            new Keybind("Up", 3, "ArrowUp", "w"),
+            new Keybind("Down", 4, "ArrowDown", "s"),
+            new Keybind("Select", 5, " ", "Enter", "Space"),
+            new Keybind("Back", 6, "Backspace", "b"),
+            new Keybind("Use", 7, "Shift", "u")
+        ]
+        this.seletingKeybind = false
+        this.triedRebinding = false
+        this.currentMenuItem = undefined
+        this.currentKeybind = undefined
+        this.currentType = undefined
+    }
+
+    startRebind(type, keybindNumber, usedMenuItem) {
+        this.seletingKeybind = true
+        this.currentKeybind = this.keybinds[keybindNumber - 1]
+        this.currentMenuItem = usedMenuItem
+        this.currentType = type
+    }
+
+    setKeybinds(event) {
+        if (this.checkKeybinds(event.key)) {
+            switch(this.currentType) {
+                case "A":
+                    if (event.key === ' ')
+                        this.currentKeybind.displayNameA = "Space"
+                    else
+                        this.currentKeybind.displayNameA = event.key
+                    ///
+                    this.currentKeybind.keybindA = event.key
+                    this.currentMenuItem.title = this.currentKeybind.displayNameA
+                    break
+                case "B":
+                    if (event.key === ' ')
+                        this.currentKeybind.displayNameB = "Space"
+                    else
+                        this.currentKeybind.displayNameB = event.key
+                    ///
+                    this.currentKeybind.keybindB = event.key
+                    this.currentMenuItem.title = this.currentKeybind.displayNameB
+                    break
+            }
+            this.finishRebinding() 
+        } else {
+        this.triedRebinding = true
+        }
+    }
+
+    checkKeybinds(keybind) {
+        for (var keybindNumber = 0; keybindNumber !== this.keybinds.length; keybindNumber++) {
+            if (keybind === this.keybinds[keybindNumber].keybindA || keybind === this.keybinds[keybindNumber].keybindB) {
+                return false
+            }
+        }
+        return true
+    }
+
+    finishRebinding() {
+        this.seletingKeybind = false
+        this.triedRebinding = false
+        this.currentMenuItem = undefined
+        this.currentKeybind = undefined
+        this.currentType = undefined
+    }
+
+    resetKeybinds(type) {
+        for (var keybindNumber = 0; keybindNumber !== this.keybinds.length; keybindNumber++)
+        switch (type) {
+            case "A":
+                this.keybinds[keybindNumber].keybindA = this.originalKeybinds[keybindNumber].keybindA
+                this.keybinds[keybindNumber].displayNameA = this.originalKeybinds[keybindNumber].displayNameA
+            break
+
+            case "B":
+                this.keybinds[keybindNumber].keybindB = this.originalKeybinds[keybindNumber].keybindB
+                this.keybinds[keybindNumber].displayNameB = this.originalKeybinds[keybindNumber].displayNameB
+            break
+        }
+    }
+
+    load(savedArray) {
+        this.keybinds = []
+        for(var keybindsLoaded = 0; keybindsLoaded < 7; keybindsLoaded++) {
+            this.keybinds.push(new Keybind(savedArray[keybindsLoaded].name, savedArray[keybindsLoaded].value, savedArray[keybindsLoaded].keybindA, savedArray[keybindsLoaded].keybindB, savedArray[keybindsLoaded].displayNameA, savedArray[keybindsLoaded].displayNameB)) 
+        }
+    }
+}
+
+export class Keybind {
+    constructor(name, value, keybindA, keybindB, displayNameA, displayNameB) {
+        this.name = name
+
+        if (displayNameA === undefined)
+            this.displayNameA = keybindA
+        else
+            this.displayNameA = displayNameA
+
+        ///
+
+        if (displayNameB === undefined)
+            this.displayNameB = keybindB
+        else
+            this.displayNameB = displayNameB
+
+        this.keybindA = keybindA
+        this.keybindB = keybindB
+        this.x = 10
+        this.y = value * 75 - 15
+        this.value = value
+    }
+
+    Draw() {
+        canvas.context.font = "100px"
+        canvas.context.fillStyle = "darkgray"
+        canvas.context.fillText(this.name, this.x, this.y)
+        canvas.context.fillText("Reset", this.x, 8 * 75 - 15)
+    }
+
+    Update() {
+        gameStates.menuController.menus[2].menuItems[this.value - 1].title = this.displayNameA
+        gameStates.menuController.menus[2].menuItems[this.value + 7].title = this.displayNameB
+    }
+}

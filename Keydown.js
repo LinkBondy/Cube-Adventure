@@ -1,18 +1,23 @@
 "use strict";
-const {startingMenusStates, storyModeStates, gameMode, ShopMode, PlayerStyles, BackgroundStyles, cubeStyle, gameStates, levelTools} = require ('./GameData')
-const {draw} = require('./Draw')
+const {startingMenusStates, storyModeStates, gameMode, ShopMode, settingStates, gameStates} = require ('./GameData')
 
 export function Keydown(event) {
     console.log(event)
+    var keybindArray = gameStates.keybindController.keybinds
     // Start Game "Menu"
-    if ((event.key === " " || event.key === "Enter") && gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
+    if ((keybindArray[4/*select*/].keybindA === event.key || keybindArray[4/*select*/].keybindB === event.key) && gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
         gameStates.SetGameState(startingMenusStates.Menu, "Starting")
         return
     }
 
-    if (event.key === "Backspace" && (gameStates.currentStartingMenusState === startingMenusStates.Menu || gameStates.currentStartingMenusState === startingMenusStates.Selected)) {           
+    if ((keybindArray[5/*back*/].keybindA === event.key || keybindArray[5/*back*/].keybindB === event.key) && (gameStates.currentStartingMenusState === startingMenusStates.Menu || gameStates.currentStartingMenusState === startingMenusStates.Selected && !gameStates.keybindController.seletingKeybind)) {           
         if (gameStates.currentShopMode > 1) {
             gameStates.currentShopMode = ShopMode.ShopMenu
+            return   
+        }
+
+        if (gameStates.currentSettingState > 1) {
+            gameStates.SetGameState(settingStates.Selecting, "Settings")
             return   
         }
 
@@ -20,87 +25,44 @@ export function Keydown(event) {
             gameStates.SetGameState(gameStates.currentStartingMenusState - 1, "Starting")
             return
         }
+
+        
     }
+    // Left "Menus"
+    if ((keybindArray[0/*left*/].keybindA === event.key || keybindArray[0/*left*/].keybindB === event.key) && gameStates.menuController.CheckMenu() !== undefined)
+        gameStates.menuController.menus[gameStates.menuController.CheckMenu()].moveLeft()
+
+    // Right "Menus"
+    if ((keybindArray[1/*right*/].keybindA === event.key || keybindArray[1/*right*/].keybindB === event.key) && gameStates.menuController.CheckMenu() !== undefined)
+        gameStates.menuController.menus[gameStates.menuController.CheckMenu()].moveRight()
+
     // Down "Menus"
-    if ((event.keyCode === 40 || event.key === "s") && gameStates.menuController.CheckMenu() !== undefined)
+    if ((keybindArray[3/*down*/].keybindA === event.key || keybindArray[3/*down*/].keybindB === event.key) && gameStates.menuController.CheckMenu() !== undefined)
         gameStates.menuController.menus[gameStates.menuController.CheckMenu()].moveDown()
 
     // Up "Menus"
-    if ((event.keyCode === 38 || event.key === "w") && gameStates.menuController.CheckMenu() !== undefined)
+    if ((keybindArray[2/*up*/].keybindA === event.key || keybindArray[2/*up*/].keybindB === event.key) && gameStates.menuController.CheckMenu() !== undefined)
         gameStates.menuController.menus[gameStates.menuController.CheckMenu()].moveUp()
     
     // Selected "Menus"
-    if ((event.key === " " || event.key === "Enter") && gameStates.menuController.CheckMenu() !== undefined) {
-        gameStates.menuController.menus[gameStates.menuController.CheckMenu()].selected() 
+    if ((keybindArray[4/*select*/].keybindA === event.key || keybindArray[4/*select*/].keybindB === event.key) && gameStates.menuController.CheckMenu() !== undefined) {
+        gameStates.menuController.menus[gameStates.menuController.CheckMenu()].selected()
+        if (gameStates.keybindController.seletingKeybind)
+            stopEvents.stopMouseUp = true
         return
     }
 
     if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
-        // Down "Shop Backround"   
-        if ((event.keyCode === 40 || event.key === "s") && gameStates.currentBackgroundStyle < 2 && gameStates.currentShopMode === ShopMode.Backround && gameStates.currentGameMode === gameMode.Shop)
-            gameStates.currentBackgroundStyle = gameStates.currentBackgroundStyle + 1
-
-        // Up "Shop Backround"
-        if ((event.keyCode === 38 || event.key === "w") && gameStates.currentBackgroundStyle != 1 && gameStates.currentShopMode === ShopMode.Backround && gameStates.currentGameMode === gameMode.Shop)
-            gameStates.currentBackgroundStyle = gameStates.currentBackgroundStyle - 1
-        
-        if ((event.key === " " || event.key === "Enter") && gameStates.currentGameMode === gameMode.Shop && gameStates.currentShopMode === ShopMode.Backround) {
-            
-            if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-                draw.spriteStyle = false
-                draw.plasticStyle = true
-            }
-
-            if (gameStates.currentBackgroundStyle === BackgroundStyles.Sprite) {
-                draw.plasticStyle = false
-                draw.spriteStyle = true
-            }
-            
-            return
-        }
-        // Down "Shop Player"   
-        if ((event.keyCode === 40 || event.key === "s") && gameStates.currentPlayerStyle < 5 && gameStates.currentShopMode === ShopMode.Player && gameStates.currentGameMode === gameMode.Shop)
-            gameStates.currentPlayerStyle = gameStates.currentPlayerStyle + 1
-
-        // Up "Shop Player"
-        if ((event.keyCode === 38 || event.key === "w") && gameStates.currentPlayerStyle != 1 && gameStates.currentShopMode === ShopMode.Player && gameStates.currentGameMode === gameMode.Shop)
-            gameStates.currentPlayerStyle = gameStates.currentPlayerStyle - 1
-        
-        if ((event.key === " " || event.key === "Enter")  && gameStates.currentShopMode === ShopMode.Player && gameStates.currentGameMode === gameMode.Shop) {
-            
-            if (gameStates.currentPlayerStyle === PlayerStyles.BlueCube) {
-                gameStates.currentCubeStyle = cubeStyle.BlueCube
-            }
-            
-            else if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeAlien && draw.blueCubeAlienLock === false) {
-                gameStates.currentCubeStyle = cubeStyle.Alien   
-            }
-            
-            else if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeLava) {
-                gameStates.currentCubeStyle = cubeStyle.Lava
-            }
-            
-            else if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeWooden && draw.blueCubeWoodenLock === false) {
-                gameStates.currentCubeStyle = cubeStyle.Wooden 
-            } 
-
-            else if (gameStates.currentPlayerStyle === PlayerStyles.BlueCubeSad && draw.blueCubeSadLock === false) {
-                gameStates.currentCubeStyle = cubeStyle.Sad 
-            } 
-            
-            return
-        }
-    ///
         // Down "Level Selector"   
-        if ((event.keyCode === 40 || event.key === "s") && gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode)
+        if ((keybindArray[3/*down*/].keybindA === event.key || keybindArray[3/*down*/].keybindB === event.key) && gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode)
             gameStates.currentLevelIndex = gameStates.currentLevelIndex + 1
 
         // Up "Level Selector"
-        if ((event.keyCode === 38 || event.key === "w") && gameStates.currentLevelIndex != 0 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode)
+        if ((keybindArray[2/*up*/].keybindA === event.key || keybindArray[2/*up*/].keybindB === event.key) && gameStates.currentLevelIndex != 0 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode)
             gameStates.currentLevelIndex = gameStates.currentLevelIndex - 1
 
         // Level Selector to Game
-        if ((event.key === " " || event.key === "Enter") && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && gameStates.levelController.CheckLocked()) {
+        if ((keybindArray[4/*select*/].keybindA === event.key || keybindArray[4/*select*/].keybindB === event.key) && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && gameStates.levelController.CheckLocked()) {
             gameStates.SetGameState(storyModeStates.Playing, "StoryMode")
             return
         }
@@ -110,7 +72,7 @@ export function Keydown(event) {
         }
     ///
         // Game to Pause Menu
-        if ((event.key === " " || event.key === "Enter") && gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
+        if ((keybindArray[4/*select*/].keybindA === event.key || keybindArray[4/*select*/].keybindB === event.key) && gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
             gameStates.SetGameState(storyModeStates.Paused, "StoryMode")
             gameStates.CurrentLevel().enemies.forEach(function(enemy) {
                 enemy.stopTimer()    
@@ -118,29 +80,54 @@ export function Keydown(event) {
             return
         }
 
+        if (gameStates.arrayChartController.findCurrentArrayChart() !== false) {
+            var arrayChart = gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()]
+            // "Left" Arrow || "a" Key
+            if ((keybindArray[0/*left*/].keybindA === event.key || keybindArray[0/*left*/].keybindB === event.key) && arrayChart.currentX !== 0)
+                arrayChart.currentX--
+
+            // "Right" Arrow || "d" Key
+            if ((keybindArray[1/*right*/].keybindA === event.key || keybindArray[1/*right*/].keybindB === event.key) && arrayChart.currentX !== arrayChart.loopWidth - 1)
+                arrayChart.currentX++    
+
+             // "Up" Arrow || "w" Key
+             if ((keybindArray[2/*up*/].keybindA === event.key || keybindArray[2/*up*/].keybindB === event.key) && arrayChart.currentY !== 0)
+                arrayChart.currentY--
+        
+            // "Down" Arrow || "s" Key
+            if ((keybindArray[3/*down*/].keybindA === event.key || keybindArray[3/*down*/].keybindB === event.key) && arrayChart.currentY !== arrayChart.loopHeight - 1)
+                arrayChart.currentY++
+
+            if ((keybindArray[4/*select*/].keybindA === event.key || keybindArray[4/*select*/].keybindB === event.key)) {
+                arrayChart.action(arrayChart, arrayChart.currentY * arrayChart.loopWidth + arrayChart.currentX)
+                return
+            }
+            return
+        }
+
         if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
             gameStates.CurrentLevel().players.forEach(function(player) {    
                 // "Right" Arrow || "d" Key
-                if (event.keyCode === 39 || event.key === "d") {
+                if (keybindArray[1/*right*/].keybindA === event.key || keybindArray[1/*right*/].keybindB === event.key) {
                     player.moveRight()
                     return
                 }
             
                 // "Down" Arrow || "s" Key
-                if (event.keyCode === 40 || event.key === "s") {
+                if (keybindArray[3/*down*/].keybindA === event.key || keybindArray[3/*down*/].keybindB === event.key) {
                     player.moveDown()
                     return
                 }
             
                 // "Up" Arrow || "w" Key
-                if (event.keyCode === 38 || event.key === "w") {
+                if (keybindArray[2/*up*/].keybindA === event.key || keybindArray[2/*up*/].keybindB === event.key) {
                     player.moveUp()
                     return
                 }
 
             
                 // "Left" Arrow || "a" Key
-                if (event.keyCode === 37 || event.key === "a") {
+                if (keybindArray[0/*left*/].keybindA === event.key || keybindArray[0/*left*/].keybindB === event.key) {
                     player.moveLeft()
                     return
                 }
@@ -148,4 +135,18 @@ export function Keydown(event) {
             })
         }
     }       
+}
+
+export var stopEvents = {
+    stopMouseUp: false
+}
+export function KeyUp(event) {
+    console.log(event)
+    if (stopEvents.stopMouseUp === true) {
+        stopEvents.stopMouseUp = false
+        return
+    }
+
+    if (gameStates.keybindController.seletingKeybind)
+        gameStates.keybindController.setKeybinds(event)
 }
