@@ -1,5 +1,5 @@
-"use strict";
-function MouseMove(event) {
-    //console.log(event)
+'use strict'
+function MouseMove (event) {
+  // console.log(event)
 }
-document.addEventListener('mousemove', MouseMove )
+document.addEventListener('mousemove', MouseMove)
