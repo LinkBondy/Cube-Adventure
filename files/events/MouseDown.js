@@ -1,5 +1,5 @@
 'use strict'
-const { startingMenusStates, storyModeStates, gameMode, ShopMode, settingStates, gameStates } = require('./GameData')
+const { startingMenusStates, storyModeStates, gameMode, ShopMode, settingStates, gameStates } = require('../data/GameData')
 
 export function MouseDown (event) {
   const isTouching = function (x, y, width, height, mouseX, mouseY) {
@@ -88,7 +88,7 @@ export function MouseDown (event) {
     if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 850 && event.offsetX > 690 && event.offsetY > 450 && event.offsetY < 600 && gameStates.mobile === true) { gameStates.currentLevelIndex = gameStates.currentLevelIndex + 1 }
 
     // Up "Level Selector"
-    if (gameStates.currentLevelIndex != 0 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 160 && event.offsetX > 0 && event.offsetY > 450 && event.offsetY < 600 && gameStates.mobile === true) { gameStates.currentLevelIndex = gameStates.currentLevelIndex - 1 }
+    if (gameStates.currentLevelIndex !== 0 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 160 && event.offsetX > 0 && event.offsetY > 450 && event.offsetY < 600 && gameStates.mobile === true) { gameStates.currentLevelIndex = gameStates.currentLevelIndex - 1 }
 
     // Level Selector to Game
     if (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetY > 500 && event.offsetY < 600 && event.offsetX < 610 && event.offsetX > 225) {

@@ -1,6 +1,6 @@
 'use strict'
-const { canvas } = require('./Canvas')
-const { gameStates } = require('./GameData')
+const { canvas } = require('../drawing/Canvas')
+const { gameStates } = require('../data/GameData')
 
 export class KeybindController {
   constructor () {

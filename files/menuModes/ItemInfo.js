@@ -1,8 +1,8 @@
 'use strict'
-const { images } = require('./Images')
-const { draw } = require('./Draw')
-const { canvas } = require('./Canvas')
-const { gameStates } = require('./GameData')
+const { images } = require('../drawing/Images')
+const { draw } = require('../drawing/Draw')
+const { canvas } = require('../drawing/Canvas')
+const { gameStates } = require('../data/GameData')
 
 const LockedFeature = {
   infoCuber: 1,
@@ -41,24 +41,24 @@ export class InfoController {
     this.unlockedLevel = 0
   }
 
-  Keydown (event) {
+  Keydown (event, keybindArray) {
     // Down
-    if ((event.keyCode === 40 || event.key === 's') && this.itemIndex < (this.items.length - 1)) {
+    if ((keybindArray[3/* down */].keybindA === event.key || keybindArray[3/* down */].keybindB === event.key) && this.itemIndex < (this.items.length - 1)) {
       this.itemIndex = this.itemIndex + 1
       this.slideIndex = 0
     }
 
     // Up
-    if ((event.keyCode === 38 || event.key === 'w') && this.itemIndex != 0) {
+    if ((keybindArray[2/* up */].keybindA === event.key || keybindArray[2/* up */].keybindB === event.key) && this.itemIndex !== 0) {
       this.itemIndex = this.itemIndex - 1
       this.slideIndex = 0
     }
 
     // Right
-    if ((event.keyCode === 39 || event.key === 'd') && this.slideIndex < this.items[this.itemIndex].slides.length - 1) { this.slideIndex = this.slideIndex + 1 }
+    if ((keybindArray[1/* right */].keybindA === event.key || keybindArray[1/* right */].keybindB === event.key) && this.slideIndex < this.items[this.itemIndex].slides.length - 1) { this.slideIndex = this.slideIndex + 1 }
 
     // Left
-    if ((event.keyCode === 37 || event.key === 'a') && this.slideIndex > 0) { this.slideIndex = this.slideIndex - 1 }
+    if ((keybindArray[0/* left */].keybindA === event.key || keybindArray[0/* left */].keybindB === event.key) && this.slideIndex > 0) { this.slideIndex = this.slideIndex - 1 }
   }
 
   Mousedown (event) {
@@ -75,7 +75,7 @@ export class InfoController {
     }
 
     // Up
-    if (event.offsetY > 0 && event.offsetY < 150 && event.offsetX < 850 && this.itemIndex != 0) {
+    if (event.offsetY > 0 && event.offsetY < 150 && event.offsetX < 850 && this.itemIndex !== 0) {
       this.itemIndex = this.itemIndex - 1
       this.slideIndex = 0
     }
@@ -217,7 +217,7 @@ class BarrierInfo {
     ], 0)
 
     const cuberSlide1 = new ItemSlide([
-      new ItemImage(false, images.WallGrassV1_200x200, 550, 10),
+      new ItemImage(false, images.WallGrassClassicA_200x200, 550, 10),
       ///
       new ItemText('Walls', '200px Arial', 'purple', 10, 160),
       new ItemText('Walls stop players movement.', '60px Arial', 'rgb(2, 0, 139)', 10, 300),

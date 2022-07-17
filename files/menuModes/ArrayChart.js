@@ -1,7 +1,7 @@
 'use strict'
-const { images } = require('./Images')
-const { gameMode, ShopMode, gameStates, settingStates, cubeStyle, BackgroundStyles, drawUpdate } = require('./GameData')
-const { canvas } = require('./Canvas')
+const { images } = require('../drawing/Images')
+const { gameMode, ShopMode, gameStates, settingStates, cubeStyle, BackgroundStyles, drawUpdate } = require('../data/GameData')
+const { canvas } = require('../drawing/Canvas')
 export class ArrayChartController {
   constructor () {
     this.arrayCharts = []
@@ -26,7 +26,7 @@ export class ArrayChartController {
     }))
 
     this.arrayCharts.push(this.backroundStyles = new ArrayChart(/* title */'Background Style', /* currentSelection */0, /* offsetX */220, /* offsetY */300, /* sectionWidth */200, /* sectionHeight */200, /* loopWidth */2, /* loopHeight */1, [
-      new ArrayChartImage(/* displayName */'Classic', /* locked */false, /* value */BackgroundStyles.Classic, /* image */images.WallGrassV1_400x400, /* imageStartX */-4, /* imageStartY */0, /* imageStartWidth */images.WallGrassV1_400x400.width, /* imageStartHeight */images.WallGrassV1_400x400.height),
+      new ArrayChartImage(/* displayName */'Classic', /* locked */false, /* value */BackgroundStyles.Classic, /* image */images.WallGrassClassicA_400x400, /* imageStartX */-4, /* imageStartY */0, /* imageStartWidth */images.WallGrassClassicA_400x400.width, /* imageStartHeight */images.WallGrassClassicA_400x400.height),
       new ArrayChartBox(/* displayName */'Plastic', drawUpdate.highestLevelLock, /* value */BackgroundStyles.Plastic, /* colour */'rgb(127, 127, 127)', /* boarder */'rgb(0, 0, 0)', /* checkLocked */function () { this.locked = drawUpdate.highestLevelLock })
     ], function (arrayChart, currentSelectionCheck) {
       if (!arrayChart.items[currentSelectionCheck].locked) {
@@ -93,6 +93,23 @@ class ArrayChart {
         numberDrew++
       }
     }
+  }
+
+  Keydown (event, keybindArray) {
+    // "Left"
+    if ((keybindArray[0/* left */].keybindA === event.key || keybindArray[0/* left */].keybindB === event.key) && this.currentX !== 0) { this.currentX-- }
+
+    // "Right"
+    if ((keybindArray[1/* right */].keybindA === event.key || keybindArray[1/* right */].keybindB === event.key) && this.currentX !== this.loopWidth - 1) { this.currentX++ }
+
+    // "Up"
+    if ((keybindArray[2/* up */].keybindA === event.key || keybindArray[2/* up */].keybindB === event.key) && this.currentY !== 0) { this.currentY-- }
+
+    // "Down"
+    if ((keybindArray[3/* down */].keybindA === event.key || keybindArray[3/* down */].keybindB === event.key) && this.currentY !== this.loopHeight - 1) { this.currentY++ }
+
+    // "Select"
+    if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key)) { this.action(this, this.currentY * this.loopWidth + this.currentX) }
   }
 };
 

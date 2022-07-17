@@ -1,6 +1,6 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates } = require('./GameData')
-const { canvas } = require('./Canvas')
+const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates } = require('../data/GameData')
+const { canvas } = require('../drawing/Canvas')
 class MenuItem {
   constructor (title, valueX, valueY, color, action) {
     this.title = title
@@ -57,6 +57,26 @@ class Menu {
     // Find the selected menuItem
     const menuItem = this.menuItems[this.selectedIndexX * this.height + this.selectedIndexY]
     menuItem.action()
+  }
+
+  Keydown (event, keybindArray, stopEvents) {
+    // Left "Menus"
+    if (keybindArray[0/* left */].keybindA === event.key || keybindArray[0/* left */].keybindB === event.key) { this.moveLeft() }
+
+    // Right "Menus"
+    if (keybindArray[1/* right */].keybindA === event.key || keybindArray[1/* right */].keybindB === event.key) { this.moveRight() }
+
+    // Down "Menus"
+    if (keybindArray[3/* down */].keybindA === event.key || keybindArray[3/* down */].keybindB === event.key) { this.moveDown() }
+
+    // Up "Menus"
+    if (keybindArray[2/* up */].keybindA === event.key || keybindArray[2/* up */].keybindB === event.key) { this.moveUp() }
+
+    // Selected "Menus"
+    if (keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) {
+      this.selected()
+      if (gameStates.keybindController.seletingKeybind) { stopEvents.stopMouseUp = true }
+    }
   }
 
   Draw () {

@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-  entry: './Cube Adventure.js',
+  entry: './files/startUp/cubeAdventure.js',
   mode: 'development',
   output: {
     filename: 'bundle.js',

@@ -1,35 +1,34 @@
 'use strict'
-const { KeybindController } = require('./Keybinds')
-const { ArrayChartController } = require('./SeletionArea')
-const { MenuController } = require('./Menu')
-const { LevelController } = require('./Levels')
-const { Background } = require('./Class')
-const { InfoController } = require('./ItemInfo')
-const { images } = require('./Images')
-const { draw } = require('./Draw')
-const { gameStates, levelTools, dataManagement } = require('./GameData')
-const { canvas } = require('./Canvas')
-const { Keydown, KeyUp } = require('./Keydown')
-const { MouseDown } = require('./MouseDown')
-const audio = {
-  // MusicW1: new Audio(),
-
+const { KeybindController } = require('../events/Keybinds')
+const { ArrayChartController } = require('../menuModes/ArrayChart')
+const { MenuController } = require('../menuModes/Menu')
+const { LevelController } = require('../levels/Levels')
+const { Background } = require('../levels/Class')
+const { InfoController } = require('../menuModes/ItemInfo')
+const { images } = require('../drawing/Images')
+const { draw } = require('../drawing/Draw')
+const { update } = require('../data/Update')
+const { gameStates, dataManagement } = require('../data/GameData')
+const { canvas } = require('../drawing/Canvas')
+const { Keydown, KeyUp } = require('../events/Keydown')
+const { MouseDown } = require('../events/MouseDown')
+/* const audio = {
+  MusicW1: new Audio(),
   SetMusic: function () {
-    /* if (gameStates.currentStoryModeState === storyModeStates.Playing)
+    if (gameStates.currentStoryModeState === storyModeStates.Playing)
             audio.MusicW1.play();
         else
             audio.MusicW1.pause();
-            */
   }
-}
+} */
 
-export var game = {
+export const game = {
   startTime: new Date(),
   isRunning: true,
   lastTime: new Date().getTime(),
   ///
   mainLoop: function () {
-    const timePassed = new Date().getTime() - game.lastTime
+    // const timePassed = new Date().getTime() - game.lastTime
     game.lastTime = new Date().getTime()
     /* if (!game.isRunning)
             timePassed = 0
@@ -40,7 +39,7 @@ export var game = {
         delta = 1 */
     const delta = 1
     dataManagement.Save(draw)
-    levelTools.UpdateGame(delta)
+    update.UpdateGame(delta)
     draw.DrawGame()
     window.setTimeout(game.mainLoop, 1000 / 120)
     // window.requestAnimationFrame(game.mainLoop)
@@ -68,6 +67,7 @@ function ImageLoadingLoop () {
 
 function StartGame () {
   canvas.createCanvasContext()
+  gameStates.loading = true
   gameStates.levelController = new LevelController()
   gameStates.background = new Background()
   gameStates.infoController = new InfoController()
@@ -77,6 +77,7 @@ function StartGame () {
   gameStates.levelController.createLevels()
   dataManagement.Load(draw)
   game.mainLoop()
+  gameStates.loading = false
 }
 
 function LoadGame () {

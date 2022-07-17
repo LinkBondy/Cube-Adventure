@@ -1,10 +1,15 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates, drawUpdate } = require('./GameData')
+const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates } = require('../data/GameData')
 const { canvas } = require('./Canvas')
 const { images } = require('./Images')
-export var draw = {
+export const draw = {
   DrawImage: function (image, x, y) {
     canvas.context.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height)
+  },
+  ChangeShdow: function (offsetX, offsetY, offsetColour) {
+    canvas.context.shadowOffsetX = offsetX
+    canvas.context.shadowOffsetY = offsetY
+    canvas.context.shadowColor = offsetColour
   },
   DrawGame: function () {
     gameStates.background.DrawBackround()
@@ -26,7 +31,7 @@ export var draw = {
     this.DrawToolBarButtons()
   },
   StoryModeDraw: function () {
-    if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelController.CheckLocked()) {
+    if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelController.CheckLocked())) {
       this.LevelsDraw()
     }
 
@@ -40,13 +45,6 @@ export var draw = {
     }
 
     if (gameStates.currentStoryModeState === storyModeStates.Lost) {
-      if (levelTools.loseCounterStop === false) {
-        levelTools.currentLosses = levelTools.currentLosses + 1
-        if (levelTools.currentLosses === 50) {
-          drawUpdate.blueCubeSadLock = false
-        }
-        levelTools.loseCounterStop = true
-      }
       gameStates.menuController.LoseMenu.Draw()
       this.DrawLoseText()
     }
@@ -61,18 +59,26 @@ export var draw = {
     if (gameStates.currentShopMode === ShopMode.ShopMenu) { gameStates.menuController.ShopMenu.Draw() }
   },
   StartingSreenDraw: function () {
+    this.ChangeShdow(8, 8, 'rgb(50, 50, 50)')
+
     canvas.context.font = '275px Arial'
     canvas.context.fillStyle = 'black'
     canvas.context.fillText('CUB', 0, 250)
     canvas.context.font = '125px Arial'
+    canvas.context.shadowColor = 'rgba(127, 0, 0)'
+    canvas.context.shadowOffsetX = 0
+    canvas.context.shadowOffsetY = 0
     canvas.context.fillStyle = 'red'
     canvas.context.fillText('Adventure', 120, 400)
     canvas.context.font = '60px Arial'
     canvas.context.fillStyle = 'darkred'
+    canvas.context.shadowColor = 'rgba(67, 0, 0)'
     canvas.context.fillText('Press Enter to Begin', 120, 550)
     ///
+    this.ChangeShdow(8, 8, 'rgb(50, 50, 50)')
     canvas.context.fillStyle = 'black'
     canvas.context.fillRect(600, 50, 200, 200)
+    this.ChangeShdow(0, 0, 'rgb(0, 0, 0)')
     canvas.context.fillStyle = gameStates.currentThemeColour
     canvas.context.fillRect(600 + 20, 50 + 40, 40, 40)
     canvas.context.fillRect(600 + 140, 50 + 40, 40, 40)
@@ -239,6 +245,9 @@ export var draw = {
     canvas.context.textAlign = 'left'
   },
   DrawToolBarButtons: function () {
+    canvas.context.shadowOffsetX = 4
+    canvas.context.shadowOffsetY = 4
+    canvas.context.shadowColor = 'rgba(50, 50, 50)'
     switch (gameStates.currentStoryModeState) {
       case storyModeStates.Playing:
         draw.DrawImage(images.PauseButton, 900, 475)
@@ -252,5 +261,8 @@ export var draw = {
         if (gameStates.currentStoryModeState !== storyModeStates.Lost && gameStates.currentStoryModeState !== storyModeStates.WonStage && gameStates.currentStartingMenusState !== startingMenusStates.NotStarted) { draw.DrawImage(images.BackButton, 900, 475) }
         break
     }
+    canvas.context.shadowOffsetX = 0
+    canvas.context.shadowOffsetY = 0
+    canvas.context.shadowColor = 'black'
   }
 }

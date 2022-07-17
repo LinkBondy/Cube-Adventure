@@ -1,22 +1,14 @@
 'use strict'
-function LoadImage (path) {
-  const image = new Image()
-  image.src = path
-  images.stillLoading += 1
-  image.onload = function () {
-    images.stillLoading -= 1
-  }
-  return image
-}
-export var images = {
+export const images = {
   stillLoading: 0,
   LoadImages: function () {
     ///
-    images.WallGrassV1 = LoadImage('images/WallGrassV1.png')
-    images.WallGrassV1_200x200 = LoadImage('images/WallGrassV1_200x200.png')
-    images.WallGrassV1_400x400 = LoadImage('images/WallGrassV1_400x400.png')
-    images.WallGrassV2 = LoadImage('images/WallGrassV2.png')
-    images.WallGrassV3 = LoadImage('images/WallGrassV3.png')
+    images.WallGrassClassicA = LoadImage('images/WallGrassClassicA.png')
+    images.WallGrassClassicB = LoadImage('images/WallGrassClassicB.png')
+    images.WallGrassClassicA_200x200 = LoadImage('images/WallGrassClassicA_200x200.png')
+    images.WallGrassClassicA_400x400 = LoadImage('images/WallGrassClassicA_400x400.png')
+    images.WallGrassRockA = LoadImage('images/WallGrassRockA.png')
+    images.WallGrassPuddleA = LoadImage('images/WallGrassPuddleA.png')
     images.WallGrassTree = LoadImage('images/WallGrassTree.png')
     images.WallGrassTreeV2 = LoadImage('images/WallGrassTreeV2.png')
     ///
@@ -84,4 +76,14 @@ export var images = {
     images.PauseButton = LoadImage('images/PauseButton.png')
     images.PlayButton = LoadImage('images/PlayButton.png')
   }
+}
+
+function LoadImage (path) {
+  const image = new window.Image()
+  image.src = path
+  images.stillLoading += 1
+  image.onload = function () {
+    images.stillLoading -= 1
+  }
+  return image
 }

@@ -1,18 +1,9 @@
 'use strict'
-const {
-  Player,
-  Enemy,
-  Wall,
-  Item,
-  Rock,
-  Water,
-  Hole,
-  ChangeDirectionSquare,
-  FinishArea,
-  Unlock,
-  Teleporter
-} = require('./Class')
-const { gameStates } = require('./GameData')
+const { Player, Enemy, ChangeDirectionSquare } = require('./Moveable')
+const { Wall, Rock, Water } = require('./Barriers')
+const { Unlock, Teleporter, Hole, FinishArea } = require('./Interactable')
+const { Item } = require('./Collectable')
+const { gameStates } = require('../data/GameData')
 
 class Level {
   constructor (levelData, requirement1, requirement2, currentX, currentY, width, height) {

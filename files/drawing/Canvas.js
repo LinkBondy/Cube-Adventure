@@ -1,8 +1,5 @@
 'use strict'
 class Canvas {
-  constructor () {
-  }
-
   createCanvasContext () {
     const canvas = document.getElementById('mycanvas')
     this.context = canvas.getContext('2d')
