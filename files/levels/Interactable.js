@@ -145,7 +145,9 @@ export class Hole extends GameObject {
   }
 
   Draw () {
-    if (this.fullHole) { this.DrawingX = 100 } else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } else { this.DrawingX = 0 }
+    if (this.fullHole) { this.DrawingX = 100 } 
+    else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } 
+    else { this.DrawingX = 0 }
 
     if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
       canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)

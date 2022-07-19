@@ -387,42 +387,34 @@ export class LevelController {
       ],
       enemies: [
         new Enemy(500, 200, 50, 50, true, false, false, false, 2.5),
-        /// Pink Switch Puzzle
+        // Pink Switch Puzzle
         new Enemy(450, 300, 50, 50, false, false, false, true, 2),
         new Enemy(550, 300, 50, 50, false, false, false, true, 2),
         new Enemy(650, 300, 50, 50, false, false, false, true, 2),
-        /// Blue Switch Puzzle
-        new Enemy(750, 0, 50, 50, true, false, false, false, 2)
+        //
+        new Enemy(350, 600 + 50, 50, 50, false, false, false, true, 2.5),
+        new Enemy(400, 600 + 400, 50, 50, false, false, true, false, 2.5),
+        new Enemy(450, 600 + 50, 50, 50, false, false, false, true, 2.5),
       ],
       walls: [
-        new Wall(0, 550, 800, 50, 'rgb(190, 190, 190)'),
+        new Wall(350, 550, 450, 50, 'rgb(190, 190, 190)'),
         new Wall(800, 0, 50, 600, 'rgb(190, 190, 190)'),
-        // Water Walls
-        new Wall(50, 150, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(100, 100, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(150, 50, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(200, 50, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(250, 0, 50, 100, 'rgb(190, 190, 190)'),
         /// Middle
         new Wall(0, 200, 350, 50, 'rgb(190, 190, 190)'),
         new Wall(550, 150, 200, 50, 'rgb(190, 190, 190)'),
         /// Bottom
         new Wall(0, 300, 300, 50, 'rgb(190, 190, 190)'),
+        new Wall(0, 350, 50, 250, 'rgb(190, 190, 190)'),
+        new Wall(100, 400, 200, 200, 'rgb(190, 190, 190)'),
+        new Wall(300, 400, 50, 200, 'rgb(190, 190, 190)'),
         new Wall(400, 250, 400, 50, 'rgb(190, 190, 190)'),
-        /// Pink Switch Puzzle Entrance
-        new Wall(200, 350, 100, 100, 'rgb(190, 190, 190)'),
-        new Wall(350, 300, 100, 100, 'rgb(190, 190, 190)'),
-        new Wall(350, 400, 100, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(100, 350, 200, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(50, 350, 50, 250, 'rgba(190, 190, 190, 0.9)', true, true),
+        // Pink Switch Puzzle Entrance
+        new Wall(350, 300, 100, 50, 'rgb(190, 190, 190)'),
+        new Wall(400, 350, 50, 50, 'rgb(190, 190, 190)'),
+        //new Wall(350, 400, 100, 50, 'rgba(190, 190, 190, 0.9)', true, true),
         new Wall(350, 450, 100, 100, 'rgb(190, 190, 190)'),
-        /// Life Jacket Puzzle
-        new Wall(50, 550, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(100, 500, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 350, 50, 200, 'rgb(190, 190, 190)'),
-        new Wall(100, 400, 50, 50, 'rgb(190, 190, 190)'),
-        ///
-        new Wall(150, 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(50, 350, 150, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(50, 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
         /// Pink Switch Puzzle
         // Row 1
         new Wall(500, 450, 50, 50, 'rgb(190, 190, 190)'),
@@ -430,25 +422,74 @@ export class LevelController {
         // Row 2
         new Wall(500, 350, 50, 50, 'rgb(190, 190, 190)'),
         new Wall(600, 350, 50, 50, 'rgb(190, 190, 190)'),
-        // Pathway Walls
+        // Pathway
         new Wall(700, 350, 50, 150, 'rgb(190, 190, 190)'),
         /// Blue Switch Puzzle
-        new Wall(350, 50, 200, 50, 'rgb(190, 190, 190)'),
-        new Wall(350, 100, 150, 50, 'rgb(190, 190, 190)'),
+        // Middle and Right
+        new Wall(0, 0, 400, 50, 'rgb(190, 190, 190)'),
         new Wall(300, 150, 200, 50, 'rgb(190, 190, 190)'),
-        new Wall(550, 50, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(600, 50, 200, 50, 'rgb(190, 190, 190)'),
-        //
-        new Wall(300, 50, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true)
+        new Wall(450, 50, 100, 50, 'rgb(190, 190, 190)'),
+        new Wall(400, 100, 100, 50, 'rgb(190, 190, 190)'),
+        new Wall(600, 0, 200, 100, 'rgb(190, 190, 190)'),
+        // Left
+        new Wall(0, 150, 200, 50, 'rgb(190, 190, 190)'),
+        new Wall(0, 100, 250, 50, 'rgb(190, 190, 190)'),
+        new Wall(0, 50, 350, 50, 'rgb(190, 190, 190)'),
+        new Wall(250, 0, 50, 100, 'rgb(190, 190, 190)'),
+        //// 
+        //// 
+        //// 
+        /// Secret Puzzle
+        // Entrance
+        new Wall(0, 600 + 0, 50, 50, 'rgb(190, 190, 190)'),
+        new Wall(50, 600 + 0, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(100, 600 + 0, 750, 50, 'rgb(190, 190, 190)'),
+        // Left Side
+        new Wall(0, 600 + 50, 50, 350, 'rgb(190, 190, 190)'),
+        new Wall(50, 600 + 100, 150, 50, 'rgb(190, 190, 190)'),
+        new Wall(100, 600 + 200, 150, 50, 'rgb(190, 190, 190)'),
+        new Wall(50, 600 + 300, 100, 50, 'rgb(190, 190, 190)'),
+        new Wall(200, 600 + 250, 50, 100, 'rgb(190, 190, 190)'),
+        // Water Enterance
+        new Wall(50, 600 + 350, 100, 50, 'rgb(190, 190, 190)'),
+        new Wall(100, 600 + 400, 100, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(150, 600 + 450, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(200, 600 + 450, 50, 50, 'rgb(190, 190, 190)'),
+        // Middle-Left Side
+        new Wall(250, 600 + 450, 50, 150, 'rgb(190, 190, 190)'),
+        new Wall(250, 600 + 200, 50, 200, 'rgb(190, 190, 190)'),
+        new Wall(250, 600 + 50, 50, 100, 'rgb(190, 190, 190)'),
+        new Wall(300, 600 + 450, 50, 150, 'rgb(190, 190, 190)'),
+        new Wall(300, 600 + 200, 50, 200, 'rgb(190, 190, 190)'),
+        new Wall(300, 600 + 50, 50, 100, 'rgb(190, 190, 190)'),
+        // Middle 
+        new Wall(350, 600 + 450, 150, 150, 'rgb(190, 190, 190)'),
+        // Right Side
+        new Wall(500, 600 + 50, 50, 100, 'rgb(190, 190, 190)'),
+        new Wall(700, 600 + 50, 100, 50, 'rgb(190, 190, 190)'),   
+        new Wall(700, 600 + 150, 50, 150, 'rgb(190, 190, 190)'),   
+        // Life Jacket Puzzle
+        new Wall(500, 600 + 200, 50, 350, 'rgb(190, 190, 190)'),
+        new Wall(500, 600 + 550, 350, 50, 'rgb(190, 190, 190)'),
+        new Wall(550, 600 + 300, 200, 50, 'rgb(190, 190, 190)'),
+        new Wall(600, 600 + 500, 250, 50, 'rgb(190, 190, 190)'),
+        new Wall(600, 600 + 400, 50, 50, 'rgb(190, 190, 190)'),
+        new Wall(800, 600 + 50, 50, 450, 'rgb(190, 190, 190)'),
+        new Wall(700, 600 + 350, 50, 100, 'rgb(190, 190, 190)'),
+        ///
+        new Wall(650, 600 + 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(550, 600 + 350, 150, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(550, 600 + 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
       ],
       waters: [
-        new Water(-50, -50, 150, 200, 'rgb(0, 175, 235)'),
-        new Water(100, -50, 50, 150, 'rgb(0, 175, 235)'),
-        new Water(150, -50, 100, 100, 'rgb(0, 175, 235)')
+        new Water(-50, 600 + 400, 100, 150, 'rgb(0, 175, 235)'),
+        new Water(50, 600 + 400, 50, 200, 'rgb(0, 175, 235)'),
+        new Water(100, 600 + 450, 50, 150, 'rgb(0, 175, 235)'),
+        new Water(150, 600 + 500, 100, 100, 'rgb(0, 175, 235)')
       ],
       items: [
-        new Item(50, 500, 50, 50, 1),
-        new Item(0, 150, 50, 50, 2)
+        new Item(550, 600 + 500, 50, 50, 1),
+        new Item(0, 600 + 550, 50, 50, 2)
       ],
       rocks: [
         new Rock(550, 100, 50, 50, 'plum', 'orchid', '8Purple', false, 2, 1),
@@ -456,16 +497,29 @@ export class LevelController {
       ],
       holes: [
         new Hole(550, 200, 50, 50, false, 0, 1),
-        /// Life Jacket Puzzle
-        new Hole(200, 450, 50, 50, false, 0, 2),
-        new Hole(150, 450, 50, 50, false, 0, 2),
-        new Hole(100, 450, 50, 50, false, 0, 1),
+        /// Secret Puzzle
+        // Life Jacket Puzzle
+        new Hole(700, 600 + 450, 50, 50, false, 0, 2),
+        new Hole(650, 600 + 450, 50, 50, false, 0, 2),
+        new Hole(600, 600 + 450, 50, 50, false, 0, 1),
         ///
-        new Hole(150, 400, 50, 50, false, 0, 1),
-        new Hole(150, 350, 50, 50, false, 0, 1),
-        new Hole(100, 350, 50, 50, false, 0, 1),
-        new Hole(50, 350, 50, 50, false, 0, 1),
-        new Hole(50, 400, 50, 50, false, 0, 1),
+        new Hole(650, 600 + 400, 50, 50, false, 0, 1),
+        new Hole(650, 600 + 350, 50, 50, false, 0, 1),
+        new Hole(600, 600 + 350, 50, 50, false, 0, 1),
+        new Hole(550, 600 + 350, 50, 50, false, 0, 1),
+        new Hole(550, 600 + 400, 50, 50, false, 0, 1),
+        // Middle-Left
+        new Hole(250, 600 + 150, 50, 50, false, 0, 1),
+        new Hole(300, 600 + 150, 50, 50, false, 0, 1),
+        // Right
+        new Hole(600, 600 + 50, 50, 50, true, 0, 0),
+        new Hole(600, 600 + 100, 50, 50, true, 0, 0),
+        new Hole(600, 600 + 150, 50, 50, true, 0, 0),
+        new Hole(600, 600 + 200, 50, 50, true, 0, 0),
+        // Left
+        new Hole(100, 600 + 200, 50, 50, true, 0, 0),
+        new Hole(150, 600 + 200, 50, 50, true, 0, 0),
+        new Hole(200, 600 + 200, 50, 50, true, 0, 0),
         /// Pink Switch Puzzle
         new Hole(700, 500, 50, 50, false, 0, 1),
         new Hole(700, 300, 50, 50, false, 0, 1)
@@ -481,9 +535,9 @@ export class LevelController {
       ],
       unlocks: [
         new Unlock(750, 400, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '8Purple', 2),
-        new Unlock(150, 150, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '8Blue', 1)
+        new Unlock(200, 150, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '8Blue', 1)
       ]
-    }, /* Requirements */7, undefined, /* Level Borders */1, 1, 1, 1))
+    }, /* Requirements */7, undefined, /* Level Borders */1, 1, 1, 2))
 
     // Level 9
     this.levels.push(new Level({

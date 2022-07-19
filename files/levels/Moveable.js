@@ -199,7 +199,7 @@ export class Enemy extends GameObject {
       }
     })
 
-    if ((this.movesLeft && this.x <= (0 + 850 * (gameStates.CurrentLevel().width - 1))) || (this.movesLeft && intersectsWall)) {
+    if ((this.movesLeft && oldX < 0) || (this.movesLeft && intersectsWall)) {
       this.movesLeft = false
       this.x = oldX
       if (this.waitTime !== undefined && this.waitTime !== null) {
@@ -218,7 +218,7 @@ export class Enemy extends GameObject {
       return
     }
 
-    if ((this.movesRight && this.x >= (850 * gameStates.CurrentLevel().width - this.width)) || (this.movesRight && intersectsWall)) {
+    if ((this.movesRight && oldX > (850 * gameStates.CurrentLevel().width - this.width)) || (this.movesRight && intersectsWall)) {
       this.movesRight = false
       this.x = oldX
       if (this.waitTime !== undefined) {
@@ -237,7 +237,7 @@ export class Enemy extends GameObject {
       return
     }
 
-    if ((this.movesUp && this.y <= (600 * (gameStates.CurrentLevel().height - 1))) || (this.movesUp && intersectsWall)) {
+    if ((this.movesUp && oldY < 0) || (this.movesUp && intersectsWall)) {
       this.movesUp = false
       this.y = oldY
       if (this.waitTime !== undefined) {
@@ -256,7 +256,7 @@ export class Enemy extends GameObject {
       return
     }
 
-    if ((this.movesDown && this.y >= (600 * gameStates.CurrentLevel().height - this.height)) || (this.movesDown && intersectsWall)) {
+    if ((this.movesDown && oldY > 600 * gameStates.CurrentLevel().height - this.height) || (this.movesDown && intersectsWall)) {
       this.movesDown = false
       this.y = oldY
       if (this.waitTime !== undefined) {

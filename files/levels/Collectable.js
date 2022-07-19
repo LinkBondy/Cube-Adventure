@@ -1,6 +1,6 @@
 const { images } = require('../drawing/Images')
 const { draw } = require('../drawing/Draw')
-const { gameMode, gameStates, BackgroundStyles, drawUpdate } = require('../data/GameData')
+const { gameMode, storyModeStates, gameStates, BackgroundStyles, drawUpdate } = require('../data/GameData')
 const { GameObject } = require('./Class')
 export class Item extends GameObject {
   constructor (x, y, width, height, typeNumber) {
@@ -31,15 +31,16 @@ export class Item extends GameObject {
   }
 
   update () {
-    if (this.typeNumber === 2 && this.collected && gameStates.currentGameMode === gameMode.StoryMode) {
-      drawUpdate.blueCubeAlienLock = false
-    }
+    
   }
 
   reset () {
     this.x = this.original_x
     this.y = this.original_y
     this.allowMovementWater = false
-    this.collected = false
+    if (this.typeNumber === 2 && this.collected && gameStates.currentStoryModeState === storyModeStates.WonStage) {
+        drawUpdate.blueCubeAlienLock = false
+    }
+    this.collected = false 
   }
 };
