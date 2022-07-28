@@ -32,6 +32,7 @@ class Level {
 export class LevelController {
   constructor () {
     this.levels = []
+    this.currentWorld = 1
   }
 
   createLevels () {
@@ -41,8 +42,8 @@ export class LevelController {
         new Player(400, 0, 50, 50)
       ],
       enemies: [
-        new Enemy(800, 400, 50, 50, false, true, false, false, 5),
-        new Enemy(0, 200, 50, 50, true, false, false, false, 5)
+        new Enemy(800, 400, 50, 50, [true, false, false, false], 10),
+        new Enemy(0, 200, 50, 50, [false, true, false, false], 10)
       ],
       finishAreas: [
         new FinishArea(0, 550, 850, 50)
@@ -55,7 +56,7 @@ export class LevelController {
         new Player(400, 0, 50, 50)
       ],
       enemies: [
-        new Enemy(400, 500, 50, 50, false, false, true, false, 3)
+        new Enemy(400, 500, 50, 50, [false, false, true, false], 5.5)
       ],
       walls: [
         new Wall(0, 0, 350, 600, 'rgb(190, 190, 190)'),
@@ -78,9 +79,9 @@ export class LevelController {
         new Player(400, 0, 50, 50)
       ],
       enemies: [
-        new Enemy(200, 450, 50, 50, true, false, false, false, 4),
-        new Enemy(400, 350, 50, 50, true, true, false, false, 2.5),
-        new Enemy(600, 50, 50, 50, false, true, false, false, 4)
+        new Enemy(200, 450, 50, 50, [true, false, false, false], 6),
+        new Enemy(400, 350, 50, 50, [true, true, false, false], 5),
+        new Enemy(600, 50, 50, 50, [false, true, false, false], 6)
       ],
       walls: [
         new Wall(0, 0, 200, 550, 'rgb(190, 190, 190)'),
@@ -125,13 +126,13 @@ export class LevelController {
         new Player(100, 100, 50, 50)
       ],
       enemies: [
-        new Enemy(400, 50, 50, 50, true, true, false, false, 3),
+        new Enemy(400, 50, 50, 50, [true, true, false, false], 5.5),
         ///
-        new Enemy(300, 300, 50, 50, true, false, false, false, 2.5),
-        new Enemy(300, 500, 50, 50, true, false, false, false, 2.5),
+        new Enemy(300, 300, 50, 50, [true, false, false, false], 5),
+        new Enemy(300, 500, 50, 50, [true, false, false, false], 5),
         ///
-        new Enemy(500, 300, 50, 50, false, true, false, false, 2.5),
-        new Enemy(500, 500, 50, 50, false, true, false, false, 2.5)
+        new Enemy(500, 300, 50, 50, [false, true, false, false], 5),
+        new Enemy(500, 500, 50, 50, [false, true, false, false], 5)
       ],
       walls: [
         new Wall(0, 0, 850, 50, 'rgb(190, 190, 190)'),
@@ -166,10 +167,10 @@ export class LevelController {
         new Player(150, 150, 50, 50)
       ],
       enemies: [
-        new Enemy(50, 500, 50, 50, false, false, true, false, 2.5),
-        new Enemy(500, 150, 50, 50, false, true, false, false, 2.5),
-        new Enemy(500, 300, 50, 50, false, true, false, false, 2.5),
-        new Enemy(500, 450, 50, 50, false, true, false, false, 2.5)
+        new Enemy(50, 500, 50, 50, [false, false, true, false], 5),
+        new Enemy(500, 150, 50, 50, [false, true, false, false], 5),
+        new Enemy(500, 300, 50, 50, [false, true, false, false], 5),
+        new Enemy(500, 450, 50, 50, [false, true, false, false], 5)
       ],
       walls: [
         // Side Walls
@@ -224,7 +225,7 @@ export class LevelController {
         new Player(50, 50, 50, 50)
       ],
       enemies: [
-        new Enemy(700, 500, 50, 50, true, false, false, false, 2)
+        new Enemy(700, 500, 50, 50, [true, false, false, false], 3.5)
       ],
       walls: [
         new Wall(0, 0, 850, 50, 'rgb(190, 190, 190)'),
@@ -299,9 +300,9 @@ export class LevelController {
         new Player(150, 50, 50, 50)
       ],
       enemies: [
-        new Enemy(250, 100, 50, 50, true, false, false, false, 2.5),
-        new Enemy(50, 250, 50, 50, false, true, false, false, 3),
-        new Enemy(250, 400, 50, 50, true, false, false, false, 2.5)
+        new Enemy(250, 100, 50, 50, [true, false, false, false], 4),
+        new Enemy(50, 250, 50, 50, [false, true, false, false], 4.5),
+        new Enemy(250, 400, 50, 50, [true, false, false, false], 4)
       ],
       walls: [
         new Wall(0, 0, 50, 600, 'rgb(190, 190, 190)'),
@@ -386,15 +387,15 @@ export class LevelController {
         new Player(100, 250, 50, 50)
       ],
       enemies: [
-        new Enemy(500, 200, 50, 50, true, false, false, false, 2.5),
+        new Enemy(500, 200, 50, 50, [true, false, false, false], 4),
         // Pink Switch Puzzle
-        new Enemy(450, 300, 50, 50, false, false, false, true, 2),
-        new Enemy(550, 300, 50, 50, false, false, false, true, 2),
-        new Enemy(650, 300, 50, 50, false, false, false, true, 2),
+        new Enemy(450, 300, 50, 50, [false, false, false, true], 3),
+        new Enemy(550, 300, 50, 50, [false, false, false, true], 3),
+        new Enemy(650, 300, 50, 50, [false, false, false, true], 3),
         //
-        new Enemy(350, 600 + 50, 50, 50, false, false, false, true, 2.5),
-        new Enemy(400, 600 + 400, 50, 50, false, false, true, false, 2.5),
-        new Enemy(450, 600 + 50, 50, 50, false, false, false, true, 2.5),
+        new Enemy(350, 600 + 50, 50, 50, [false, false, false, true], 4),
+        new Enemy(400, 600 + 400, 50, 50, [false, false, true, false], 4),
+        new Enemy(450, 600 + 50, 50, 50, [false, false, false, true], 4)
       ],
       walls: [
         new Wall(350, 550, 450, 50, 'rgb(190, 190, 190)'),
@@ -413,7 +414,7 @@ export class LevelController {
         // Pink Switch Puzzle Entrance
         new Wall(350, 300, 100, 50, 'rgb(190, 190, 190)'),
         new Wall(400, 350, 50, 50, 'rgb(190, 190, 190)'),
-        //new Wall(350, 400, 100, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        // new Wall(350, 400, 100, 50, 'rgba(190, 190, 190, 0.9)', true, true),
         new Wall(350, 450, 100, 100, 'rgb(190, 190, 190)'),
         /// Pink Switch Puzzle
         // Row 1
@@ -426,19 +427,19 @@ export class LevelController {
         new Wall(700, 350, 50, 150, 'rgb(190, 190, 190)'),
         /// Blue Switch Puzzle
         // Middle and Right
-        new Wall(0, 0, 400, 50, 'rgb(190, 190, 190)'),
+        // new Wall(0, 0, 800, 50, 'rgb(190, 190, 190)'),
         new Wall(300, 150, 200, 50, 'rgb(190, 190, 190)'),
-        new Wall(450, 50, 100, 50, 'rgb(190, 190, 190)'),
+
         new Wall(400, 100, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(600, 0, 200, 100, 'rgb(190, 190, 190)'),
+        new Wall(550, 50, 250, 50, 'rgb(190, 190, 190)'),
         // Left
         new Wall(0, 150, 200, 50, 'rgb(190, 190, 190)'),
         new Wall(0, 100, 250, 50, 'rgb(190, 190, 190)'),
         new Wall(0, 50, 350, 50, 'rgb(190, 190, 190)'),
-        new Wall(250, 0, 50, 100, 'rgb(190, 190, 190)'),
-        //// 
-        //// 
-        //// 
+        new Wall(0, 0, 800, 50, 'rgb(190, 190, 190)'),
+        /// /
+        /// /
+        /// /
         /// Secret Puzzle
         // Entrance
         new Wall(0, 600 + 0, 50, 50, 'rgb(190, 190, 190)'),
@@ -462,12 +463,12 @@ export class LevelController {
         new Wall(300, 600 + 450, 50, 150, 'rgb(190, 190, 190)'),
         new Wall(300, 600 + 200, 50, 200, 'rgb(190, 190, 190)'),
         new Wall(300, 600 + 50, 50, 100, 'rgb(190, 190, 190)'),
-        // Middle 
+        // Middle
         new Wall(350, 600 + 450, 150, 150, 'rgb(190, 190, 190)'),
         // Right Side
         new Wall(500, 600 + 50, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(700, 600 + 50, 100, 50, 'rgb(190, 190, 190)'),   
-        new Wall(700, 600 + 150, 50, 150, 'rgb(190, 190, 190)'),   
+        new Wall(700, 600 + 50, 100, 50, 'rgb(190, 190, 190)'),
+        new Wall(700, 600 + 150, 50, 150, 'rgb(190, 190, 190)'),
         // Life Jacket Puzzle
         new Wall(500, 600 + 200, 50, 350, 'rgb(190, 190, 190)'),
         new Wall(500, 600 + 550, 350, 50, 'rgb(190, 190, 190)'),
@@ -479,7 +480,7 @@ export class LevelController {
         ///
         new Wall(650, 600 + 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
         new Wall(550, 600 + 350, 150, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(550, 600 + 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(550, 600 + 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true)
       ],
       waters: [
         new Water(-50, 600 + 400, 100, 150, 'rgb(0, 175, 235)'),
@@ -492,6 +493,7 @@ export class LevelController {
         new Item(0, 600 + 550, 50, 50, 2)
       ],
       rocks: [
+        new Rock(500, 100, 50, 50, 'plum', 'orchid', '8Purple', false, 2, 1),
         new Rock(550, 100, 50, 50, 'plum', 'orchid', '8Purple', false, 2, 1),
         new Rock(50, 250, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1)
       ],
@@ -545,10 +547,10 @@ export class LevelController {
         new Player(700, 500, 50, 50)
       ],
       enemies: [
-        new Enemy(350, 50, 50, 50, false, false, false, true, 2, 1000),
-        new Enemy(450, 50, 50, 50, false, false, false, true, 2, 1000),
+        new Enemy(350, 50, 50, 50, [false, false, false, true], 3.5, 750),
+        new Enemy(450, 50, 50, 50, [false, false, false, true], 3.5, 750),
         ///
-        new Enemy(200 + 850, 300, 50, 50, false, true, false, false, 2, 1000)
+        new Enemy(200 + 850, 300, 50, 50, [false, true, false, false], 5, 750)
       ],
       walls: [
         new Wall(0, 0, 850, 50, 'rgb(190, 190, 190)'),
@@ -588,12 +590,13 @@ export class LevelController {
         new Wall(350 + 850, 0, 250, 50, 'rgb(190, 190, 190)'),
         new Wall(600 + 850, 0, 250, 200, 'rgb(190, 190, 190)'),
         // Exit Puzzle
+        new Wall(400 + 850, 200, 150, 50, 'rgb(190, 190, 190)'),
         new Wall(750 + 850, 250, 100, 150, 'rgb(190, 190, 190)'),
         new Wall(650 + 850, 300, 50, 50, 'rgb(190, 190, 190)'),
         // Red Teleporter Puzzle and Exit Puzzle Split
-        new Wall(500 + 850, 200, 350, 50, 'rgb(190, 190, 190)'),
-        new Wall(200 + 850, 200, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(450 + 850, 200, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true)
+        new Wall(200 + 850, 200, 150, 50, 'rgb(190, 190, 190)'),
+        new Wall(350 + 850, 200, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new Wall(450 + 850, 200, 400, 50, 'rgb(190, 190, 190)')
 
       ],
       waters: [
@@ -610,7 +613,7 @@ export class LevelController {
         new Water(50, 500, 350, 50, 'rgb(0, 175, 235)')
       ],
       items: [
-        new Item(550 + 850, 100, 50, 50, 1)
+        new Item(350 + 850, 100, 50, 50, 1)
       ],
       rocks: [
         // Red Teleporter Puzzle Right Entracne
@@ -630,13 +633,17 @@ export class LevelController {
         new Rock(150, 450, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
         new Rock(150, 500, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
         // Exit Puzzle
-        new Rock(400 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(450 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(500 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
+        new Rock(350 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
+        new Rock(400 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
+        new Rock(450 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
+        new Rock(500 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
+        new Rock(550 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
         ///
-        new Rock(400 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(450 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(500 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1)
+        new Rock(350 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
+        new Rock(400 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
+        new Rock(450 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
+        new Rock(500 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
+        new Rock(550 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1)
       ],
       holes: [
         // Exit Puzzle Entracne
@@ -654,7 +661,7 @@ export class LevelController {
       ],
       teleporters: [
         new Teleporter(100, 300, '8Teleporter', 50, 50, 1),
-        new Teleporter(350 + 850, 100, '8Teleporter', 50, 50, 1)
+        new Teleporter(550 + 850, 100, '8Teleporter', 50, 50, 1)
       ]
     }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 1))
   }

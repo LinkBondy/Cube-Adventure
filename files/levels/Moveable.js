@@ -4,13 +4,10 @@ const { cubeStyle, gameStates, BackgroundStyles } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 const { GameObject } = require('./Class')
 export class Enemy extends GameObject {
-  constructor (x, y, width, height, movesLeft, movesRight, movesUp, movesDown, blockSpeed, waitTime) {
+  constructor (x, y, width, height, directions, blockSpeed, waitTime) {
     super(x, y, width, height)
     // Moving
-    this.movesLeft = movesLeft
-    this.movesRight = movesRight
-    this.movesUp = movesUp
-    this.movesDown = movesDown
+    this.directions = directions
     this.blockSpeed = blockSpeed
     // Waiting
     this.waitTime = waitTime
@@ -20,26 +17,24 @@ export class Enemy extends GameObject {
     // Original variables for reseting
     this.original_x = this.x
     this.original_y = this.y
-    this.originalMovesLeft = this.movesLeft
-    this.originalMovesRight = this.movesRight
-    this.originalMovesUp = this.movesUp
-    this.originalMovesDown = this.movesDown
+    this.originalDirections = [...this.directions]
     this.original_blockSpeed = blockSpeed
     // Other
     this.inWater = undefined
     this.stopHole = false
+    this.updatedDirections = false
+    this.stopChangeDirection = false
+    this.changeDirectionSquareUsed = false
   }
 
   reset () {
     window.clearTimeout(this.timeoutID)
     this.x = this.original_x
     this.y = this.original_y
-    this.movesLeft = this.originalMovesLeft
-    this.movesRight = this.originalMovesRight
-    this.movesUp = this.originalMovesUp
-    this.movesDown = this.originalMovesDown
+    this.directions = [...this.originalDirections]
     this.blockSpeed = this.original_blockSpeed
     this.inWater = undefined
+    this.updatedDirections = false
   }
 
   setTimer () {
@@ -58,53 +53,76 @@ export class Enemy extends GameObject {
   update (delta) {
     const oldX = this.x
     const oldY = this.y
-    let intersectsWall = false
+    let currentBarrierIntersected
+    let intersectsBarrier = false
     let intersectsWater = false
     const self = this
-    if ((this.movesLeft && this.movesRight) || (this.movesUp && this.movesDown)) {
-      const chooseMovement = Math.floor(Math.random() * 2 + 1)
-      // console.log(Math2)
-      if (chooseMovement === 1) {
-        if (this.movesLeft && this.movesRight) {
-          this.movesLeft = false
-        }
-
-        if (this.movesUp && this.movesDown) {
-          this.movesUp = false
+    const chooseDirection = []
+    if (!this.updatedDirections) {
+      for (let directionsCheck = 0; directionsCheck < this.directions.length; directionsCheck++) {
+        if (this.directions[directionsCheck] === true) {
+          chooseDirection.push(directionsCheck)
         }
       }
 
-      if (chooseMovement === 2) {
-        if (this.movesLeft && this.movesRight) {
-          this.movesRight = false
-        }
-
-        if (this.movesUp && this.movesDown) {
-          this.movesDown = false
+      if (chooseDirection.length >= 2) {
+        const chooseMovement = Math.floor(Math.random() * chooseDirection.length + 1)
+        // console.log(Math2)
+        if (chooseMovement === 1) {
+          for (let directionsSet = chooseDirection.length - 1; directionsSet >= 0; directionsSet--) {
+            if (directionsSet !== 0) {
+              this.directions[chooseDirection[directionsSet]] = false
+            }
+          }
+        } else if (chooseMovement === 2) {
+          for (let directionsSet = chooseDirection.length - 1; directionsSet >= 0; directionsSet--) {
+            if (directionsSet !== 1) {
+              this.directions[chooseDirection[directionsSet]] = false
+            }
+          }
+        } else if (chooseMovement === 3) {
+          for (let directionsSet = chooseDirection.length - 1; directionsSet >= 0; directionsSet--) {
+            if (directionsSet !== 2) {
+              this.directions[chooseDirection[directionsSet]] = false
+            }
+          }
+        } else if (chooseMovement === 4) {
+          for (let directionsSet = chooseDirection.length - 1; directionsSet >= 0; directionsSet--) {
+            if (directionsSet !== 3) {
+              this.directions[chooseDirection[directionsSet]] = false
+            }
+          }
         }
       }
+      this.updatedDirections = true
     }
-    // Move Enemy
-    if (this.movesLeft) {
+    // Left
+    if (this.directions[0]) {
       this.x = this.x - this.blockSpeed * delta
     }
 
-    if (this.movesRight) {
+    // Right
+    if (this.directions[1]) {
       this.x = this.x + this.blockSpeed * delta
     }
 
-    if (this.movesUp) {
+    // Up
+    if (this.directions[2]) {
       this.y = this.y - this.blockSpeed * delta
     }
 
-    if (this.movesDown) {
+    // Down
+    if (this.directions[3]) {
       this.y = this.y + this.blockSpeed * delta
     }
 
     // Check if touching changeDirectionSquares
     gameStates.CurrentLevel().changeDirectionSquares.forEach(function (changeDirectionSquare) {
-      if (changeDirectionSquare.intersectsAll(self) && changeDirectionSquare.allowDirectionChange) {
-        // console.log("hi")
+      if (changeDirectionSquare.intersectsAll(self.blockSpeed / 2, self) && changeDirectionSquare.allowDirectionChange && !self.stopChangeDirection) {
+        self.stopChangeDirection = true
+        self.changeDirectionSquareUsed = changeDirectionSquare
+        self.x = changeDirectionSquare.x
+        self.y = changeDirectionSquare.y
         if ((changeDirectionSquare.changeLeft && changeDirectionSquare.changeRight) || (changeDirectionSquare.changeUp && changeDirectionSquare.changeDown)) {
           const chooseMovementChange = Math.floor(Math.random() * 2 + 1)
 
@@ -120,47 +138,54 @@ export class Enemy extends GameObject {
             if (changeDirectionSquare.changeUp && changeDirectionSquare.changeDown) { changeDirectionSquare.changeDown = false }
           }
         }
-        if (self.movesLeft || self.movesRight) {
+        if (self.directions[0/* left */] || self.directions[1/* right */]) {
           if (changeDirectionSquare.changeUp) {
-            self.movesUp = true
+            self.directions[2/* up */] = true
           }
 
           if (changeDirectionSquare.changeDown) {
-            self.movesDown = true
+            self.directions[3/* down */] = true
           }
-          self.movesLeft = false
-          self.movesRight = false
-        } else if (self.movesUp || self.movesDown) {
+          self.directions[0/* left */] = false
+          self.directions[1/* right */] = false
+        } else if (self.directions[2/* up */] || self.directions[3/* down */]) {
           if (changeDirectionSquare.changeLeft) {
-            self.movesLeft = true
+            self.directions[0/* left */] = true
           }
 
           if (changeDirectionSquare.changeRight) {
-            self.movesRight = true
+            self.directions[1/* right */] = true
           }
-          self.movesUp = false
-          self.movesDown = false
+          self.directions[2/* up */] = false
+          self.directions[3/* down */] = false
         }
       }
     })
 
+    if (this.changeDirectionSquareUsed !== false && this.stopChangeDirection && !this.changeDirectionSquareUsed.intersectsAll(this.blockSpeed / 2, this)) {
+      this.stopChangeDirection = false
+      this.changeDirectionSquareUsed = false
+    }
+
     // Check if touching walls
     gameStates.CurrentLevel().walls.forEach(function (wall) {
       if (wall.intersects(self) && !wall.allowMovement) {
-        intersectsWall = true
+        intersectsBarrier = true
+        currentBarrierIntersected = wall
       }
     })
 
     // Check if touching rocks
     gameStates.CurrentLevel().rocks.forEach(function (rock) {
       if (!rock.allowMovement && rock.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
+        currentBarrierIntersected = rock
       }
     })
 
     // Check if touching holes
     gameStates.CurrentLevel().holes.forEach(function (hole) {
-      if (!hole.fullHole && hole.intersectsAll(self)) {
+      if (!hole.fullHole && hole.intersectsAll(0, self)) {
         hole.currentIntersects = hole.currentIntersects + 1
         self.stopHole = true
         hole.stopEnemy = true
@@ -172,7 +197,8 @@ export class Enemy extends GameObject {
       }
 
       if (hole.fullHole && hole.intersects(self) && self.stopHole === false && hole.stopEnemy === false) {
-        intersectsWall = true
+        intersectsBarrier = true
+        currentBarrierIntersected = hole
       }
     })
 
@@ -182,7 +208,7 @@ export class Enemy extends GameObject {
         intersectsWater = true
       }
     })
-    // Chnage speed if in water
+    // Chnage speed if in/out water
     if (intersectsWater && (this.inWater === false || this.inWater === undefined)) {
       this.blockSpeed = this.blockSpeed / 2
     }
@@ -195,17 +221,18 @@ export class Enemy extends GameObject {
     // Check if touching finishAreas
     gameStates.CurrentLevel().finishAreas.forEach(function (finishArea) {
       if (finishArea.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
+        currentBarrierIntersected = finishArea
       }
     })
 
-    if ((this.movesLeft && oldX < 0) || (this.movesLeft && intersectsWall)) {
-      this.movesLeft = false
-      this.x = oldX
+    if ((this.directions[0/* left */] && oldX < 0) || (this.directions[0/* left */] && intersectsBarrier)) {
+      this.directions[0/* left */] = false
+      if (currentBarrierIntersected !== undefined) { this.x = currentBarrierIntersected.x + currentBarrierIntersected.width } else { this.x = 0 }
       if (this.waitTime !== undefined && this.waitTime !== null) {
         this.oldDate = new Date()
         this.action = function () {
-          self.movesRight = true
+          self.directions[1/* right */] = true
           self.timeoutId = undefined
           // self.action = undefined
         }
@@ -213,18 +240,18 @@ export class Enemy extends GameObject {
           self.action()
         }, self.waitTime)
       } else {
-        this.movesRight = true
+        this.directions[1/* right */] = true
       }
       return
     }
 
-    if ((this.movesRight && oldX > (850 * gameStates.CurrentLevel().width - this.width)) || (this.movesRight && intersectsWall)) {
-      this.movesRight = false
-      this.x = oldX
+    if ((this.directions[1/* right */] && oldX > 850 * gameStates.CurrentLevel().width - this.width) || (this.directions[1/* right */] && intersectsBarrier)) {
+      this.directions[1/* right */] = false
+      if (currentBarrierIntersected !== undefined) { this.x = currentBarrierIntersected.x - 50 } else { this.x = 850 * gameStates.CurrentLevel().width - this.width }
       if (this.waitTime !== undefined) {
         this.oldDate = new Date()
         this.action = function () {
-          self.movesLeft = true
+          self.directions[0/* left */] = true
           self.timeoutId = undefined
           // self.action = undefined
         }
@@ -232,18 +259,18 @@ export class Enemy extends GameObject {
           self.action()
         }, self.waitTime)
       } else {
-        this.movesLeft = true
+        this.directions[0/* left */] = true
       }
       return
     }
 
-    if ((this.movesUp && oldY < 0) || (this.movesUp && intersectsWall)) {
-      this.movesUp = false
-      this.y = oldY
+    if ((this.directions[2/* up */] && oldY < 0) || (this.directions[2/* up */] && intersectsBarrier)) {
+      this.directions[2/* up */] = false
+      if (currentBarrierIntersected !== undefined) { this.y = currentBarrierIntersected.y + currentBarrierIntersected.height } else { this.y = 0 }
       if (this.waitTime !== undefined) {
         this.oldDate = new Date()
         this.action = function () {
-          self.movesDown = true
+          self.directions[3/* down */] = true
           self.timeoutId = undefined
           // self.action = undefined
         }
@@ -251,18 +278,18 @@ export class Enemy extends GameObject {
           self.action()
         }, self.waitTime)
       } else {
-        this.movesDown = true
+        this.directions[3/* down */] = true
       }
       return
     }
 
-    if ((this.movesDown && oldY > 600 * gameStates.CurrentLevel().height - this.height) || (this.movesDown && intersectsWall)) {
-      this.movesDown = false
-      this.y = oldY
+    if ((this.directions[3/* down */] && oldY > 600 * gameStates.CurrentLevel().height - this.height) || (this.directions[3/* down */] && intersectsBarrier)) {
+      this.directions[3/* down */] = false
+      if (currentBarrierIntersected !== undefined) { this.y = currentBarrierIntersected.y - 50 } else { this.y = 600 * gameStates.CurrentLevel().height - this.height }
       if (this.waitTime !== undefined) {
         this.oldDate = new Date()
         this.action = function () {
-          self.movesUp = true
+          self.directions[2/* up */] = true
           self.timeoutId = undefined
           // self.action = undefined
         }
@@ -270,7 +297,7 @@ export class Enemy extends GameObject {
           self.action()
         }, self.waitTime)
       } else {
-        this.movesUp = true
+        this.directions[2/* up */] = true
       }
     }
   }
@@ -297,11 +324,11 @@ export class Player extends GameObject {
   moveRight () {
     const oldX = this.x
     this.x = this.x + 50
-    let intersectsWall = false
+    let intersectsBarrier = false
     const self = this
     gameStates.CurrentLevel().walls.forEach(function (wall) {
       if (!wall.allowMovement && wall.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
         })
@@ -310,7 +337,7 @@ export class Player extends GameObject {
 
     gameStates.CurrentLevel().rocks.forEach(function (rock) {
       if (!rock.allowMovement && rock.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
         })
@@ -320,7 +347,7 @@ export class Player extends GameObject {
     gameStates.CurrentLevel().waters.forEach(function (water) {
       gameStates.CurrentLevel().items.forEach(function (item) {
         if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
-          intersectsWall = true
+          intersectsBarrier = true
           gameStates.CurrentLevel().holes.forEach(function (hole) {
             hole.stopPlayer = true
           })
@@ -348,7 +375,7 @@ export class Player extends GameObject {
       }
     })
 
-    if (intersectsWall) {
+    if (intersectsBarrier) {
       this.x = oldX
     }
     gameStates.CurrentLevel().holes.forEach(function (hole) {
@@ -359,11 +386,11 @@ export class Player extends GameObject {
   moveLeft () {
     const oldX = this.x
     this.x = this.x - 50
-    let intersectsWall = false
+    let intersectsBarrier = false
     const self = this
     gameStates.CurrentLevel().walls.forEach(function (wall) {
       if (!wall.allowMovement && wall.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
         })
@@ -372,7 +399,7 @@ export class Player extends GameObject {
 
     gameStates.CurrentLevel().rocks.forEach(function (rock) {
       if (!rock.allowMovement && rock.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
         })
@@ -382,7 +409,7 @@ export class Player extends GameObject {
     gameStates.CurrentLevel().waters.forEach(function (water) {
       gameStates.CurrentLevel().items.forEach(function (item) {
         if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
-          intersectsWall = true
+          intersectsBarrier = true
           gameStates.CurrentLevel().holes.forEach(function (hole) {
             hole.stopPlayer = true
           })
@@ -410,7 +437,7 @@ export class Player extends GameObject {
       }
     })
 
-    if (intersectsWall) {
+    if (intersectsBarrier) {
       this.x = oldX
     }
     gameStates.CurrentLevel().holes.forEach(function (hole) {
@@ -421,11 +448,11 @@ export class Player extends GameObject {
   moveDown () {
     const oldY = this.y
     this.y = this.y + 50
-    let intersectsWall = false
+    let intersectsBarrier = false
     const self = this
     gameStates.CurrentLevel().walls.forEach(function (wall) {
       if (!wall.allowMovement && wall.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
         })
@@ -434,7 +461,7 @@ export class Player extends GameObject {
 
     gameStates.CurrentLevel().rocks.forEach(function (rock) {
       if (!rock.allowMovement && rock.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
         })
@@ -444,7 +471,7 @@ export class Player extends GameObject {
     gameStates.CurrentLevel().waters.forEach(function (water) {
       gameStates.CurrentLevel().items.forEach(function (item) {
         if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
-          intersectsWall = true
+          intersectsBarrier = true
           gameStates.CurrentLevel().holes.forEach(function (hole) {
             hole.stopPlayer = true
           })
@@ -472,7 +499,7 @@ export class Player extends GameObject {
       }
     })
 
-    if (intersectsWall) {
+    if (intersectsBarrier) {
       this.y = oldY
     }
     gameStates.CurrentLevel().holes.forEach(function (hole) {
@@ -483,11 +510,11 @@ export class Player extends GameObject {
   moveUp () {
     const oldY = this.y
     this.y = this.y - 50
-    let intersectsWall = false
+    let intersectsBarrier = false
     const self = this
     gameStates.CurrentLevel().walls.forEach(function (wall) {
       if (!wall.allowMovement && wall.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
         })
@@ -496,7 +523,7 @@ export class Player extends GameObject {
 
     gameStates.CurrentLevel().rocks.forEach(function (rock) {
       if (!rock.allowMovement && rock.intersects(self)) {
-        intersectsWall = true
+        intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
         })
@@ -506,7 +533,7 @@ export class Player extends GameObject {
     gameStates.CurrentLevel().waters.forEach(function (water) {
       gameStates.CurrentLevel().items.forEach(function (item) {
         if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
-          intersectsWall = true
+          intersectsBarrier = true
           gameStates.CurrentLevel().holes.forEach(function (hole) {
             hole.stopPlayer = true
           })
@@ -534,7 +561,7 @@ export class Player extends GameObject {
       }
     })
 
-    if (intersectsWall) {
+    if (intersectsBarrier) {
       this.y = oldY
     }
     gameStates.CurrentLevel().holes.forEach(function (hole) {

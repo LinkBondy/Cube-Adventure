@@ -30,19 +30,13 @@ export const game = {
   mainLoop: function () {
     // const timePassed = new Date().getTime() - game.lastTime
     game.lastTime = new Date().getTime()
-    /* if (!game.isRunning)
-            timePassed = 0
-        console.log('timePassed is: ', timePassed)
-        var delta = timePassed/20
-        console.log(delta)
-        if (delta > 1)
-        delta = 1 */
-    const delta = 1
+    let delta = 1
+    if (!game.isRunning) { delta = 0 }
     dataManagement.Save(draw)
     update.UpdateGame(delta)
     draw.DrawGame()
-    window.setTimeout(game.mainLoop, 1000 / 120)
-    // window.requestAnimationFrame(game.mainLoop)
+    // window.setTimeout(game.mainLoop, 1000 / 120)
+    window.requestAnimationFrame(game.mainLoop)
   }
 }
 

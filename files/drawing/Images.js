@@ -75,6 +75,7 @@ export const images = {
     images.BackButton = LoadImage('images/BackButton.png')
     images.PauseButton = LoadImage('images/PauseButton.png')
     images.PlayButton = LoadImage('images/PlayButton.png')
+    images.WorldTwoLedges = LoadImage('images/WorldTwoLedges.png')
   }
 }
 

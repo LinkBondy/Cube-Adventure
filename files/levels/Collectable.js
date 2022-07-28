@@ -31,7 +31,7 @@ export class Item extends GameObject {
   }
 
   update () {
-    
+
   }
 
   reset () {
@@ -39,8 +39,8 @@ export class Item extends GameObject {
     this.y = this.original_y
     this.allowMovementWater = false
     if (this.typeNumber === 2 && this.collected && gameStates.currentStoryModeState === storyModeStates.WonStage) {
-        drawUpdate.blueCubeAlienLock = false
+      drawUpdate.blueCubeAlienLock = false
     }
-    this.collected = false 
+    this.collected = false
   }
 };

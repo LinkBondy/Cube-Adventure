@@ -41,13 +41,39 @@ export class KeybindController {
     if (this.checkKeybinds(event.key)) {
       switch (this.currentType) {
         case 'A':
-          if (event.key === ' ') { this.currentKeybind.displayNameA = 'Space' } else { this.currentKeybind.displayNameA = event.key }
+          if (event.key === ' ') { this.currentKeybind.displayNameA = 'Space' } else if (event.key === 'Dead') {
+            this.currentKeybind.displayNameA = event.code + '+'
+            if (event.altKey) {
+              this.currentKeybind.displayNameA = this.currentKeybind.displayNameA + 'alt'
+              if (event.shiftKey) {
+                this.currentKeybind.displayNameA = this.currentKeybind.displayNameA + '+'
+              }
+            }
+            if (event.shiftKey) {
+              this.currentKeybind.displayNameA = this.currentKeybind.displayNameA + 'shift'
+            }
+          } else {
+            this.currentKeybind.displayNameA = event.key
+          }
           ///
           this.currentKeybind.keybindA = event.key
           this.currentMenuItem.title = this.currentKeybind.displayNameA
           break
         case 'B':
-          if (event.key === ' ') { this.currentKeybind.displayNameB = 'Space' } else { this.currentKeybind.displayNameB = event.key }
+          if (event.key === ' ') { this.currentKeybind.displayNameB = 'Space' } else if (event.key === 'Dead') {
+            this.currentKeybind.displayNameB = event.code + '+'
+            if (event.altKey) {
+              this.currentKeybind.displayNameB = this.currentKeybind.displayNameB + 'alt'
+              if (event.shiftKey) {
+                this.currentKeybind.displayNameB = this.currentKeybind.displayNameB + '+'
+              }
+            }
+            if (event.shiftKey) {
+              this.currentKeybind.displayNameB = this.currentKeybind.displayNameB + 'shift'
+            }
+          } else {
+            this.currentKeybind.displayNameB = event.key
+          }
           ///
           this.currentKeybind.keybindB = event.key
           this.currentMenuItem.title = this.currentKeybind.displayNameB

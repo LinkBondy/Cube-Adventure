@@ -44,18 +44,24 @@ export class Wall extends GameObject {
           ///
           canvas.context.save()
           canvas.context.translate(x - 2, y - 2)
-          // if (this.randomList[i] % 2 === 0)
-          // canvas.context.rotate(90 * Math.PI / 180)
-          if (this.randomList[i] % 40 === 0) {
-            draw.DrawImage(images.WallGrassPuddleA, 0, 0)
-          } else if (this.randomList[i] % 9 === 0) { draw.DrawImage(images.WallGrassRockA, 0, 0) } else if (this.randomList[i] % 507 === 0) {
-            draw.DrawImage(images.WallGrassTree, 0, 0)
-          } else {
-            // if (Math.floor(Math.random() * 2 + 1) === 1)
-            draw.DrawImage(images.WallGrassClassicA, 0, 0)
-            // else
+          if (gameStates.levelController.currentWorld === 1) {
+            // if (this.randomList[i] % 2 === 0)
+            // canvas.context.rotate(90 * Math.PI / 180)
+            if (this.randomList[i] % 40 === 0) {
+              draw.DrawImage(images.WallGrassPuddleA, 0, 0)
+            } else if (this.randomList[i] % 9 === 0) { draw.DrawImage(images.WallGrassRockA, 0, 0) } else if (this.randomList[i] % 507 === 0) {
+              draw.DrawImage(images.WallGrassTree, 0, 0)
+            } else {
+              // if (Math.floor(Math.random() * 2 + 1) === 1)
+              draw.DrawImage(images.WallGrassClassicA, 0, 0)
+            }
+          } else if (gameStates.levelController.currentWorld === 2) {
+          // if (this.randomList[i] % 9 === 0) {
+            // canvas.context.drawImage(images.WorldTwoLedges, 104, 10, 54, 54, 0, 0, 54, 54)
+          // } else {
+            canvas.context.drawImage(images.WorldTwoLedges, 100, 6, 54, 54, 0, 0, 54, 54)
+            // }
           }
-
           canvas.context.restore()
         }
       }

@@ -18,7 +18,7 @@ export class Unlock extends GameObject {
   update () {
     const self = this
     gameStates.CurrentLevel().players.forEach(function (player) {
-      if (self.intersectsAll(player)) {
+      if (self.intersectsAll(0, player)) {
         gameStates.CurrentLevel().rocks.forEach(function (rock) {
           if (self.title === rock.title && rock.allowMovement === rock.originalAllowMovement) {
             rock.allowMovement = !rock.allowMovement
@@ -34,7 +34,7 @@ export class Unlock extends GameObject {
     })
 
     gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-      if (self.intersectsAll(enemy)) {
+      if (self.intersectsAll(1, enemy)) {
         gameStates.CurrentLevel().rocks.forEach(function (rock) {
           if (self.title === rock.title && rock.allowMovement === rock.originalAllowMovement) {
             rock.allowMovement = !rock.allowMovement
@@ -145,9 +145,7 @@ export class Hole extends GameObject {
   }
 
   Draw () {
-    if (this.fullHole) { this.DrawingX = 100 } 
-    else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } 
-    else { this.DrawingX = 0 }
+    if (this.fullHole) { this.DrawingX = 100 } else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } else { this.DrawingX = 0 }
 
     if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
       canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)

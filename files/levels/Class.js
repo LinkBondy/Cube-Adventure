@@ -60,10 +60,20 @@ export class GameObject {
     return false
   }
 
-  intersectsAll (otherBox) {
+  intersectsAll (offset, otherBox) {
     // Check if the left-top point is inside otherBox
-    if (this.left() === otherBox.left() && this.top() === otherBox.top()) {
-      return true
+    if (offset === 0) {
+      if ((this.left() === otherBox.left() && this.right() === otherBox.right()) && (this.top() === otherBox.top() && this.bottom() === otherBox.bottom())) {
+        return true
+      }
+    } else {
+      // for (let checkedX = 0; checkedX < offset; checkedX++) {
+      // for (let checkedY = 0; checkedY < offset; checkedY++) {
+      if ((this.left() >= otherBox.left() - offset && this.right() <= otherBox.right() + offset) && (this.top() >= otherBox.top() - offset && this.bottom() <= otherBox.bottom() + offset)) {
+        return true
+      }
+      // }
+      // }
     }
     return false
   }
@@ -145,7 +155,11 @@ export class Background {
 
   DrawBackround () {
     if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      this.color1 = 'rgb(100, 200, 100)'
+      if (gameStates.levelController.currentWorld === 1) {
+        this.color1 = 'rgb(100, 200, 100)'
+      } else if (gameStates.levelController.currentWorld === 2) {
+        this.color1 = 'rgb(153, 63, 33)'
+      }
     } else {
       this.color1 = 'lightgray'
     }

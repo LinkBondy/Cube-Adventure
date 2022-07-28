@@ -106,7 +106,7 @@ export const update = {
         }
       })
       gameStates.CurrentLevel().holes.forEach(function (hole) {
-        if (player.intersectsAll(hole) && hole.fullHole) {
+        if (player.intersectsAll(0, hole) && hole.fullHole) {
           lose = true
         }
       })
