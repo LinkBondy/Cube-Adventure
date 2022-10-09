@@ -6,7 +6,7 @@ const { Item } = require('./Collectable')
 const { gameStates } = require('../data/GameData')
 
 class Level {
-  constructor (levelData, requirement1, requirement2, currentX, currentY, width, height) {
+  constructor (levelData, requirement1, requirement2, currentX, currentY, width, height, timeLimit) {
     this.players = levelData.players ?? []
     this.enemies = levelData.enemies ?? []
     this.walls = levelData.walls ?? []
@@ -26,6 +26,18 @@ class Level {
     this.startingY = this.currentY
     this.width = width
     this.height = height
+    this.collectedItems = []
+    this.timeLimit = timeLimit
+    this.originalTimeLimit = this.timeLimit
+    this.clockFrame = 0
+    this.timeWaited = 0
+  }
+
+  reset () {
+    this.collectedItems = []
+    this.timeLimit = this.originalTimeLimit
+    this.clockFrame = 0
+    this.timeWaited = 0
   }
 }
 
@@ -48,7 +60,7 @@ export class LevelController {
       finishAreas: [
         new FinishArea(0, 550, 850, 50)
       ]
-    }, /* Requirements */0, undefined, /* Level Borders */1, 1, 1, 1))
+    }, /* Requirements */0, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 30))
 
     // Level 2
     this.levels.push(new Level({
@@ -71,7 +83,7 @@ export class LevelController {
       finishAreas: [
         new FinishArea(350, 550, 150, 50)
       ]
-    }, /* Requirements */1, undefined, /* Level Borders */1, 1, 1, 1))
+    }, /* Requirements */1, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 45))
 
     // Level 3
     this.levels.push(new Level({
@@ -118,7 +130,7 @@ export class LevelController {
         ///
         new ChangeDirectionSquare(500, 350, 50, 50, false, true, true, false, true)
       ]
-    }, /* Requirements */2, undefined, /* Level Borders */1, 1, 1, 1))
+    }, /* Requirements */2, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 45))
 
     // Level 4
     this.levels.push(new Level({
@@ -159,7 +171,7 @@ export class LevelController {
       unlocks: [
         new Unlock(700, 100, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '4Blue', 1)
       ]
-    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1))
+    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 60))
 
     // Level 5
     this.levels.push(new Level({
@@ -217,7 +229,7 @@ export class LevelController {
         new Unlock(150, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '5Blue', 1),
         new Unlock(350, 150, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '5Purple', 2)
       ]
-    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1))
+    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 90))
 
     // Level 6
     this.levels.push(new Level({
@@ -292,7 +304,7 @@ export class LevelController {
         new Teleporter(50, 500, 50, 50, '6Teleporter', 1),
         new Teleporter(250, 300, 50, 50, '6Teleporter', 1)
       ]
-    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1))
+    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 30))
 
     // Level 7
     this.levels.push(new Level({
@@ -379,7 +391,7 @@ export class LevelController {
         new Teleporter(150, 500, '7Teleporter', 50, 50, 2),
         new Teleporter(650, 50, '7Teleporter', 50, 50, 2)
       ]
-    }, /* Requirements */5, 6, /* Level Borders */1, 1, 1, 1))
+    }, /* Requirements */5, 6, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 120))
 
     // Level 8
     this.levels.push(new Level({
@@ -539,7 +551,7 @@ export class LevelController {
         new Unlock(750, 400, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '8Purple', 2),
         new Unlock(200, 150, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '8Blue', 1)
       ]
-    }, /* Requirements */7, undefined, /* Level Borders */1, 1, 1, 2))
+    }, /* Requirements */7, undefined, /* Level Borders */1, 1, 1, 2, /* Time Limit */ 150))
 
     // Level 9
     this.levels.push(new Level({
@@ -663,7 +675,7 @@ export class LevelController {
         new Teleporter(100, 300, '8Teleporter', 50, 50, 1),
         new Teleporter(550 + 850, 100, '8Teleporter', 50, 50, 1)
       ]
-    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 1))
+    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 150))
   }
 
   CheckLocked () {

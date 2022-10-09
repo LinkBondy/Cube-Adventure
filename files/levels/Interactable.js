@@ -51,17 +51,19 @@ export class Unlock extends GameObject {
   }
 
   Draw () {
-    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      if (this.colorNumber === 1) {
-        if (this.activated) { draw.DrawImage(images.SwitchW1ActivatedBlue, this.x, this.y) } else { draw.DrawImage(images.SwitchW1Blue, this.x, this.y) }
-      } else if (this.colorNumber === 2) {
-        if (this.activated) { draw.DrawImage(images.SwitchW1ActivatedPurple, this.x, this.y) } else { draw.DrawImage(images.SwitchW1Purple, this.x, this.y) }
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        if (this.colorNumber === 1) {
+          if (this.activated) { draw.DrawImage(images.SwitchW1ActivatedBlue, this.x, this.y) } else { draw.DrawImage(images.SwitchW1Blue, this.x, this.y) }
+        } else if (this.colorNumber === 2) {
+          if (this.activated) { draw.DrawImage(images.SwitchW1ActivatedPurple, this.x, this.y) } else { draw.DrawImage(images.SwitchW1Purple, this.x, this.y) }
+        }
+      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        canvas.context.fillStyle = this.color1
+        canvas.context.fillRect(this.x, this.y, this.width, this.height)
+        if (this.activated) { canvas.context.fillStyle = this.activatedcolor } else { canvas.context.fillStyle = this.color2 }
+        canvas.context.fillRect(this.x + 10, this.y + 10, 30, 30)
       }
-    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      canvas.context.fillStyle = this.color1
-      canvas.context.fillRect(this.x, this.y, this.width, this.height)
-      if (this.activated) { canvas.context.fillStyle = this.activatedcolor } else { canvas.context.fillStyle = this.color2 }
-      canvas.context.fillRect(this.x + 10, this.y + 10, 30, 30)
     }
   }
 
@@ -104,21 +106,23 @@ export class Teleporter extends GameObject {
   }
 
   Draw () {
-    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      if (this.colorNumber === 1) {
-        draw.DrawImage(images.TeleporterTomatoSprite, this.x, this.y)
-      }
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        if (this.colorNumber === 1) {
+          draw.DrawImage(images.TeleporterTomatoSprite, this.x, this.y)
+        }
 
-      if (this.colorNumber === 2) {
-        draw.DrawImage(images.TeleporterPurpleSprite, this.x, this.y)
-      }
-    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      if (this.colorNumber === 1) {
-        draw.DrawImage(images.TeleporterTomato, this.x, this.y)
-      }
+        if (this.colorNumber === 2) {
+          draw.DrawImage(images.TeleporterPurpleSprite, this.x, this.y)
+        }
+      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        if (this.colorNumber === 1) {
+          draw.DrawImage(images.TeleporterTomato, this.x, this.y)
+        }
 
-      if (this.colorNumber === 2) {
-        draw.DrawImage(images.TeleporterPurple, this.x, this.y)
+        if (this.colorNumber === 2) {
+          draw.DrawImage(images.TeleporterPurple, this.x, this.y)
+        }
       }
     }
   }
@@ -145,14 +149,16 @@ export class Hole extends GameObject {
   }
 
   Draw () {
-    if (this.fullHole) { this.DrawingX = 100 } else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } else { this.DrawingX = 0 }
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (this.fullHole) { this.DrawingX = 100 } else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } else { this.DrawingX = 0 }
 
-    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
-    }
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+      }
 
-    if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      canvas.context.drawImage(images.HolePlastic, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        canvas.context.drawImage(images.HolePlastic, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+      }
     }
   }
 
@@ -178,8 +184,10 @@ export class FinishArea extends GameObject {
   }
 
   Draw () {
-    canvas.context.fillStyle = this.color1
-    canvas.context.fillRect(this.x, this.y, this.width, this.height)
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      canvas.context.fillStyle = this.color1
+      canvas.context.fillRect(this.x, this.y, this.width, this.height)
+    }
   }
 
   reset () {

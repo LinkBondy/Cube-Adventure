@@ -129,34 +129,36 @@ export class Rock extends GameObject {
   }
 
   Draw () {
-    const self = this
-    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic && this.typeNumber === 1) {
-      if (this.colorNumber === 1) {
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      const self = this
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic && this.typeNumber === 1) {
+        if (this.colorNumber === 1) {
+          gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
+            if (self.allowMovement && unlock.title === self.title) {
+              draw.DrawImage(images.UnlockedRockBlue, self.x, self.y)
+            } else if (!self.allowMovement && unlock.title === self.title) {
+              draw.DrawImage(images.UnlockRockBlue, self.x, self.y)
+            }
+          })
+        } else if (this.colorNumber === 2) {
+          gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
+            if (self.allowMovement && unlock.title === self.title) {
+              draw.DrawImage(images.UnlockedRockPurple, self.x, self.y)
+            } else if (!self.allowMovement && unlock.title === self.title) {
+              draw.DrawImage(images.UnlockRockPurple, self.x, self.y)
+            }
+          })
+        }
+      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic && this.typeNumber === 1) {
         gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-          if (self.allowMovement && unlock.title === self.title) {
-            draw.DrawImage(images.UnlockedRockBlue, self.x, self.y)
-          } else if (!self.allowMovement && unlock.title === self.title) {
-            draw.DrawImage(images.UnlockRockBlue, self.x, self.y)
-          }
-        })
-      } else if (this.colorNumber === 2) {
-        gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-          if (self.allowMovement && unlock.title === self.title) {
-            draw.DrawImage(images.UnlockedRockPurple, self.x, self.y)
-          } else if (!self.allowMovement && unlock.title === self.title) {
-            draw.DrawImage(images.UnlockRockPurple, self.x, self.y)
-          }
-        })
-      }
-    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic && this.typeNumber === 1) {
-      gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-        if (!self.allowMovement && unlock.title === self.title) { canvas.context.fillStyle = self.color1 }
+          if (!self.allowMovement && unlock.title === self.title) { canvas.context.fillStyle = self.color1 }
 
-        if (self.allowMovement && unlock.title === self.title) { canvas.context.fillStyle = self.color2 }
-      })
-      canvas.context.beginPath()
-      canvas.context.arc(this.x + 25, this.y + 25, 25, 0, 360)
-      canvas.context.fill()
+          if (self.allowMovement && unlock.title === self.title) { canvas.context.fillStyle = self.color2 }
+        })
+        canvas.context.beginPath()
+        canvas.context.arc(this.x + 25, this.y + 25, 25, 0, 360)
+        canvas.context.fill()
+      }
     }
   }
 

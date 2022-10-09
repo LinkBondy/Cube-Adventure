@@ -28,7 +28,9 @@ export class Enemy extends GameObject {
   }
 
   reset () {
+    // console.log(this.timeoutID)
     window.clearTimeout(this.timeoutID)
+    // console.log(this.timeoutID)
     this.x = this.original_x
     this.y = this.original_y
     this.directions = [...this.originalDirections]
@@ -38,11 +40,13 @@ export class Enemy extends GameObject {
   }
 
   setTimer () {
+    console.log('Before Change' + this.directions)
     if (this.timeoutID !== null && this.timeoutID !== undefined) {
       this.timeoutID = setTimeout(function () {
         this.action()
       }.bind(this), this.waitTime - (this.pausedDate - this.oldDate))
     }
+    console.log('After Change' + this.directions)
   }
 
   stopTimer () {
@@ -109,11 +113,13 @@ export class Enemy extends GameObject {
     // Up
     if (this.directions[2]) {
       this.y = this.y - this.blockSpeed * delta
+      // console.log("Up")
     }
 
     // Down
     if (this.directions[3]) {
       this.y = this.y + this.blockSpeed * delta
+      // console.log("Down")
     }
 
     // Check if touching changeDirectionSquares
@@ -303,10 +309,12 @@ export class Enemy extends GameObject {
   }
 
   Draw () {
-    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      draw.DrawImage(images.RedCube, this.x, this.y)
-    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      draw.DrawImage(images.RedCubePlastic, this.x, this.y)
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        draw.DrawImage(images.RedCube, this.x, this.y)
+      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        draw.DrawImage(images.RedCubePlastic, this.x, this.y)
+      }
     }
   }
 };
@@ -603,12 +611,14 @@ export class Player extends GameObject {
   }
 
   Draw () {
-    if (gameStates.currentCubeStyle === cubeStyle.Classic) { this.drawX = 0 } else if (gameStates.currentCubeStyle === cubeStyle.Alien) { this.drawX = 50 } else if (gameStates.currentCubeStyle === cubeStyle.Sad) { this.drawX = 100 } else if (gameStates.currentCubeStyle === cubeStyle.Happy) { this.drawX = 150 }
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (gameStates.currentCubeStyle === cubeStyle.Classic) { this.drawX = 0 } else if (gameStates.currentCubeStyle === cubeStyle.Alien) { this.drawX = 50 } else if (gameStates.currentCubeStyle === cubeStyle.Sad) { this.drawX = 100 } else if (gameStates.currentCubeStyle === cubeStyle.Happy) { this.drawX = 150 }
 
-    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      canvas.context.drawImage(images.BlueCube, this.drawX, 0, 50, images.BlueCube.height, this.x, this.y, 50, images.BlueCube.height)
-    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      canvas.context.drawImage(images.BlueCubePlastic, this.drawX, 0, 50, images.BlueCubePlastic.height, this.x, this.y, 50, images.BlueCubePlastic.height)
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        canvas.context.drawImage(images.BlueCube, this.drawX, 0, 50, images.BlueCube.height, this.x, this.y, 50, images.BlueCube.height)
+      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        canvas.context.drawImage(images.BlueCubePlastic, this.drawX, 0, 50, images.BlueCubePlastic.height, this.x, this.y, 50, images.BlueCubePlastic.height)
+      }
     }
   }
 };
@@ -630,8 +640,10 @@ export class ChangeDirectionSquare extends GameObject {
   }
 
   Draw () {
-    if (!this.allowDirectionChange) { canvas.context.fillStyle = this.color2 } else { canvas.context.fillStyle = this.color1 }
-    canvas.context.fillRect(this.x, this.y, this.width, this.height)
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (!this.allowDirectionChange) { canvas.context.fillStyle = this.color2 } else { canvas.context.fillStyle = this.color1 }
+      canvas.context.fillRect(this.x, this.y, this.width, this.height)
+    }
   }
 
   reset () {

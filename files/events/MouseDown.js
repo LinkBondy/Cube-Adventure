@@ -16,12 +16,12 @@ export function MouseDown (event) {
   }
 
   // Start Game "Menu"
-  if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted && isTouching(0, 500, 850, 100, event.offsetX, event.offsetY)) {
+  if (isTouching(0, 500, 850, 100, event.offsetX, event.offsetY) && gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
     gameStates.SetGameState(startingMenusStates.Menu, 'Starting')
     return
   }
 
-  if (isTouching(900, 475, 100, 100, event.offsetX, event.offsetY)) {
+  if (isTouching(925, 475, 100, 100, event.offsetX, event.offsetY)) {
     if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStoryModeState === storyModeStates.Playing) {
       gameStates.SetGameState(storyModeStates.Paused, 'StoryMode')
       gameStates.CurrentLevel().enemies.forEach(function (enemy) {
@@ -56,6 +56,8 @@ export function MouseDown (event) {
       return
     }
   }
+
+  // Check if an Array Chart is beening displayed
   if (gameStates.arrayChartController.findCurrentArrayChart() !== false) {
     const arrayChart = gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()]
     for (let numberChecked = 0; numberChecked < arrayChart.items.length; numberChecked++) {
@@ -83,6 +85,7 @@ export function MouseDown (event) {
     return
   }
 
+  // Check if a game mode is selected
   if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
     // Down "Level Selector"
     if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 850 && event.offsetX > 690 && event.offsetY > 450 && event.offsetY < 600 && gameStates.mobile === true) { gameStates.currentLevelIndex = gameStates.currentLevelIndex + 1 }

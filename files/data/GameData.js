@@ -1,6 +1,5 @@
 'use strict'
 export const startingMenusStates = {
-  // NewInfo: 1,
   NotStarted: 1,
   Menu: 2,
   Selected: 3
@@ -63,9 +62,18 @@ export const gameStates = {
   },
 
   SetGameState: function (gameState, type) {
-    if (type === 'Starting') { gameStates.currentStartingMenusState = gameState }
-    if (type === 'StoryMode') { gameStates.currentStoryModeState = gameState }
-    if (type === 'Settings') { gameStates.currentSettingState = gameState }
+    if (type === 'Starting') {
+      gameStates.currentStartingMenusState = gameState
+    }
+    if (type === 'StoryMode') {
+      gameStates.currentStoryModeState = gameState
+      if (gameStates.currentStoryModeState === storyModeStates.Playing) {
+        levelTools.UpdateLevelTime()
+      }
+    }
+    if (type === 'Settings') {
+      gameStates.currentSettingState = gameState
+    }
   }
 }
 
@@ -85,6 +93,7 @@ export const levelTools = {
   },
 
   Restart: function () {
+    gameStates.CurrentLevel().reset()
     gameStates.CurrentLevel().players.forEach(function (player) {
       player.reset()
     })
@@ -130,11 +139,18 @@ export const levelTools = {
     })
     gameStates.CurrentLevel().currentX = gameStates.CurrentLevel().startingX
     gameStates.CurrentLevel().currentY = gameStates.CurrentLevel().startingY
+  },
+
+  UpdateLevelTime: function () {
+    if (gameStates.currentStoryModeState === storyModeStates.Playing) {
+      gameStates.CurrentLevel().timeLimit -= 1
+      window.setTimeout(levelTools.UpdateLevelTime, 1000)
+    }
   }
 }
 
 export const dataManagement = {
-  Save: function (draw) {
+  Save: function () {
     window.localStorage.setItem('level', gameStates.infoController.unlockedLevel)
     window.localStorage.setItem('newUpdate', false)
     if (gameStates.infoController.unlockedLevel !== gameStates.levelController.levels.length && gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex - 1) {
@@ -175,6 +191,9 @@ export const dataManagement = {
     if (window.localStorage.getItem('PlayerAlienLock') !== null) {
       const AlienLock = JSON.parse(window.localStorage.getItem('PlayerAlienLock'))
       drawUpdate.blueCubeAlienLock = AlienLock
+      if (!drawUpdate.blueCubeAlienLock) {
+        gameStates.levelController.levels[7].items[1].stopCollecting = true
+      }
     }
 
     const BackgroundStyle = Number(window.localStorage.getItem('backgroundStyle'))

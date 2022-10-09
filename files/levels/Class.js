@@ -166,14 +166,18 @@ export class Background {
 
     canvas.context.clearRect(0, 0, canvas.width, canvas.height)
     canvas.context.fillStyle = this.color1
-    canvas.context.fillRect(0, 0, canvas.width - 200, canvas.height)
+    canvas.context.fillRect(0, 0, canvas.width - 250, canvas.height)
   }
 
   DrawToolBar () {
     this.color2 = gameStates.currentThemeColour
     canvas.context.fillStyle = this.color2
-    canvas.context.fillRect(850, 0, 200, canvas.height)
+    canvas.context.fillRect(850, 0, canvas.width - 850, canvas.height)
     canvas.context.fillStyle = 'black'
     canvas.context.fillRect(850, 0, 2, canvas.height)
+    if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting)) {
+      canvas.context.fillRect(850, 460, canvas.width - 850, 4)
+      canvas.context.fillRect(850, 200, canvas.width - 850, 4)
+    }
   }
 };

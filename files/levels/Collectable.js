@@ -10,28 +10,35 @@ export class Item extends GameObject {
     this.typeNumber = typeNumber
     this.allowMovementWater = false
     this.collected = false
+    this.stopCollecting = false
+    this.finishCollecting = false
   }
 
   Draw () {
-    if (this.typeNumber === 1 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      draw.DrawImage(images.LifeJacket, this.x, this.y)
-    }
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (this.typeNumber === 1 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        draw.DrawImage(images.LifeJacket, this.x, this.y)
+      }
 
-    if (this.typeNumber === 1 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      draw.DrawImage(images.LifeJacketPlastic, this.x, this.y)
-    }
+      if (this.typeNumber === 1 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        draw.DrawImage(images.LifeJacketPlastic, this.x, this.y)
+      }
 
-    if (this.typeNumber === 2 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic && gameStates.currentGameMode === gameMode.StoryMode && drawUpdate.blueCubeAlienLock) {
-      draw.DrawImage(images.Three_Bead, this.x, this.y)
-    }
+      if (this.typeNumber === 2 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic && gameStates.currentGameMode === gameMode.StoryMode && !this.stopCollecting) {
+        draw.DrawImage(images.ThreeBead, this.x, this.y)
+      }
 
-    if (this.typeNumber === 2 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Plastic && gameStates.currentGameMode === gameMode.StoryMode && drawUpdate.blueCubeAlienLock) {
-      draw.DrawImage(images.Three_Bead_Plastic, this.x, this.y)
+      if (this.typeNumber === 2 && !this.collected && gameStates.currentBackgroundStyle === BackgroundStyles.Plastic && gameStates.currentGameMode === gameMode.StoryMode && !this.stopCollecting) {
+        draw.DrawImage(images.ThreeBeadPlastic, this.x, this.y)
+      }
     }
   }
 
   update () {
-
+    if (this.collected && !this.finishCollecting && !this.stopCollecting) {
+      this.finishCollecting = true
+      gameStates.CurrentLevel().collectedItems.push(this)
+    }
   }
 
   reset () {
@@ -40,7 +47,9 @@ export class Item extends GameObject {
     this.allowMovementWater = false
     if (this.typeNumber === 2 && this.collected && gameStates.currentStoryModeState === storyModeStates.WonStage) {
       drawUpdate.blueCubeAlienLock = false
+      this.stopCollecting = true
     }
     this.collected = false
+    this.finishCollecting = false
   }
 };

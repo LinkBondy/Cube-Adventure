@@ -1,5 +1,5 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates } = require('../data/GameData')
+const { gameMode, startingMenusStates, storyModeStates, ShopMode, BackgroundStyles, gameStates, levelTools, settingStates } = require('../data/GameData')
 const { canvas } = require('./Canvas')
 const { images } = require('./Images')
 export const draw = {
@@ -29,6 +29,10 @@ export const draw = {
     }
     gameStates.background.DrawToolBar()
     this.DrawToolBarButtons()
+    if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting /* && gameStates.levelController.CheckLocked() */)) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
+      this.DrawCollectedItems()
+      this.DrawTimer()
+    }
   },
   StoryModeDraw: function () {
     if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelController.CheckLocked())) {
@@ -215,28 +219,23 @@ export const draw = {
     canvas.context.fillText('to replace:', 410, 220)
     canvas.context.fillStyle = gameStates.currentThemeColour
     canvas.context.font = '80px Arial'
-    canvas.context.shadowColor = 'black'
-    canvas.context.shadowOffsetX = 5
-    canvas.context.shadowOffsetY = 5
+    this.ChangeShdow(4, 4, 'black')
     switch (gameStates.keybindController.currentType) {
       case 'A':
         canvas.context.fillStyle = gameStates.currentThemeColour
         canvas.context.fillText(gameStates.keybindController.currentKeybind.displayNameA, 410, 320)
-        canvas.context.shadowOffsetX = 0
-        canvas.context.shadowOffsetY = 0
+        this.ChangeShdow(0, 0, 'black')
         canvas.context.strokeText(gameStates.keybindController.currentKeybind.displayNameA, 410, 320)
         break
 
       case 'B':
 
         canvas.context.fillText(gameStates.keybindController.currentKeybind.displayNameB, 410, 320)
-        canvas.context.shadowOffsetX = 0
-        canvas.context.shadowOffsetY = 0
+        this.ChangeShdow(0, 0, 'black')
         canvas.context.strokeText(gameStates.keybindController.currentKeybind.displayNameB, 410, 320)
         break
     }
-    canvas.context.shadowOffsetX = 0
-    canvas.context.shadowOffsetY = 0
+    this.ChangeShdow(0, 0, 'black')
     canvas.context.fillStyle = 'rgb(97, 97, 117)'
     if (gameStates.keybindController.triedRebinding) { canvas.context.fillText('Try Again', 410, 420) }
     canvas.context.font = '60px Arial'
@@ -245,24 +244,83 @@ export const draw = {
     canvas.context.textAlign = 'left'
   },
   DrawToolBarButtons: function () {
-    canvas.context.shadowOffsetX = 4
-    canvas.context.shadowOffsetY = 4
-    canvas.context.shadowColor = 'rgba(50, 50, 50)'
+    this.ChangeShdow(4, 4, 'rgba(50, 50, 50)')
     switch (gameStates.currentStoryModeState) {
       case storyModeStates.Playing:
-        draw.DrawImage(images.PauseButton, 900, 475)
+        draw.DrawImage(images.PauseButton, 925, 475)
         break
 
       case storyModeStates.Paused:
-        draw.DrawImage(images.PlayButton, 900, 475)
+        draw.DrawImage(images.PlayButton, 925, 475)
         break
 
       default:
-        if (gameStates.currentStoryModeState !== storyModeStates.Lost && gameStates.currentStoryModeState !== storyModeStates.WonStage && gameStates.currentStartingMenusState !== startingMenusStates.NotStarted) { draw.DrawImage(images.BackButton, 900, 475) }
+        if (gameStates.currentStoryModeState !== storyModeStates.Lost && gameStates.currentStoryModeState !== storyModeStates.WonStage && gameStates.currentStartingMenusState !== startingMenusStates.NotStarted) {
+          draw.DrawImage(images.BackButton, 925, 475)
+        }
         break
     }
-    canvas.context.shadowOffsetX = 0
-    canvas.context.shadowOffsetY = 0
-    canvas.context.shadowColor = 'black'
+    this.ChangeShdow(0, 0, 'black')
+  },
+  DrawCollectedItems: function () {
+    const items = gameStates.CurrentLevel().collectedItems
+    for (let row = 0; row < Math.round(items.length / 2 + 0.4); row++) {
+      for (let col = 0; col < 2; col++) {
+        let image = images.BlueCube
+        if (!(items.length % 2 === 1 && col === 1 && row === (Math.round(items.length / 2 + 0.4)) - 1)) {
+          switch (items[row * 2 + col].typeNumber) {
+            case 1:
+              if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+                image = images.LifeJacket_80x80
+              }
+              if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+                image = images.LifeJacketPlastic_80x80
+              }
+              break
+            case 2:
+              if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+                image = images.ThreeBead_80x80
+              }
+              if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+                image = images.ThreeBeadPlastic_80x80
+              }
+              break
+          }
+          draw.DrawImage(image, 862 + (50 / 3) * (col + 1) + 100 * col, 225 + row * 125)
+        }
+      }
+    }
+    this.ChangeShdow(4, 4, 'rgba(50, 50, 50)')
+    for (let row = 0; row < 2; row++) {
+      for (let col = 0; col < 2; col++) {
+        draw.DrawImage(images.Frame, 850 + (50 / 3) * (row + 1) + 100 * row, 215 + (125 * col))
+      }
+    }
+    this.ChangeShdow(0, 0, 'black')
+  },
+  DrawTimer: function () {
+    canvas.context.font = '75px Arial'
+    canvas.context.fillStyle = 'black'
+    if (gameStates.levelController.CheckLocked()) {
+      canvas.context.fillText(gameStates.CurrentLevel().timeLimit, 965, 105)
+    } else {
+      canvas.context.fillText('???', 965, 105)
+    }
+    this.AnimateClock()
+    // this.DrawImage(images.Clock, 860, 10)
+    canvas.context.drawImage(images.Clock, gameStates.CurrentLevel().clockFrame, 0, 96, 116, 860, 10, 48 * 2, 58 * 2)
+  },
+  AnimateClock: function () {
+    if (gameStates.currentStoryModeState === storyModeStates.Playing) {
+      if (gameStates.CurrentLevel().clockFrame === 96 * 63 && gameStates.CurrentLevel().timeWaited === 48) {
+        gameStates.CurrentLevel().clockFrame = 0
+        gameStates.CurrentLevel().timeWaited = 0
+      } else if (gameStates.CurrentLevel().timeWaited === 48) {
+        gameStates.CurrentLevel().clockFrame += 96
+        gameStates.CurrentLevel().timeWaited = 0
+      } else {
+        gameStates.CurrentLevel().timeWaited += 6
+      }
+    }
   }
 }

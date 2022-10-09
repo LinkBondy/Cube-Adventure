@@ -69,7 +69,7 @@ function StartGame () {
   gameStates.arrayChartController = new ArrayChartController()
   gameStates.keybindController = new KeybindController()
   gameStates.levelController.createLevels()
-  dataManagement.Load(draw)
+  dataManagement.Load()
   game.mainLoop()
   gameStates.loading = false
 }

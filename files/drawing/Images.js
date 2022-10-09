@@ -46,11 +46,15 @@ export const images = {
     images.InvisibleWall_200x200 = LoadImage('images/InvisibleWall_200x200.png')
     ///
     images.LifeJacket = LoadImage('images/LifeJacket.png')
+    images.LifeJacket_80x80 = LoadImage('images/LifeJacket_80x80.png')
     images.LifeJacket_200x200 = LoadImage('images/LifeJacket_200x200.png')
     images.LifeJacketPlastic = LoadImage('images/LifeJacketPlastic.png')
+    images.LifeJacketPlastic_80x80 = LoadImage('images/LifeJacketPlastic_80x80.png')
     ///
-    images.Three_Bead = LoadImage('images/Three_Bead.png')
-    images.Three_Bead_Plastic = LoadImage('images/Three_Bead_Plastic.png')
+    images.ThreeBead = LoadImage('images/ThreeBead.png')
+    images.ThreeBead_80x80 = LoadImage('images/ThreeBead_80x80.png')
+    images.ThreeBeadPlastic = LoadImage('images/ThreeBeadPlastic.png')
+    images.ThreeBeadPlastic_80x80 = LoadImage('images/ThreeBeadPlastic_80x80.png')
     ///
     images.Water_Medium2 = LoadImage('images/Water_Medium2.png')
     images.Water_Medium_200x200 = LoadImage('images/Water_Medium_200x200.png')
@@ -68,13 +72,13 @@ export const images = {
     ///
     images.UpArrow = LoadImage('images/UpArrow.png')
     images.DownArrow = LoadImage('images/DownArrow.png')
-    images.UpArrowShop = LoadImage('images/UpArrowShop.png')
-    images.DownArrowShop = LoadImage('images/DownArrowShop.png')
     images.LockedIcon = LoadImage('images/LockedIcon.png')
     ///
     images.BackButton = LoadImage('images/BackButton.png')
     images.PauseButton = LoadImage('images/PauseButton.png')
     images.PlayButton = LoadImage('images/PlayButton.png')
+    images.Frame = LoadImage('images/Frame.png')
+    images.Clock = LoadImage('images/Clock.png')
     images.WorldTwoLedges = LoadImage('images/WorldTwoLedges.png')
   }
 }

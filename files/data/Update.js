@@ -110,6 +110,9 @@ export const update = {
           lose = true
         }
       })
+      if (gameStates.CurrentLevel().timeLimit <= 0) {
+        lose = true
+      }
     })
     return lose
   }
