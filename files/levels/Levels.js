@@ -1,6 +1,6 @@
 'use strict'
 const { Player, Enemy, ChangeDirectionSquare } = require('./Moveable')
-const { Wall, Rock, Water } = require('./Barriers')
+const { TallGrass, FakeTallGrass, Rock, Water } = require('./Barriers')
 const { Unlock, Teleporter, Hole, FinishArea } = require('./Interactable')
 const { Item } = require('./Collectable')
 const { gameStates } = require('../data/GameData')
@@ -44,6 +44,7 @@ class Level {
 export class LevelController {
   constructor () {
     this.levels = []
+    this.specialLevels = []
     this.currentWorld = 1
   }
 
@@ -54,13 +55,39 @@ export class LevelController {
         new Player(400, 0, 50, 50)
       ],
       enemies: [
-        new Enemy(800, 400, 50, 50, [true, false, false, false], 10),
-        new Enemy(0, 200, 50, 50, [false, true, false, false], 10)
+        new Enemy(700, 400, 50, 50, [true, false, false, false], 10),
+        new Enemy(100, 150, 50, 50, [false, true, false, false], 10)
+      ],
+      walls: [
+        /// Left Wall
+        new TallGrass(0, 0, 50, 200),
+        new TallGrass(0, 400, 50, 200),
+        //
+        new TallGrass(50, 100, 50, 150),
+        new TallGrass(50, 350, 50, 150),
+        /// Right Wall
+        new TallGrass(800, 0, 50, 200),
+        new TallGrass(800, 400, 50, 200),
+        //
+        new TallGrass(750, 100, 50, 150),
+        new TallGrass(750, 350, 50, 150),
+        /// Top Wall
+        new TallGrass(50, 0, 300, 50),
+        new TallGrass(500, 0, 300, 50),
+        //
+        new TallGrass(50, 50, 350, 50),
+        new TallGrass(450, 50, 350, 50),
+        /// Bottom Wall
+        new TallGrass(50, 550, 300, 50),
+        new TallGrass(500, 550, 300, 50),
+        //
+        new TallGrass(50, 500, 350, 50),
+        new TallGrass(450, 500, 350, 50)
       ],
       finishAreas: [
-        new FinishArea(0, 550, 850, 50)
+        new FinishArea(350, 550, 150, 50)
       ]
-    }, /* Requirements */0, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 30))
+    }, /* Requirements */0, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
 
     // Level 2
     this.levels.push(new Level({
@@ -71,19 +98,19 @@ export class LevelController {
         new Enemy(400, 500, 50, 50, [false, false, true, false], 5.5)
       ],
       walls: [
-        new Wall(0, 0, 350, 600, 'rgb(190, 190, 190)'),
-        new Wall(500, 0, 350, 600, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 0, 350, 600),
+        new TallGrass(500, 0, 350, 600),
         ///
-        new Wall(350, 100, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(350, 250, 50, 200, 'rgb(190, 190, 190)'),
+        new TallGrass(350, 100, 50, 50),
+        new TallGrass(350, 250, 50, 200),
         ///
-        new Wall(450, 100, 50, 200, 'rgb(190, 190, 190)'),
-        new Wall(450, 400, 50, 50, 'rgb(190, 190, 190)')
+        new TallGrass(450, 100, 50, 200),
+        new TallGrass(450, 400, 50, 50)
       ],
       finishAreas: [
         new FinishArea(350, 550, 150, 50)
       ]
-    }, /* Requirements */1, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 45))
+    }, /* Requirements */1, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
 
     // Level 3
     this.levels.push(new Level({
@@ -96,27 +123,27 @@ export class LevelController {
         new Enemy(600, 50, 50, 50, [false, true, false, false], 6)
       ],
       walls: [
-        new Wall(0, 0, 200, 550, 'rgb(190, 190, 190)'),
-        new Wall(650, 0, 200, 550, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 0, 200, 550),
+        new TallGrass(650, 0, 200, 550),
         ///
-        new Wall(200, 0, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(500, 0, 150, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(200, 0, 150, 50),
+        new TallGrass(500, 0, 150, 50),
         ///
-        new Wall(500, 100, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(200, 100, 150, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(500, 100, 150, 50),
+        new TallGrass(200, 100, 150, 50),
         ///
-        new Wall(350, 200, 150, 150, 'rgb(190, 190, 190)'),
-        new Wall(550, 150, 100, 250, 'rgb(190, 190, 190)'),
-        new Wall(200, 150, 100, 250, 'rgb(190, 190, 190)'),
+        new TallGrass(350, 200, 150, 150),
+        new TallGrass(550, 150, 100, 250),
+        new TallGrass(200, 150, 100, 250),
         ///
-        new Wall(0, 550, 350, 50, 'rgb(190, 190, 190)'),
-        new Wall(500, 550, 350, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 550, 350, 50),
+        new TallGrass(500, 550, 350, 50),
         ///
-        new Wall(200, 400, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(500, 400, 150, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(200, 400, 150, 50),
+        new TallGrass(500, 400, 150, 50),
         ///
-        new Wall(200, 500, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(500, 500, 150, 50, 'rgb(190, 190, 190)')
+        new TallGrass(200, 500, 150, 50),
+        new TallGrass(500, 500, 150, 50)
       ],
       finishAreas: [
         new FinishArea(350, 550, 150, 50)
@@ -130,7 +157,7 @@ export class LevelController {
         ///
         new ChangeDirectionSquare(500, 350, 50, 50, false, true, true, false, true)
       ]
-    }, /* Requirements */2, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 45))
+    }, /* Requirements */2, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
 
     // Level 4
     this.levels.push(new Level({
@@ -147,19 +174,19 @@ export class LevelController {
         new Enemy(500, 500, 50, 50, [false, true, false, false], 5)
       ],
       walls: [
-        new Wall(0, 0, 850, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 0, 850, 50),
         ///
-        new Wall(0, 50, 100, 550, 'rgb(190, 190, 190)'),
-        new Wall(750, 50, 100, 550, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 50, 100, 550),
+        new TallGrass(750, 50, 100, 550),
         ///
-        new Wall(150, 100, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(450, 100, 250, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(150, 100, 250, 50),
+        new TallGrass(450, 100, 250, 50),
         ///
-        new Wall(0, 150, 400, 50, 'rgb(190, 190, 190)'),
-        new Wall(450, 150, 400, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 150, 400, 50),
+        new TallGrass(450, 150, 400, 50),
         ///
-        new Wall(350, 200, 50, 350, 'rgb(190, 190, 190)'),
-        new Wall(450, 200, 50, 350, 'rgb(190, 190, 190)')
+        new TallGrass(350, 200, 50, 350),
+        new TallGrass(450, 200, 50, 350)
       ],
       rocks: [
         new Rock(400, 500, 50, 50, 'lightblue', 'aqua', '4Blue', false, 1, 1)
@@ -171,7 +198,7 @@ export class LevelController {
       unlocks: [
         new Unlock(700, 100, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '4Blue', 1)
       ]
-    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 60))
+    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
 
     // Level 5
     this.levels.push(new Level({
@@ -186,33 +213,33 @@ export class LevelController {
       ],
       walls: [
         // Side Walls
-        new Wall(0, 550, 850, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 0, 850, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 550, 850, 50),
+        new TallGrass(0, 0, 850, 50),
         ///
-        new Wall(100, 100, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(100, 200, 50, 400, 'rgb(190, 190, 190)'),
+        new TallGrass(100, 100, 50, 50),
+        new FakeTallGrass(100, 150, 50, 50),
         ///
-        new Wall(100, 150, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new TallGrass(100, 200, 50, 400),
         ///
-        new Wall(400, 100, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(400, 200, 50, 350, 'rgb(190, 190, 190)'),
+        new TallGrass(400, 100, 50, 100),
+        new TallGrass(400, 200, 50, 350),
         ///
-        new Wall(450, 100, 50, 450, 'rgb(190, 190, 190)'),
+        new TallGrass(450, 100, 50, 450),
         ///
-        new Wall(150, 100, 300, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(150, 100, 300, 50),
         ///
-        new Wall(0, 50, 50, 500, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 50, 50, 500),
         ///
-        new Wall(700, 50, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(700, 200, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(700, 350, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(700, 500, 50, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(700, 50, 50, 100),
+        new TallGrass(700, 200, 50, 100),
+        new TallGrass(700, 350, 50, 100),
+        new TallGrass(700, 500, 50, 50),
         ///
-        new Wall(700, 450, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(700, 300, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(700, 150, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
+        new FakeTallGrass(700, 450, 50, 50),
+        new FakeTallGrass(700, 300, 50, 50),
+        new FakeTallGrass(700, 150, 50, 50),
         ///
-        new Wall(800, 50, 50, 500, 'rgb(190, 190, 190)')
+        new TallGrass(800, 50, 50, 500)
       ],
       rocks: [
         new Rock(300, 150, 50, 50, 'lightblue', 'aqua', '5Blue', false, 1, 1),
@@ -229,7 +256,7 @@ export class LevelController {
         new Unlock(150, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '5Blue', 1),
         new Unlock(350, 150, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '5Purple', 2)
       ]
-    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 90))
+    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
 
     // Level 6
     this.levels.push(new Level({
@@ -240,35 +267,35 @@ export class LevelController {
         new Enemy(700, 500, 50, 50, [true, false, false, false], 3.5)
       ],
       walls: [
-        new Wall(0, 0, 850, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 550, 850, 50, 'rgb(190, 190, 190)'),
-        new Wall(800, 50, 50, 500, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 0, 850, 50),
+        new TallGrass(0, 550, 850, 50),
+        new TallGrass(800, 50, 50, 500),
         ///
-        new Wall(0, 50, 50, 550, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 50, 50, 550),
         ///
-        new Wall(100, 50, 50, 250, 'rgb(190, 190, 190)'),
-        new Wall(100, 350, 50, 250, 'rgb(190, 190, 190)'),
+        new TallGrass(100, 50, 50, 250),
+        new TallGrass(100, 350, 50, 250),
         ///
-        new Wall(200, 50, 50, 550, 'rgb(190, 190, 190)'),
+        new TallGrass(200, 50, 50, 550),
         ///
-        new Wall(250, 50, 50, 250, 'rgb(190, 190, 190)'),
-        new Wall(250, 350, 50, 200, 'rgb(190, 190, 190)'),
+        new TallGrass(250, 50, 50, 250),
+        new TallGrass(250, 350, 50, 200),
         ///
-        new Wall(300, 50, 50, 250, 'rgb(190, 190, 190)'),
+        new TallGrass(300, 50, 50, 250),
         ///
-        new Wall(350, 50, 50, 450, 'rgb(190, 190, 190)'),
+        new TallGrass(350, 50, 50, 450),
         ///
-        new Wall(400, 50, 50, 250, 'rgb(190, 190, 190)'),
-        new Wall(450, 350, 50, 200, 'rgb(190, 190, 190)'),
+        new TallGrass(400, 50, 50, 250),
+        new TallGrass(450, 350, 50, 200),
         ///
-        new Wall(500, 150, 50, 400, 'rgb(190, 190, 190)'),
+        new TallGrass(500, 150, 50, 400),
         ///
-        new Wall(550, 150, 200, 50, 'rgb(190, 190, 190)'),
-        new Wall(500, 100, 250, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(550, 150, 200, 50),
+        new TallGrass(500, 100, 250, 50),
         ///
-        new Wall(600, 250, 200, 250, 'rgb(190, 190, 190)'),
+        new TallGrass(600, 250, 200, 250),
         ///
-        new Wall(750, 500, 50, 50, 'rgb(190, 190, 190)')
+        new TallGrass(750, 500, 50, 50)
       ],
       rocks: [
         new Rock(100, 300, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1),
@@ -304,7 +331,7 @@ export class LevelController {
         new Teleporter(50, 500, 50, 50, '6Teleporter', 1),
         new Teleporter(250, 300, 50, 50, '6Teleporter', 1)
       ]
-    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 30))
+    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
 
     // Level 7
     this.levels.push(new Level({
@@ -317,61 +344,61 @@ export class LevelController {
         new Enemy(250, 400, 50, 50, [true, false, false, false], 4)
       ],
       walls: [
-        new Wall(0, 0, 50, 600, 'rgb(190, 190, 190)'),
-        new Wall(50, 0, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(50, 550, 250, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 0, 50, 600),
+        new TallGrass(50, 0, 250, 50),
+        new TallGrass(50, 550, 250, 50),
         ///
-        new Wall(50, 50, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(50, 150, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(50, 300, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(50, 450, 50, 100, 'rgb(190, 190, 190)'),
+        new TallGrass(50, 50, 50, 50),
+        new TallGrass(50, 150, 50, 100),
+        new TallGrass(50, 300, 50, 100),
+        new TallGrass(50, 450, 50, 100),
         ///
-        new Wall(250, 50, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(250, 150, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(250, 300, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(250, 450, 50, 100, 'rgb(190, 190, 190)'),
+        new TallGrass(250, 50, 50, 50),
+        new TallGrass(250, 150, 50, 100),
+        new TallGrass(250, 300, 50, 100),
+        new TallGrass(250, 450, 50, 100),
         ///
-        new Wall(300, 0, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(300, 150, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(300, 300, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(300, 450, 50, 150, 'rgb(190, 190, 190)'),
+        new TallGrass(300, 0, 50, 100),
+        new TallGrass(300, 150, 50, 100),
+        new TallGrass(300, 300, 50, 100),
+        new TallGrass(300, 450, 50, 150),
         ///
-        new Wall(800, 50, 50, 150, 'rgb(190, 190, 190)'),
-        new Wall(800, 350, 50, 250, 'rgb(190, 190, 190)'),
+        new TallGrass(800, 50, 50, 150),
+        new TallGrass(800, 350, 50, 250),
         ///
-        new Wall(700, 50, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(650, 100, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(600, 150, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(450, 350, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(400, 400, 50, 150, 'rgb(190, 190, 190)'),
-        new Wall(350, 500, 50, 100, 'rgb(190, 190, 190)'),
+        new TallGrass(700, 50, 100, 50),
+        new TallGrass(650, 100, 50, 50),
+        new TallGrass(600, 150, 50, 100),
+        new TallGrass(450, 350, 50, 100),
+        new TallGrass(400, 400, 50, 150),
+        new TallGrass(350, 500, 50, 100),
         ///
-        new Wall(500, 500, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(550, 450, 50, 150, 'rgb(190, 190, 190)'),
-        new Wall(600, 400, 50, 200, 'rgb(190, 190, 190)'),
-        new Wall(650, 400, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(700, 500, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(750, 450, 50, 150, 'rgb(190, 190, 190)'),
+        new TallGrass(500, 500, 50, 100),
+        new TallGrass(550, 450, 50, 150),
+        new TallGrass(600, 400, 50, 200),
+        new TallGrass(650, 400, 50, 50),
+        new TallGrass(700, 500, 50, 100),
+        new TallGrass(750, 450, 50, 150),
         ///
-        new Wall(700, 100, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(650, 150, 50, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(700, 100, 50, 50),
+        new TallGrass(650, 150, 50, 50),
         ///
-        new Wall(450, 50, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(550, 0, 300, 50, 'rgb(190, 190, 190)'),
-        new Wall(450, 100, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(400, 100, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(350, 0, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(350, 150, 100, 50, 'rgb(190, 190, 190)')
+        new TallGrass(450, 50, 150, 50),
+        new TallGrass(550, 0, 300, 50),
+        new TallGrass(450, 100, 100, 50),
+        new TallGrass(400, 100, 100, 50),
+        new TallGrass(350, 0, 50, 50),
+        new TallGrass(350, 150, 100, 50)
       ],
       waters: [
-        new Water(700, 100, 100, 500, 'rgb(0, 175, 235)'),
-        new Water(650, 150, 50, 450, 'rgb(0, 175, 235)'),
-        new Water(600, 250, 50, 350, 'rgb(0, 175, 235)'),
+        new Water(700, 100, 100, 500),
+        new Water(650, 150, 50, 450),
+        new Water(600, 250, 50, 350),
         ///
-        new Water(550, 300, 50, 300, 'rgb(0, 175, 235)'),
-        new Water(500, 350, 50, 250, 'rgb(0, 175, 235)'),
-        new Water(450, 450, 50, 150, 'rgb(0, 175, 235)'),
-        new Water(400, 550, 50, 50, 'rgb(0, 175, 235)')
+        new Water(550, 300, 50, 300),
+        new Water(500, 350, 50, 250),
+        new Water(450, 450, 50, 150),
+        new Water(400, 550, 50, 50)
       ],
       items: [
         new Item(500, 0, 50, 50, 1)
@@ -391,7 +418,7 @@ export class LevelController {
         new Teleporter(150, 500, '7Teleporter', 50, 50, 2),
         new Teleporter(650, 50, '7Teleporter', 50, 50, 2)
       ]
-    }, /* Requirements */5, 6, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 120))
+    }, /* Requirements */5, 6, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
 
     // Level 8
     this.levels.push(new Level({
@@ -410,95 +437,94 @@ export class LevelController {
         new Enemy(450, 600 + 50, 50, 50, [false, false, false, true], 4)
       ],
       walls: [
-        new Wall(350, 550, 450, 50, 'rgb(190, 190, 190)'),
-        new Wall(800, 0, 50, 600, 'rgb(190, 190, 190)'),
+        new TallGrass(350, 550, 450, 50),
+        new TallGrass(800, 0, 50, 600),
         /// Middle
-        new Wall(0, 200, 350, 50, 'rgb(190, 190, 190)'),
-        new Wall(550, 150, 200, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 200, 350, 50),
+        new TallGrass(550, 150, 200, 50),
         /// Bottom
-        new Wall(0, 300, 300, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 350, 50, 250, 'rgb(190, 190, 190)'),
-        new Wall(100, 400, 200, 200, 'rgb(190, 190, 190)'),
-        new Wall(300, 400, 50, 200, 'rgb(190, 190, 190)'),
-        new Wall(400, 250, 400, 50, 'rgb(190, 190, 190)'),
-        new Wall(100, 350, 200, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(50, 350, 50, 250, 'rgba(190, 190, 190, 0.9)', true, true),
+        new TallGrass(0, 300, 300, 50),
+        new TallGrass(0, 350, 50, 250),
+        new TallGrass(100, 400, 200, 200),
+        new FakeTallGrass(100, 350, 200, 50),
+        new FakeTallGrass(50, 350, 50, 250),
+        new TallGrass(300, 400, 50, 200),
+        new TallGrass(400, 250, 400, 50),
         // Pink Switch Puzzle Entrance
-        new Wall(350, 300, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(400, 350, 50, 50, 'rgb(190, 190, 190)'),
-        // new Wall(350, 400, 100, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(350, 450, 100, 100, 'rgb(190, 190, 190)'),
+        new TallGrass(350, 300, 100, 50),
+        new TallGrass(400, 350, 50, 50),
+        // new FakeTallGrass(350, 400, 100, 50)
+        new TallGrass(350, 450, 100, 100),
         /// Pink Switch Puzzle
         // Row 1
-        new Wall(500, 450, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(600, 450, 50, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(500, 450, 50, 50),
+        new TallGrass(600, 450, 50, 50),
         // Row 2
-        new Wall(500, 350, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(600, 350, 50, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(500, 350, 50, 50),
+        new TallGrass(600, 350, 50, 50),
         // Pathway
-        new Wall(700, 350, 50, 150, 'rgb(190, 190, 190)'),
+        new TallGrass(700, 350, 50, 150),
         /// Blue Switch Puzzle
         // Middle and Right
-        // new Wall(0, 0, 800, 50, 'rgb(190, 190, 190)'),
-        new Wall(300, 150, 200, 50, 'rgb(190, 190, 190)'),
+        // new TallGrass(0, 0, 800, 50),
+        new TallGrass(300, 150, 200, 50),
 
-        new Wall(400, 100, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(550, 50, 250, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(400, 100, 100, 50),
+        new TallGrass(550, 50, 250, 50),
         // Left
-        new Wall(0, 150, 200, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 100, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 50, 350, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 0, 800, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 150, 200, 50),
+        new TallGrass(0, 100, 250, 50),
+        new TallGrass(0, 50, 350, 50),
+        new TallGrass(0, 0, 800, 50),
         /// /
         /// /
         /// /
         /// Secret Puzzle
         // Entrance
-        new Wall(0, 600 + 0, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(50, 600 + 0, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(100, 600 + 0, 750, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 600 + 0, 50, 50),
+        new FakeTallGrass(50, 600 + 0, 50, 50),
+        new TallGrass(100, 600 + 0, 750, 50),
         // Left Side
-        new Wall(0, 600 + 50, 50, 350, 'rgb(190, 190, 190)'),
-        new Wall(50, 600 + 100, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(100, 600 + 200, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(50, 600 + 300, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(200, 600 + 250, 50, 100, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 600 + 50, 50, 350),
+        new TallGrass(50, 600 + 100, 150, 50),
+        new TallGrass(100, 600 + 200, 150, 50),
+        new TallGrass(50, 600 + 300, 100, 50),
+        new TallGrass(200, 600 + 250, 50, 100),
         // Water Enterance
-        new Wall(50, 600 + 350, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(100, 600 + 400, 100, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(150, 600 + 450, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(200, 600 + 450, 50, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(50, 600 + 350, 100, 50),
+        new TallGrass(200, 600 + 450, 50, 50),
+        new FakeTallGrass(100, 600 + 400, 100, 50),
+        new FakeTallGrass(150, 600 + 450, 50, 50),
         // Middle-Left Side
-        new Wall(250, 600 + 450, 50, 150, 'rgb(190, 190, 190)'),
-        new Wall(250, 600 + 200, 50, 200, 'rgb(190, 190, 190)'),
-        new Wall(250, 600 + 50, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(300, 600 + 450, 50, 150, 'rgb(190, 190, 190)'),
-        new Wall(300, 600 + 200, 50, 200, 'rgb(190, 190, 190)'),
-        new Wall(300, 600 + 50, 50, 100, 'rgb(190, 190, 190)'),
+        new TallGrass(250, 600 + 450, 50, 150),
+        new TallGrass(250, 600 + 200, 50, 200),
+        new TallGrass(250, 600 + 50, 50, 100),
+        new TallGrass(300, 600 + 450, 50, 150),
+        new TallGrass(300, 600 + 200, 50, 200),
+        new TallGrass(300, 600 + 50, 50, 100),
         // Middle
-        new Wall(350, 600 + 450, 150, 150, 'rgb(190, 190, 190)'),
+        new TallGrass(350, 600 + 450, 150, 150),
         // Right Side
-        new Wall(500, 600 + 50, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(700, 600 + 50, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(700, 600 + 150, 50, 150, 'rgb(190, 190, 190)'),
+        new TallGrass(500, 600 + 50, 50, 100),
+        new TallGrass(700, 600 + 50, 100, 50),
+        new TallGrass(700, 600 + 150, 50, 150),
         // Life Jacket Puzzle
-        new Wall(500, 600 + 200, 50, 350, 'rgb(190, 190, 190)'),
-        new Wall(500, 600 + 550, 350, 50, 'rgb(190, 190, 190)'),
-        new Wall(550, 600 + 300, 200, 50, 'rgb(190, 190, 190)'),
-        new Wall(600, 600 + 500, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(600, 600 + 400, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(800, 600 + 50, 50, 450, 'rgb(190, 190, 190)'),
-        new Wall(700, 600 + 350, 50, 100, 'rgb(190, 190, 190)'),
-        ///
-        new Wall(650, 600 + 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(550, 600 + 350, 150, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(550, 600 + 400, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true)
+        new TallGrass(500, 600 + 200, 50, 350),
+        new TallGrass(500, 600 + 550, 350, 50),
+        new TallGrass(550, 600 + 300, 200, 50),
+        new TallGrass(600, 600 + 500, 250, 50),
+        new TallGrass(600, 600 + 400, 50, 50),
+        new FakeTallGrass(650, 600 + 400, 50, 50),
+        new FakeTallGrass(550, 600 + 350, 150, 50),
+        new FakeTallGrass(550, 600 + 400, 50, 50),
+        new TallGrass(800, 600 + 50, 50, 450),
+        new TallGrass(700, 600 + 350, 50, 100)
       ],
       waters: [
-        new Water(-50, 600 + 400, 100, 150, 'rgb(0, 175, 235)'),
-        new Water(50, 600 + 400, 50, 200, 'rgb(0, 175, 235)'),
-        new Water(100, 600 + 450, 50, 150, 'rgb(0, 175, 235)'),
-        new Water(150, 600 + 500, 100, 100, 'rgb(0, 175, 235)')
+        new Water(-50, 600 + 400, 100, 150),
+        new Water(50, 600 + 400, 50, 200),
+        new Water(100, 600 + 450, 50, 150),
+        new Water(150, 600 + 500, 100, 100)
       ],
       items: [
         new Item(550, 600 + 500, 50, 50, 1),
@@ -551,7 +577,7 @@ export class LevelController {
         new Unlock(750, 400, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '8Purple', 2),
         new Unlock(200, 150, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '8Blue', 1)
       ]
-    }, /* Requirements */7, undefined, /* Level Borders */1, 1, 1, 2, /* Time Limit */ 150))
+    }, /* Requirements */7, undefined, /* Level Borders */1, 1, 1, 2, /* Time Limit */ 500))
 
     // Level 9
     this.levels.push(new Level({
@@ -565,64 +591,63 @@ export class LevelController {
         new Enemy(200 + 850, 300, 50, 50, [false, true, false, false], 5, 750)
       ],
       walls: [
-        new Wall(0, 0, 850, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 0, 850, 50),
         // Bottom Water Walls
-        new Wall(400, 500, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 550, 850, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(400, 500, 250, 50),
+        new TallGrass(0, 550, 850, 50),
         // Centre Water Walls
-        new Wall(300, 200, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(450, 200, 100, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(300, 200, 100, 50),
+        new TallGrass(450, 200, 100, 50),
         // Left Water Walls
-        new Wall(250, 250, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 300, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(150, 300, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(0, 350, 200, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(250, 250, 100, 50),
+        new TallGrass(0, 300, 100, 50),
+        new TallGrass(150, 300, 150, 50),
+        new TallGrass(0, 350, 200, 50),
         // Right Water Walls
-        new Wall(500, 250, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(550, 300, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(750, 300, 100, 50, 'rgb(190, 190, 190)'),
-        new Wall(800, 50, 50, 250, 'rgb(190, 190, 190)'),
+        new TallGrass(500, 250, 100, 50),
+        new TallGrass(550, 300, 100, 50),
+        new TallGrass(750, 300, 100, 50),
+        new TallGrass(800, 50, 50, 250),
         // Red Teleporter Puzzle Centre
-        new Wall(250, 50, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(250, 150, 50, 100, 'rgb(190, 190, 190)'),
-        new Wall(550, 50, 50, 50, 'rgb(190, 190, 190)'),
-        new Wall(550, 150, 50, 100, 'rgb(190, 190, 190)'),
+        new TallGrass(250, 50, 50, 50),
+        new TallGrass(250, 150, 50, 100),
+        new TallGrass(550, 50, 50, 50),
+        new TallGrass(550, 150, 50, 100),
         // Red Teleporter Puzzle Right
-        new Wall(0, 50, 50, 250, 'rgb(190, 190, 190)'),
+        new TallGrass(0, 50, 50, 250),
         // Screen + 850
         // Exit Puzzle Entracne
-        new Wall(0 + 850, 550, 850, 50, 'rgb(190, 190, 190)'),
-        new Wall(50 + 850, 500, 800, 50, 'rgb(190, 190, 190)'),
-        new Wall(100 + 850, 450, 750, 50, 'rgb(190, 190, 190)'),
-        new Wall(150 + 850, 400, 700, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(0 + 850, 550, 850, 50),
+        new TallGrass(50 + 850, 500, 800, 50),
+        new TallGrass(100 + 850, 450, 750, 50),
+        new TallGrass(150 + 850, 400, 700, 50),
         ///
-        new Wall(0 + 850, 0, 200, 350, 'rgb(190, 190, 190)'),
+        new TallGrass(0 + 850, 0, 200, 350),
         // Red Teleporter Puzzle
-        new Wall(200 + 850, 0, 150, 200, 'rgb(190, 190, 190)'),
-        new Wall(350 + 850, 0, 250, 50, 'rgb(190, 190, 190)'),
-        new Wall(600 + 850, 0, 250, 200, 'rgb(190, 190, 190)'),
+        new TallGrass(200 + 850, 0, 150, 200),
+        new TallGrass(350 + 850, 0, 250, 50),
+        new TallGrass(600 + 850, 0, 250, 200),
         // Exit Puzzle
-        new Wall(400 + 850, 200, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(750 + 850, 250, 100, 150, 'rgb(190, 190, 190)'),
-        new Wall(650 + 850, 300, 50, 50, 'rgb(190, 190, 190)'),
+        new TallGrass(400 + 850, 200, 150, 50),
+        new FakeTallGrass(350 + 850, 200, 50, 50),
+        new TallGrass(750 + 850, 250, 100, 150),
+        new TallGrass(650 + 850, 300, 50, 50),
         // Red Teleporter Puzzle and Exit Puzzle Split
-        new Wall(200 + 850, 200, 150, 50, 'rgb(190, 190, 190)'),
-        new Wall(350 + 850, 200, 50, 50, 'rgba(190, 190, 190, 0.9)', true, true),
-        new Wall(450 + 850, 200, 400, 50, 'rgb(190, 190, 190)')
-
+        new TallGrass(200 + 850, 200, 150, 50),
+        new TallGrass(450 + 850, 200, 400, 50)
       ],
       waters: [
-        new Water(350, 250, 150, 50, 'rgb(0, 175, 235)'),
+        new Water(350, 250, 150, 50),
         ///
-        new Water(300, 300, 250, 50, 'rgb(0, 175, 235)'),
+        new Water(300, 300, 250, 50),
         ///
-        new Water(200, 350, 450, 50, 'rgb(0, 175, 235)'),
+        new Water(200, 350, 450, 50),
         ///
-        new Water(50, 400, 600, 50, 'rgb(0, 175, 235)'),
+        new Water(50, 400, 600, 50),
         ///
-        new Water(50, 450, 550, 50, 'rgb(0, 175, 235)'),
+        new Water(50, 450, 550, 50),
         ///
-        new Water(50, 500, 350, 50, 'rgb(0, 175, 235)')
+        new Water(50, 500, 350, 50)
       ],
       items: [
         new Item(350 + 850, 100, 50, 50, 1)
@@ -675,7 +700,47 @@ export class LevelController {
         new Teleporter(100, 300, '8Teleporter', 50, 50, 1),
         new Teleporter(550 + 850, 100, '8Teleporter', 50, 50, 1)
       ]
-    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 150))
+    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 500))
+
+    // Level 1 + 2 + 3
+    this.specialLevels.push(new Level({
+      players: [
+        new Player(400, 0, 50, 50)
+      ],
+      enemies: [
+        new Enemy(700, 400, 50, 50, [true, false, false, false], 10),
+        new Enemy(100, 150, 50, 50, [false, true, false, false], 10)
+      ],
+      walls: [
+        /// Left Wall
+        new TallGrass(0, 0, 50, 200),
+        new TallGrass(0, 400, 50, 200),
+        //
+        new TallGrass(50, 100, 50, 150),
+        new TallGrass(50, 350, 50, 150),
+        /// Right Wall
+        new TallGrass(800, 0, 50, 200),
+        new TallGrass(800, 400, 50, 200),
+        //
+        new TallGrass(750, 100, 50, 150),
+        new TallGrass(750, 350, 50, 150),
+        /// Top Wall
+        new TallGrass(50, 0, 300, 50),
+        new TallGrass(500, 0, 300, 50),
+        //
+        new TallGrass(50, 50, 350, 50),
+        new TallGrass(450, 50, 350, 50),
+        /// Bottom Wall
+        new TallGrass(50, 550, 300, 50),
+        new TallGrass(500, 550, 300, 50),
+        //
+        new TallGrass(50, 500, 350, 50),
+        new TallGrass(450, 500, 350, 50)
+      ],
+      finishAreas: [
+        new FinishArea(350, 550 + 850, 150, 50)
+      ]
+    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 3, /* Time Limit */ 500))
   }
 
   CheckLocked () {

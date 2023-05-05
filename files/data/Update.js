@@ -1,8 +1,10 @@
 'use strict'
-const { gameMode, storyModeStates, gameStates, levelTools, settingStates, drawUpdate } = require('./GameData')
+const { gameMode, /* startingMenusStates, */ storyModeStates, gameStates, levelTools, settingStates, drawUpdate } = require('./GameData')
 
 export const update = {
   UpdateGame: function (delta) {
+    // if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { gameStates.menuController.MainMenu.Update() }
+
     if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) { this.updateLevels(delta) }
 
     if (gameStates.arrayChartController.findCurrentArrayChart() !== false) { this.chartUpdate() }

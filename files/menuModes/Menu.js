@@ -12,16 +12,16 @@ class MenuItem {
 }
 
 class Menu {
-  constructor (menuItems, width, height, offsetX, negativeOffsetX, offsetY, negativeOffsetY, textYOffset) {
+  constructor (menuItems, itemWidth, itemHeight, x, y, width, height, textYOffset) {
     this.menuItems = menuItems
     this.selectedIndexX = 0
     this.selectedIndexY = 0
+    this.itemWidth = itemWidth
+    this.itemHeight = itemHeight
+    this.x = x
+    this.y = y
     this.width = width
     this.height = height
-    this.offsetX = offsetX
-    this.negativeOffsetX = negativeOffsetX
-    this.offsetY = offsetY
-    this.negativeOffsetY = negativeOffsetY
     this.textYOffset = textYOffset / 3
     ///
     this.menuItems.forEach(function (menuItem) {
@@ -36,7 +36,7 @@ class Menu {
   }
 
   moveRight () {
-    if (this.selectedIndexX !== this.width - 1) {
+    if (this.selectedIndexX !== this.itemWidth - 1) {
       this.selectedIndexX = this.selectedIndexX + 1
     }
   }
@@ -48,14 +48,14 @@ class Menu {
   }
 
   moveDown () {
-    if (this.selectedIndexY !== this.height - 1) {
+    if (this.selectedIndexY !== this.itemHeight - 1) {
       this.selectedIndexY = this.selectedIndexY + 1
     }
   }
 
   selected () {
     // Find the selected menuItem
-    const menuItem = this.menuItems[this.selectedIndexX * this.height + this.selectedIndexY]
+    const menuItem = this.menuItems[this.selectedIndexX * this.itemHeight + this.selectedIndexY]
     menuItem.action()
   }
 
@@ -79,31 +79,44 @@ class Menu {
     }
   }
 
+  MouseDown (event, isTouching, returnValue) {
+    const self = this
+    const heightPerItem = this.height / this.itemHeight
+    const widthPerItem = this.width / this.itemWidth
+    this.menuItems.forEach(function (menuItem) {
+      // Selected "Menus"
+      if (isTouching(self.x + widthPerItem * (menuItem.valueX - 1), self.y + heightPerItem * (menuItem.valueY - 1), widthPerItem, heightPerItem, event.offsetX, event.offsetY) && gameStates.menuController.CheckMenu() !== undefined) {
+        if ((menuItem.valueX - 1) === self.selectedIndexX && (menuItem.valueY - 1) === self.selectedIndexY) {
+          gameStates.menuController.menus[gameStates.menuController.CheckMenu()].selected()
+        } else {
+          self.selectedIndexX = menuItem.valueX - 1
+          self.selectedIndexY = menuItem.valueY - 1
+          returnValue = true
+        }
+      }
+    })
+  }
+
   Draw () {
     const self = this
     // Setting the width and height per menuItem
-    const heightPerItem = (this.negativeOffsetY - 5 - this.offsetY) / this.height
-    const widthPerItem = (this.negativeOffsetX - 5 - this.offsetX) / this.width
+    const heightPerItem = this.height / this.itemHeight
+    const widthPerItem = this.width / this.itemWidth
     this.menuItems.forEach(function (menuItem) {
       if ((menuItem.valueX - 1) === self.selectedIndexX && (menuItem.valueY - 1) === self.selectedIndexY) {
         canvas.context.shadowColor = 'rgba(0, 0, 0, 0.8)'
         canvas.context.shadowOffsetX = 5
         canvas.context.shadowOffsetY = 5
         canvas.context.fillStyle = 'rgba(128, 128, 128, 0.8)'
-        canvas.context.fillRect(self.offsetX + widthPerItem * (menuItem.valueX - 1), self.offsetY + heightPerItem * (menuItem.valueY - 1), widthPerItem, heightPerItem)
+        canvas.context.fillRect(self.x + widthPerItem * (menuItem.valueX - 1), self.y + heightPerItem * (menuItem.valueY - 1), widthPerItem, heightPerItem)
         canvas.context.shadowOffsetX = 0
         canvas.context.shadowOffsetY = 0
-        // Storing selector positions
-        gameStates.selectorX = widthPerItem * (menuItem.valueX - 1) + self.offsetX
-        gameStates.selectorXBottom = widthPerItem * menuItem.valueX + self.offsetX
-        gameStates.selectorY = heightPerItem * (menuItem.valueY - 1) + self.offsetY
-        gameStates.selectorYBottom = heightPerItem * menuItem.valueY + self.offsetY
       }
       // Drawing the MenuItem's text
       canvas.context.font = menuItem.size
       canvas.context.fillStyle = menuItem.color
-      const textX = widthPerItem * (menuItem.valueX - 1) + self.offsetX
-      const textY = heightPerItem * (menuItem.valueY - 1) + self.offsetY
+      const textX = widthPerItem * (menuItem.valueX - 1) + self.x
+      const textY = heightPerItem * (menuItem.valueY - 1) + self.y
       canvas.context.textAlign = 'center'
       canvas.context.fillText(menuItem.title, textX + widthPerItem / 2, textY + heightPerItem / 2 + self.textYOffset)
       canvas.context.textAlign = 'left'
@@ -132,9 +145,8 @@ export class MenuController {
         gameStates.currentGameMode = gameMode.Settings
       }),
       new MenuItem('Comming Soon', 1, 5, 'rgb(55, 0, 110)', function () {
-
       })
-    ], /* length */1, /* height */5, /* offsetX */0, /* negativeOffsetX */850, /* offsetY */0, /* negativeOffsetY */600, /* Used to find textOffsetY and fontSize */90))
+    ], /* itemWidth */1, /* itemHeight */5, /* x */0, /* y */0, /* width */850, /* height */600, /* Used to find textOffsetY and fontSize */90))
 
     this.menus.push(this.ShopMenu = new Menu([
       new MenuItem('Player', 1, 1, 'lightcoral', function () {
@@ -143,7 +155,7 @@ export class MenuController {
       new MenuItem('Background', 1, 2, 'gold', function () {
         gameStates.currentShopMode = ShopMode.Backround
       })
-    ], /* length */1, /* height */2, /* offsetX */0, /* negativeOffsetX */850, /* offsetY */0, /* negativeOffsetY */600, /* Used to find textOffsetY and fontSize */130))
+    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* Used to find textOffsetY and fontSize */130))
 
     this.menus.push(this.KeybindsSelector = new Menu([
       new MenuItem('ArrowLeft', 1, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.startRebind('A', 1, this) }),
@@ -166,7 +178,7 @@ export class MenuController {
       new MenuItem('b', 2, 6, 'rgb(231, 0, 102)', function () { gameStates.keybindController.startRebind('B', 6, this) }),
       new MenuItem('u', 2, 7, 'rgb(243, 0, 88)', function () { gameStates.keybindController.startRebind('B', 7, this) }),
       new MenuItem('Column 2', 2, 8, 'rgb(255, 0, 75)', function () { gameStates.keybindController.resetKeybinds('B') })
-    ], /* length */2, /* height */8, /* offsetX */290, /* negativeOffsetX */850, /* offsetY */0, /* negativeOffsetY */600, /* Used to find textOffsetY and fontSize */50))
+    ], /* itemWidth */2, /* itemHeight */8, /* x */290, /* y */0, /* width */510, /* height */600, /* Used to find textOffsetY and fontSize */50))
 
     this.menus.push(this.SettingsMenu = new Menu([
       new MenuItem('Keybinds', 1, 1, 'rgb(230, 200, 0)', function () {
@@ -178,7 +190,7 @@ export class MenuController {
       new MenuItem('Comming Soon', 1, 3, 'rgb(0, 200, 0)', function () {
         // gameStates.SetGameState(settingStates.Sound, "Settings")
       })
-    ], /* length */1, /* height */3, /* offsetX */0, /* negativeOffsetX */850, /* offsetY */0, /* negativeOffsetY */600, /* Used to find textOffsetY and fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* Used to find textOffsetY and fontSize */115))
 
     this.menus.push(this.LoseMenu = new Menu([
       new MenuItem('Retry', 1, 1, 'rgb(120, 0, 225)', function () {
@@ -197,7 +209,7 @@ export class MenuController {
         gameStates.currentStartingMenusState = startingMenusStates.Menu
         levelTools.loseCounterStop = false
       })
-    ], /* length */1, /* height */3, /* offsetX */0, /* negativeOffsetX */850, /* offsetY */175, /* negativeOffsetY */600, /* Used to find textOffsetY and fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */175, /* width */850, /* height */425, /* Used to find textOffsetY and fontSize */115))
 
     this.menus.push(this.WinMenu = new Menu([
       new MenuItem('Continue', 1, 1, 'rgb(255, 0, 75)', function () {
@@ -216,7 +228,7 @@ export class MenuController {
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
       })
-    ], /* length */1, /* height */3, /* offsetX */0, /* negativeOffsetX */850, /* offsetY */150, /* negativeOffsetY */600, /* Used to find textOffsetY and fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */150, /* width */850, /* height */450, /* Used to find textOffsetY and fontSize */115))
 
     this.menus.push(this.PauseMenu = new Menu([
       new MenuItem('Resume', 1, 1, 'rgb(255, 0, 86)', function () {
@@ -238,7 +250,7 @@ export class MenuController {
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
       })
-    ], /* length */1, /* height */4, /* offsetX */0, /* negativeOffsetX */850, /* offsetY */0, /* negativeOffsetY */600, /* Used to find textOffsetY and fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */4, /* x */0, /* y */0, /* width */850, /* height */600, /* Used to find textOffsetY and fontSize */115))
   }
 
   CheckMenu () {

@@ -4,13 +4,30 @@ const { draw } = require('../drawing/Draw')
 const { storyModeStates, gameStates, BackgroundStyles } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 const { GameObject } = require('./Class')
+
 export class Wall extends GameObject {
-  constructor (x, y, width, height, color1, allowMovement, invisibleWall) {
+  constructor (x, y, width, height, color1, type) {
     super(x, y, width, height, color1)
+    this.type = type
+  }
+
+  AllowMovement (wall) {
+    // If the object calling the function is TallGrass
+    if (wall.type === 'tallGrass') {
+      return false
+    }
+    // If the object calling the function is FakeTallGrass
+    if (wall.type === 'fakeTallGrass') {
+      return true
+    }
+  }
+};
+
+export class TallGrass extends Wall {
+  constructor (x, y, width, height) {
+    super(x, y, width, height, 'rgb(190, 190, 190)', 'tallGrass')
     this.original_x = this.x
     this.original_y = this.y
-    this.allowMovement = allowMovement
-    this.invisibleWall = invisibleWall
     this.randomList = Array(100)
     for (let i = 0; i < 100; i++) {
       this.randomList[i] = Math.floor(Math.random() * 1000)
@@ -18,25 +35,7 @@ export class Wall extends GameObject {
   }
 
   Draw () {
-    if (this.invisibleWall && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      let i = 0
-      for (let x = this.left(); x < this.right(); x = x + 50) {
-        for (let y = this.top(); y < this.bottom(); y = y + 50) {
-          i++
-          canvas.context.save()
-          canvas.context.translate(x - 2, y - 2)
-          ///
-          if (this.randomList[i] % 15 === 0) { draw.DrawImage(images.InvisibleWallV2, 0, 0) } else { draw.DrawImage(images.InvisibleWall, 0, 0) }
-          canvas.context.restore()
-        }
-      }
-      /* } else if (this.x > 800) {
-              for (var x = this.left(); x < this.right(); x = x + 50) {
-                  for (var y = this.top(); y < this.bottom(); y = y + 50) {
-              draw.DrawImage(images.WallGrassEdgeY, )
-                  }
-              } */
-    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic && !this.invisibleWall) {
+    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
       let i = 0
       for (let x = this.left(); x < this.right(); x += 50) {
         for (let y = this.top(); y < this.bottom(); y += 50) {
@@ -56,12 +55,55 @@ export class Wall extends GameObject {
               draw.DrawImage(images.WallGrassClassicA, 0, 0)
             }
           } else if (gameStates.levelController.currentWorld === 2) {
-          // if (this.randomList[i] % 9 === 0) {
+          /* if (this.randomList[i] % 9 === 0) {
             // canvas.context.drawImage(images.WorldTwoLedges, 104, 10, 54, 54, 0, 0, 54, 54)
           // } else {
             canvas.context.drawImage(images.WorldTwoLedges, 100, 6, 54, 54, 0, 0, 54, 54)
-            // }
+             } */
           }
+          canvas.context.restore()
+        }
+      }
+    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+      canvas.context.fillStyle = this.color1
+      canvas.context.fillRect(this.x, this.y, this.width, this.height)
+    }
+
+    /* } else if (this.x > 800) {
+              for (var x = this.left(); x < this.right(); x = x + 50) {
+                  for (var y = this.top(); y < this.bottom(); y = y + 50) {
+              draw.DrawImage(images.WallGrassEdgeY, )
+                  }
+              } */
+  }
+
+  reset () {
+    this.x = this.original_x
+    this.y = this.original_y
+  }
+};
+
+export class FakeTallGrass extends Wall {
+  constructor (x, y, width, height) {
+    super(x, y, width, height, 'rgba(190, 190, 190, 0.9)', 'fakeTallGrass')
+    this.original_x = this.x
+    this.original_y = this.y
+    this.randomList = Array(100)
+    for (let i = 0; i < 100; i++) {
+      this.randomList[i] = Math.floor(Math.random() * 1000)
+    }
+  }
+
+  Draw () {
+    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+      let i = 0
+      for (let x = this.left(); x < this.right(); x = x + 50) {
+        for (let y = this.top(); y < this.bottom(); y = y + 50) {
+          i++
+          canvas.context.save()
+          canvas.context.translate(x - 2, y - 2)
+          ///
+          if (this.randomList[i] % 15 === 0) { draw.DrawImage(images.InvisibleWallV2, 0, 0) } else { draw.DrawImage(images.InvisibleWall, 0, 0) }
           canvas.context.restore()
         }
       }
@@ -78,8 +120,9 @@ export class Wall extends GameObject {
 };
 
 export class Water extends GameObject {
-  constructor (x, y, width, height, color1) {
-    super(x, y, width, height, color1)
+  constructor (x, y, width, height) {
+    super(x, y, width, height)
+    this.color1 = 'rgb(0, 175, 235)'
     this.original_x = this.x
     this.original_y = this.y
     this.spriteX = 0

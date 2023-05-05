@@ -67,23 +67,7 @@ export function MouseDown (event) {
     }
   }
 
-  // Left "Menus"
-  if (isTouching(0, gameStates.selectorY, gameStates.selectorX, gameStates.selectorYBottom - gameStates.selectorY, event.offsetX, event.offsetY) && gameStates.menuController.CheckMenu() !== undefined) { gameStates.menuController.menus[gameStates.menuController.CheckMenu()].moveLeft() }
-
-  // Right "Menus"
-  if (isTouching(gameStates.selectorXBottom + 1, gameStates.selectorY, 850 - gameStates.selectorXBottom, gameStates.selectorYBottom - gameStates.selectorY, event.offsetX, event.offsetY) && gameStates.menuController.CheckMenu() !== undefined) { gameStates.menuController.menus[gameStates.menuController.CheckMenu()].moveRight() }
-
-  // Down "Menus"
-  if (isTouching(gameStates.selectorX, gameStates.selectorYBottom + 1, gameStates.selectorXBottom - gameStates.selectorX, 600 - gameStates.selectorYBottom, event.offsetX, event.offsetY) && gameStates.menuController.CheckMenu() !== undefined) { gameStates.menuController.menus[gameStates.menuController.CheckMenu()].moveDown() }
-
-  // Up "Menus"
-  if (isTouching(gameStates.selectorX, 0, gameStates.selectorXBottom - gameStates.selectorX, gameStates.selectorY, event.offsetX, event.offsetY) && gameStates.menuController.CheckMenu() !== undefined) { gameStates.menuController.menus[gameStates.menuController.CheckMenu()].moveUp() }
-
-  // Selected "Menus"
-  if (isTouching(gameStates.selectorX, gameStates.selectorY - 1, gameStates.selectorXBottom - gameStates.selectorX, gameStates.selectorYBottom - gameStates.selectorY, event.offsetX, event.offsetY) && gameStates.menuController.CheckMenu() !== undefined) {
-    gameStates.menuController.menus[gameStates.menuController.CheckMenu()].selected()
-    return
-  }
+  gameStates.menuController.menus[gameStates.menuController.CheckMenu()].MouseDown(event, isTouching)
 
   // Check if a game mode is selected
   if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {

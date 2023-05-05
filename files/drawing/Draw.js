@@ -64,7 +64,6 @@ export const draw = {
   },
   StartingSreenDraw: function () {
     this.ChangeShdow(8, 8, 'rgb(50, 50, 50)')
-
     canvas.context.font = '275px Arial'
     canvas.context.fillStyle = 'black'
     canvas.context.fillText('CUB', 0, 250)
@@ -83,10 +82,11 @@ export const draw = {
     canvas.context.fillStyle = 'black'
     canvas.context.fillRect(600, 50, 200, 200)
     this.ChangeShdow(0, 0, 'rgb(0, 0, 0)')
+    ///
     canvas.context.fillStyle = gameStates.currentThemeColour
-    canvas.context.fillRect(600 + 20, 50 + 40, 40, 40)
-    canvas.context.fillRect(600 + 140, 50 + 40, 40, 40)
-    canvas.context.fillRect(600 + 20, 50 + 130, 160, 40)
+    canvas.context.fillRect(620, 90, 40, 40)
+    canvas.context.fillRect(740, 90, 40, 40)
+    canvas.context.fillRect(620, 180, 160, 40)
   },
   LevelsDraw: function () {
     canvas.context.save()

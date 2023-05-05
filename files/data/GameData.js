@@ -199,17 +199,19 @@ export const dataManagement = {
     const BackgroundStyle = Number(window.localStorage.getItem('backgroundStyle'))
     if (BackgroundStyle !== null) {
       gameStates.currentBackgroundStyle = BackgroundStyle
+      gameStates.arrayChartController.arrayCharts[1].currentSelection = BackgroundStyle
+    }
+
+    const StyleCube = Number(window.localStorage.getItem('StyleCube'))
+    if (StyleCube !== null) {
+      gameStates.currentCubeStyle = StyleCube
+      gameStates.arrayChartController.arrayCharts[2].currentSelection = StyleCube
     }
 
     const currentThemeColourSelection = window.localStorage.getItem('currentThemeColourSelection')
     if (currentThemeColourSelection !== null) {
       gameStates.currentThemeColour = gameStates.arrayChartController.arrayCharts[0].items[currentThemeColourSelection].value
       gameStates.arrayChartController.arrayCharts[0].currentSelection = currentThemeColourSelection
-    }
-
-    const StyleCube = Number(window.localStorage.getItem('StyleCube'))
-    if (StyleCube !== null) {
-      gameStates.currentCubeStyle = StyleCube
     }
 
     const loadArrayKeybind = JSON.parse(window.localStorage.getItem('keybindArray'))
