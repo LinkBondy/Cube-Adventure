@@ -18,7 +18,7 @@ export class Unlock extends GameObject {
   update () {
     const self = this
     gameStates.CurrentLevel().players.forEach(function (player) {
-      if (self.intersectsAll(0, player)) {
+      if (self.intersects(/* 0, */ player)) {
         gameStates.CurrentLevel().rocks.forEach(function (rock) {
           if (self.title === rock.title && rock.allowMovement === rock.originalAllowMovement) {
             rock.allowMovement = !rock.allowMovement
@@ -34,7 +34,7 @@ export class Unlock extends GameObject {
     })
 
     gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-      if (self.intersectsAll(1, enemy)) {
+      if (self.intersects(/* 1, */ enemy)) {
         gameStates.CurrentLevel().rocks.forEach(function (rock) {
           if (self.title === rock.title && rock.allowMovement === rock.originalAllowMovement) {
             rock.allowMovement = !rock.allowMovement

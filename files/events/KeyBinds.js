@@ -39,6 +39,8 @@ export class KeybindController {
 
   setKeybinds (event) {
     if (this.checkKeybinds(event.key)) {
+      console.log(event.key)
+      console.log(event)
       switch (this.currentType) {
         case 'A':
           if (event.key === ' ') { this.currentKeybind.displayNameA = 'Space' } else if (event.key === 'Dead') {

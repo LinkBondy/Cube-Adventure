@@ -119,9 +119,9 @@ export const draw = {
       rock.Draw()
     })
 
-    /* gameStates.CurrentLevel().changeDirectionSquares.forEach(function(changeDirectionSquare) {
-            changeDirectionSquare.Draw()
-        },) */
+    /* gameStates.CurrentLevel().changeDirectionSquares.forEach(function (changeDirectionSquare) {
+      changeDirectionSquare.Draw()
+    }) */
 
     gameStates.CurrentLevel().players.forEach(function (player) {
       player.Draw()
@@ -244,7 +244,6 @@ export const draw = {
     canvas.context.textAlign = 'left'
   },
   DrawToolBarButtons: function () {
-    this.ChangeShdow(4, 4, 'rgba(50, 50, 50)')
     switch (gameStates.currentStoryModeState) {
       case storyModeStates.Playing:
         draw.DrawImage(images.PauseButton, 925, 475)
@@ -260,7 +259,6 @@ export const draw = {
         }
         break
     }
-    this.ChangeShdow(0, 0, 'black')
   },
   DrawCollectedItems: function () {
     const items = gameStates.CurrentLevel().collectedItems
@@ -286,17 +284,15 @@ export const draw = {
               }
               break
           }
-          draw.DrawImage(image, 862 + (50 / 3) * (col + 1) + 100 * col, 225 + row * 125)
+          draw.DrawImage(image, 860 + (50 / 3) * (col + 1) + 100 * col, 225 + row * 125)
         }
       }
     }
-    this.ChangeShdow(4, 4, 'rgba(50, 50, 50)')
     for (let row = 0; row < 2; row++) {
       for (let col = 0; col < 2; col++) {
         draw.DrawImage(images.Frame, 850 + (50 / 3) * (row + 1) + 100 * row, 215 + (125 * col))
       }
     }
-    this.ChangeShdow(0, 0, 'black')
   },
   DrawTimer: function () {
     canvas.context.font = '75px Arial'

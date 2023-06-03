@@ -67,7 +67,10 @@ export function MouseDown (event) {
     }
   }
 
-  gameStates.menuController.menus[gameStates.menuController.CheckMenu()].MouseDown(event, isTouching)
+  if (gameStates.menuController.CheckMenu() !== undefined) {
+    gameStates.menuController.menus[gameStates.menuController.CheckMenu()].MouseDown(event, isTouching)
+    return
+  }
 
   // Check if a game mode is selected
   if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {

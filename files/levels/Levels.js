@@ -65,12 +65,18 @@ export class LevelController {
         //
         new TallGrass(50, 100, 50, 150),
         new TallGrass(50, 350, 50, 150),
+        //
+        new TallGrass(50, 250, 50, 100),
+        new TallGrass(0, 200, 50, 200),
         /// Right Wall
         new TallGrass(800, 0, 50, 200),
         new TallGrass(800, 400, 50, 200),
         //
         new TallGrass(750, 100, 50, 150),
         new TallGrass(750, 350, 50, 150),
+        ///
+        new TallGrass(750, 250, 50, 100),
+        new TallGrass(800, 200, 50, 200),
         /// Top Wall
         new TallGrass(50, 0, 300, 50),
         new TallGrass(500, 0, 300, 50),
@@ -203,222 +209,275 @@ export class LevelController {
     // Level 5
     this.levels.push(new Level({
       players: [
-        new Player(150, 150, 50, 50)
+        new Player(400, 550, 50, 50)
       ],
       enemies: [
-        new Enemy(50, 500, 50, 50, [false, false, true, false], 5),
-        new Enemy(500, 150, 50, 50, [false, true, false, false], 5),
-        new Enemy(500, 300, 50, 50, [false, true, false, false], 5),
-        new Enemy(500, 450, 50, 50, [false, true, false, false], 5)
+        new Enemy(250, 50, 50, 50, [false, true, false, false], 5),
+        ///
+        new Enemy(150 + 850, 275, 50, 50, [false, false, false, true], 6),
+        new Enemy(200 + 850, 275, 50, 50, [false, false, true, false], 6)
       ],
       walls: [
-        // Side Walls
-        new TallGrass(0, 550, 850, 50),
-        new TallGrass(0, 0, 850, 50),
+        // Top Borders
+        new TallGrass(0, 0, 700, 50),
+        // Bottom Borders
+        new TallGrass(0, 550, 350, 50),
+        new TallGrass(500, 550, 200, 50),
+        // Left Borders
+        new TallGrass(0, 50, 100, 150),
+        new TallGrass(0, 200, 50, 50),
+        new TallGrass(0, 350, 50, 50),
+        new TallGrass(0, 400, 100, 150),
+        // Left Box Area
+        new TallGrass(150, 100, 50, 150),
+        new TallGrass(200, 100, 50, 400),
+        new TallGrass(150, 350, 50, 150),
         ///
-        new TallGrass(100, 100, 50, 50),
-        new FakeTallGrass(100, 150, 50, 50),
+        new TallGrass(250, 150, 50, 50),
+        new FakeTallGrass(250, 400, 50, 50),
+        new TallGrass(300, 400, 100, 150),
+        // Middle Box Area
+        new TallGrass(300, 50, 400, 150),
         ///
-        new TallGrass(100, 200, 50, 400),
+        new TallGrass(600, 200, 100, 50),
+        new TallGrass(600, 350, 100, 50),
         ///
-        new TallGrass(400, 100, 50, 100),
-        new TallGrass(400, 200, 50, 350),
+        new TallGrass(450, 400, 250, 150),
+        // Right Borders
+        new TallGrass(700, 0, 400, 100),
+        new TallGrass(800, 200, 200, 200),
+        new TallGrass(700, 500, 400, 100),
+        new TallGrass(250 + 850, 0, 100, 250),
+        new TallGrass(250 + 850, 350, 100, 250),
+        new TallGrass(350 + 850, 0, 50, 600),
         ///
-        new TallGrass(450, 100, 50, 450),
+        new TallGrass(400 + 850, 350, 450, 50),
+        new TallGrass(400 + 850, 400, 50, 50),
+        new TallGrass(500 + 850, 400, 50, 50),
+        new TallGrass(550 + 850, 400, 300, 200),
         ///
-        new TallGrass(150, 100, 300, 50),
-        ///
-        new TallGrass(0, 50, 50, 500),
-        ///
-        new TallGrass(700, 50, 50, 100),
-        new TallGrass(700, 200, 50, 100),
-        new TallGrass(700, 350, 50, 100),
-        new TallGrass(700, 500, 50, 50),
-        ///
-        new FakeTallGrass(700, 450, 50, 50),
-        new FakeTallGrass(700, 300, 50, 50),
-        new FakeTallGrass(700, 150, 50, 50),
-        ///
-        new TallGrass(800, 50, 50, 500)
+        new TallGrass(400 + 850, 0, 450, 400)
       ],
       rocks: [
-        new Rock(300, 150, 50, 50, 'lightblue', 'aqua', '5Blue', false, 1, 1),
-        new Rock(350, 200, 50, 50, 'lightblue', 'aqua', '5Blue', false, 1, 1),
-        new Rock(450, 50, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1)
+        new Rock(600, 250, 50, 50, 'lightblue', 'aqua', '5Blue', false, 1, 1),
+        new Rock(600, 300, 50, 50, 'lightblue', 'aqua', '5Blue', false, 1, 1),
+        ///
+        new Rock(50, 200, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1),
+        new Rock(50, 250, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1),
+        new Rock(50, 300, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1),
+        new Rock(50, 350, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1)
       ],
       finishAreas: [
-        new FinishArea(750, 50, 50, 500)
+        new FinishArea(0, 250, 50, 100)
       ],
       changeDirectionSquares: [
-        new ChangeDirectionSquare(50, 50, 50, 50, true, false, true, false, true)
+        new ChangeDirectionSquare(100, 50, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(100, 500, 50, 50, false, true, true, false, true),
+        new ChangeDirectionSquare(250, 500, 50, 50, true, false, true, false, true),
+        ///
+        new ChangeDirectionSquare(750, 400, 50, 50, false, true, true, false, true),
+        new ChangeDirectionSquare(700, 450, 50, 50, false, true, true, false, true),
+        //
+        new ChangeDirectionSquare(750, 150, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(700, 100, 50, 50, false, true, false, true, true),
+        //
+        new ChangeDirectionSquare(150 + 850, 400, 50, 50, true, false, true, false, true),
+        new ChangeDirectionSquare(200 + 850, 450, 50, 50, true, false, true, false, true),
+        //
+        new ChangeDirectionSquare(200 + 850, 100, 50, 50, true, false, false, true, true),
+        new ChangeDirectionSquare(150 + 850, 150, 50, 50, true, false, false, true, true)
       ],
       unlocks: [
-        new Unlock(150, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '5Blue', 1),
-        new Unlock(350, 150, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '5Purple', 2)
+        new Unlock(250, 100, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '5Blue', 1),
+        new Unlock(300 + 850, 275, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '5Purple', 2)
       ]
-    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
+    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 500))
 
     // Level 6
     this.levels.push(new Level({
       players: [
-        new Player(50, 50, 50, 50)
+        new Player(750, 100, 50, 50)
       ],
       enemies: [
-        new Enemy(700, 500, 50, 50, [true, false, false, false], 3.5)
+        new Enemy(500, 500, 50, 50, [true, false, false, false], 3.5)
       ],
       walls: [
+        // Top and Bottom
         new TallGrass(0, 0, 850, 50),
         new TallGrass(0, 550, 850, 50),
-        new TallGrass(800, 50, 50, 500),
-        ///
+        // Left and Right
         new TallGrass(0, 50, 50, 550),
+        new TallGrass(800, 50, 50, 200),
+        new TallGrass(800, 350, 50, 200),
+        ///
+        new TallGrass(750, 50, 50, 50),
+        new TallGrass(750, 500, 50, 50),
+        ///
+        new TallGrass(650, 50, 50, 100),
+        new TallGrass(650, 450, 50, 100),
+        ///
+        new TallGrass(700, 50, 50, 200),
+        new TallGrass(700, 350, 50, 200),
+        ///
+        new TallGrass(600, 50, 50, 550),
+        ///
+        new TallGrass(50, 50, 50, 250),
+        new TallGrass(50, 350, 50, 200),
         ///
         new TallGrass(100, 50, 50, 250),
-        new TallGrass(100, 350, 50, 250),
         ///
-        new TallGrass(200, 50, 50, 550),
+        new TallGrass(150, 50, 50, 450),
         ///
-        new TallGrass(250, 50, 50, 250),
+        new TallGrass(200, 50, 50, 250),
         new TallGrass(250, 350, 50, 200),
         ///
-        new TallGrass(300, 50, 50, 250),
+        new TallGrass(300, 150, 50, 400),
         ///
-        new TallGrass(350, 50, 50, 450),
+        new TallGrass(350, 150, 200, 50),
+        new TallGrass(300, 100, 250, 50),
         ///
-        new TallGrass(400, 50, 50, 250),
-        new TallGrass(450, 350, 50, 200),
+        new TallGrass(400, 250, 200, 250),
         ///
-        new TallGrass(500, 150, 50, 400),
-        ///
-        new TallGrass(550, 150, 200, 50),
-        new TallGrass(500, 100, 250, 50),
-        ///
-        new TallGrass(600, 250, 200, 250),
-        ///
-        new TallGrass(750, 500, 50, 50)
+        new TallGrass(550, 500, 50, 50)
       ],
       rocks: [
-        new Rock(100, 300, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1),
-        new Rock(650, 500, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1)
+        new Rock(450, 500, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1),
+        ///
+        new Rock(700, 300, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1),
+        new Rock(700, 250, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1)
       ],
       finishAreas: [
-        new FinishArea(150, 50, 50, 500)
+        new FinishArea(650, 150, 50, 300)
       ],
       changeDirectionSquares: [
         // Right Side
-        new ChangeDirectionSquare(550, 500, 50, 50, false, true, true, false, true),
+        new ChangeDirectionSquare(350, 500, 50, 50, false, true, true, false, true),
         ///
-        new ChangeDirectionSquare(550, 200, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(350, 200, 50, 50, false, true, false, true, true),
         ///
-        new ChangeDirectionSquare(750, 200, 50, 50, true, false, true, false, true),
+        new ChangeDirectionSquare(550, 200, 50, 50, true, false, true, false, true),
         ///
-        new ChangeDirectionSquare(750, 50, 50, 50, true, false, false, true, true),
+        new ChangeDirectionSquare(550, 50, 50, 50, true, false, false, true, true),
         // Left Side
-        new ChangeDirectionSquare(450, 50, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(250, 50, 50, 50, false, true, false, true, true),
         ///
-        new ChangeDirectionSquare(450, 300, 50, 50, true, false, true, false, true),
+        new ChangeDirectionSquare(250, 300, 50, 50, true, false, true, false, true),
         ///
-        new ChangeDirectionSquare(400, 300, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(200, 300, 50, 50, false, true, false, true, true),
         ///
-        new ChangeDirectionSquare(400, 500, 50, 50, true, false, true, false, true),
+        new ChangeDirectionSquare(200, 500, 50, 50, true, false, true, false, true),
         ///
-        new ChangeDirectionSquare(300, 500, 50, 50, false, true, true, false, true)
+        new ChangeDirectionSquare(100, 500, 50, 50, false, true, true, false, true)
       ],
       unlocks: [
-        new Unlock(550, 500, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '6Purple', 2)
+        new Unlock(350, 500, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '6Purple', 2)
       ],
       teleporters: [
-        new Teleporter(50, 500, 50, 50, '6Teleporter', 1),
-        new Teleporter(250, 300, 50, 50, '6Teleporter', 1)
+        new Teleporter(750, 450, 50, 50, '6Teleporter', 1),
+        new Teleporter(50, 300, 50, 50, '6Teleporter', 1)
       ]
     }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
 
     // Level 7
     this.levels.push(new Level({
       players: [
-        new Player(150, 50, 50, 50)
+        new Player(150, 50 + 600, 50, 50)
       ],
       enemies: [
-        new Enemy(250, 100, 50, 50, [true, false, false, false], 4),
-        new Enemy(50, 250, 50, 50, [false, true, false, false], 4.5),
-        new Enemy(250, 400, 50, 50, [true, false, false, false], 4)
+        new Enemy(250, 100 + 600, 50, 50, [true, false, false, false], 4),
+        new Enemy(50, 250 + 600, 50, 50, [false, true, false, false], 4.5),
+        new Enemy(250, 400 + 600, 50, 50, [true, false, false, false], 4)
       ],
       walls: [
-        new TallGrass(0, 0, 50, 600),
-        new TallGrass(50, 0, 250, 50),
-        new TallGrass(50, 550, 250, 50),
+        new TallGrass(0, 0, 250, 100),
+        new TallGrass(0, 200, 150, 200),
+        new TallGrass(0, 500, 250, 100),
+        new TallGrass(250, 0, 100, 250),
+        new TallGrass(250, 350, 100, 250),
+        new TallGrass(350, 0, 50, 600),
         ///
-        new TallGrass(50, 50, 50, 50),
-        new TallGrass(50, 150, 50, 100),
-        new TallGrass(50, 300, 50, 100),
-        new TallGrass(50, 450, 50, 100),
+        new TallGrass(400, 350, 450, 50),
+        new TallGrass(400, 400, 50, 50),
+        new TallGrass(500, 400, 50, 50),
+        new TallGrass(550, 400, 300, 200),
         ///
-        new TallGrass(250, 50, 50, 50),
-        new TallGrass(250, 150, 50, 100),
-        new TallGrass(250, 300, 50, 100),
-        new TallGrass(250, 450, 50, 100),
+        new TallGrass(400, 0, 450, 400),
         ///
-        new TallGrass(300, 0, 50, 100),
-        new TallGrass(300, 150, 50, 100),
-        new TallGrass(300, 300, 50, 100),
-        new TallGrass(300, 450, 50, 150),
+        new TallGrass(0, 0 + 600, 50, 600),
+        new TallGrass(50, 0 + 600, 250, 50),
+        new TallGrass(50, 550 + 600, 250, 50),
         ///
-        new TallGrass(800, 50, 50, 150),
-        new TallGrass(800, 350, 50, 250),
+        new TallGrass(50, 50 + 600, 50, 50),
+        new TallGrass(50, 150 + 600, 50, 100),
+        new TallGrass(50, 300 + 600, 50, 100),
+        new TallGrass(50, 450 + 600, 50, 100),
         ///
-        new TallGrass(700, 50, 100, 50),
-        new TallGrass(650, 100, 50, 50),
-        new TallGrass(600, 150, 50, 100),
-        new TallGrass(450, 350, 50, 100),
-        new TallGrass(400, 400, 50, 150),
-        new TallGrass(350, 500, 50, 100),
+        new TallGrass(250, 50 + 600, 50, 50),
+        new TallGrass(250, 150 + 600, 50, 100),
+        new TallGrass(250, 300 + 600, 50, 100),
+        new TallGrass(250, 450 + 600, 50, 100),
         ///
-        new TallGrass(500, 500, 50, 100),
-        new TallGrass(550, 450, 50, 150),
-        new TallGrass(600, 400, 50, 200),
-        new TallGrass(650, 400, 50, 50),
-        new TallGrass(700, 500, 50, 100),
-        new TallGrass(750, 450, 50, 150),
+        new TallGrass(300, 0 + 600, 50, 100),
+        new TallGrass(300, 150 + 600, 50, 100),
+        new TallGrass(300, 300 + 600, 50, 100),
+        new TallGrass(300, 450 + 600, 50, 150),
         ///
-        new TallGrass(700, 100, 50, 50),
-        new TallGrass(650, 150, 50, 50),
+        new TallGrass(800, 50 + 600, 50, 150),
+        new TallGrass(800, 350 + 600, 50, 250),
         ///
-        new TallGrass(450, 50, 150, 50),
-        new TallGrass(550, 0, 300, 50),
-        new TallGrass(450, 100, 100, 50),
-        new TallGrass(400, 100, 100, 50),
-        new TallGrass(350, 0, 50, 50),
-        new TallGrass(350, 150, 100, 50)
+        new TallGrass(700, 50 + 600, 100, 50),
+        new TallGrass(650, 100 + 600, 50, 50),
+        new TallGrass(600, 150 + 600, 50, 100),
+        new TallGrass(450, 350 + 600, 50, 100),
+        new TallGrass(400, 400 + 600, 50, 150),
+        new TallGrass(350, 500 + 600, 50, 100),
+        ///
+        new TallGrass(500, 500 + 600, 50, 100),
+        new TallGrass(550, 450 + 600, 50, 150),
+        new TallGrass(600, 400 + 600, 50, 200),
+        new TallGrass(650, 400 + 600, 50, 50),
+        new TallGrass(700, 500 + 600, 50, 100),
+        new TallGrass(750, 450 + 600, 50, 150),
+        ///
+        new TallGrass(700, 100 + 600, 50, 50),
+        new TallGrass(650, 150 + 600, 50, 50),
+        ///
+        new TallGrass(450, 50 + 600, 150, 50),
+        new TallGrass(550, 0 + 600, 300, 50),
+        new TallGrass(450, 100 + 600, 100, 50),
+        new TallGrass(400, 100 + 600, 100, 50),
+        new TallGrass(350, 0 + 600, 50, 50),
+        new TallGrass(350, 150 + 600, 100, 50)
       ],
       waters: [
-        new Water(700, 100, 100, 500),
-        new Water(650, 150, 50, 450),
-        new Water(600, 250, 50, 350),
+        new Water(700, 100 + 600, 100, 500),
+        new Water(650, 150 + 600, 50, 450),
+        new Water(600, 250 + 600, 50, 350),
         ///
-        new Water(550, 300, 50, 300),
-        new Water(500, 350, 50, 250),
-        new Water(450, 450, 50, 150),
-        new Water(400, 550, 50, 50)
+        new Water(550, 300 + 600, 50, 300),
+        new Water(500, 350 + 600, 50, 250),
+        new Water(450, 450 + 600, 50, 150),
+        new Water(400, 550 + 600, 50, 50)
       ],
       items: [
-        new Item(500, 0, 50, 50, 1)
+        new Item(450, 400, 50, 50, 1)
       ],
       rocks: [
-        new Rock(300, 100, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1),
-        new Rock(300, 250, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1),
-        new Rock(300, 400, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1)
+        new Rock(300, 100 + 600, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1),
+        new Rock(300, 250 + 600, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1),
+        new Rock(300, 400 + 600, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1)
       ],
       finishAreas: [
-        new FinishArea(800, 200, 50, 150)
+        new FinishArea(800, 200 + 600, 50, 150)
       ],
       unlocks: [
-        new Unlock(350, 450, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '7Blue', 1)
+        new Unlock(350, 450 + 600, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '7Blue', 1)
       ],
       teleporters: [
-        new Teleporter(150, 500, '7Teleporter', 50, 50, 2),
-        new Teleporter(650, 50, '7Teleporter', 50, 50, 2)
+        new Teleporter(150, 500 + 600, '7Teleporter', 50, 50, 2),
+        new Teleporter(650, 50 + 600, '7Teleporter', 50, 50, 2)
       ]
-    }, /* Requirements */5, 6, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
+    }, /* Requirements */5, 6, /* Level Borders */1, 2, 1, 2, /* Time Limit */ 500))
 
     // Level 8
     this.levels.push(new Level({

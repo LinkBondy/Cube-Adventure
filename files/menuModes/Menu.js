@@ -12,7 +12,7 @@ class MenuItem {
 }
 
 class Menu {
-  constructor (menuItems, itemWidth, itemHeight, x, y, width, height, textYOffset) {
+  constructor (menuItems, itemWidth, itemHeight, x, y, width, height, fontSize) {
     this.menuItems = menuItems
     this.selectedIndexX = 0
     this.selectedIndexY = 0
@@ -22,11 +22,7 @@ class Menu {
     this.y = y
     this.width = width
     this.height = height
-    this.textYOffset = textYOffset / 3
-    ///
-    this.menuItems.forEach(function (menuItem) {
-      menuItem.size = textYOffset + 'px Arial'
-    })
+    this.fontSize = fontSize
   }
 
   moveLeft () {
@@ -79,7 +75,7 @@ class Menu {
     }
   }
 
-  MouseDown (event, isTouching, returnValue) {
+  MouseDown (event, isTouching) {
     const self = this
     const heightPerItem = this.height / this.itemHeight
     const widthPerItem = this.width / this.itemWidth
@@ -91,7 +87,6 @@ class Menu {
         } else {
           self.selectedIndexX = menuItem.valueX - 1
           self.selectedIndexY = menuItem.valueY - 1
-          returnValue = true
         }
       }
     })
@@ -107,19 +102,35 @@ class Menu {
         canvas.context.shadowColor = 'rgba(0, 0, 0, 0.8)'
         canvas.context.shadowOffsetX = 5
         canvas.context.shadowOffsetY = 5
-        canvas.context.fillStyle = 'rgba(128, 128, 128, 0.8)'
-        canvas.context.fillRect(self.x + widthPerItem * (menuItem.valueX - 1), self.y + heightPerItem * (menuItem.valueY - 1), widthPerItem, heightPerItem)
-        canvas.context.shadowOffsetX = 0
-        canvas.context.shadowOffsetY = 0
+        canvas.context.shadowBlur = 10
+        canvas.context.fillStyle = 'rgba(145, 145, 145, 0.8)'
+        canvas.context.beginPath()
+        canvas.context.roundRect(self.x + widthPerItem * (menuItem.valueX - 1) + 2.5, self.y + heightPerItem * (menuItem.valueY - 1) + 2.5, widthPerItem - 10, heightPerItem - 10, 100)
+        canvas.context.fill()
+        // Stating the MenuItem's size and colour
+        canvas.context.font = self.fontSize + 'px Arial'
+        canvas.context.fillStyle = menuItem.color
+      } else {
+        canvas.context.font = self.fontSize / 1.5 + 'px Arial'
+        canvas.context.fillStyle = 'gray'
       }
       // Drawing the MenuItem's text
-      canvas.context.font = menuItem.size
-      canvas.context.fillStyle = menuItem.color
+      canvas.context.shadowBlur = 0
+      canvas.context.shadowOffsetX = 0
+      canvas.context.shadowOffsetY = 0
       const textX = widthPerItem * (menuItem.valueX - 1) + self.x
       const textY = heightPerItem * (menuItem.valueY - 1) + self.y
+      console.log(self.fontSize)
       canvas.context.textAlign = 'center'
-      canvas.context.fillText(menuItem.title, textX + widthPerItem / 2, textY + heightPerItem / 2 + self.textYOffset)
+      canvas.context.textBaseline = 'middle'
+      // canvas.context.storkeStyle = 'rgb(0, 0, 0)'
+      canvas.context.fillText(menuItem.title, textX + widthPerItem / 2 + 2.5, textY + heightPerItem / 2 + 2.5)
+      // canvas.context.strokeText(menuItem.title, textX + widthPerItem / 2 + 2.5, textY + heightPerItem / 2 + 5)
+      canvas.context.fillStyle = 'black'
       canvas.context.textAlign = 'left'
+      canvas.context.textBaseline = 'alphabetic'
+      canvas.context.shadowOffsetX = 0
+      canvas.context.shadowOffsetY = 0
     })
   }
 }
@@ -132,7 +143,7 @@ export class MenuController {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.StoryMode
       }),
-      new MenuItem('Customize', 1, 2, 'rgb(0, 132, 216)', function () {
+      new MenuItem('Customize', 1, 2, 'rgb(0, 122, 216)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.Shop
       }),
@@ -146,7 +157,7 @@ export class MenuController {
       }),
       new MenuItem('Comming Soon', 1, 5, 'rgb(55, 0, 110)', function () {
       })
-    ], /* itemWidth */1, /* itemHeight */5, /* x */0, /* y */0, /* width */850, /* height */600, /* Used to find textOffsetY and fontSize */90))
+    ], /* itemWidth */1, /* itemHeight */5, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */80))
 
     this.menus.push(this.ShopMenu = new Menu([
       new MenuItem('Player', 1, 1, 'lightcoral', function () {
@@ -155,7 +166,7 @@ export class MenuController {
       new MenuItem('Background', 1, 2, 'gold', function () {
         gameStates.currentShopMode = ShopMode.Backround
       })
-    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* Used to find textOffsetY and fontSize */130))
+    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */115))
 
     this.menus.push(this.KeybindsSelector = new Menu([
       new MenuItem('ArrowLeft', 1, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.startRebind('A', 1, this) }),
@@ -178,7 +189,7 @@ export class MenuController {
       new MenuItem('b', 2, 6, 'rgb(231, 0, 102)', function () { gameStates.keybindController.startRebind('B', 6, this) }),
       new MenuItem('u', 2, 7, 'rgb(243, 0, 88)', function () { gameStates.keybindController.startRebind('B', 7, this) }),
       new MenuItem('Column 2', 2, 8, 'rgb(255, 0, 75)', function () { gameStates.keybindController.resetKeybinds('B') })
-    ], /* itemWidth */2, /* itemHeight */8, /* x */290, /* y */0, /* width */510, /* height */600, /* Used to find textOffsetY and fontSize */50))
+    ], /* itemWidth */2, /* itemHeight */8, /* x */290, /* y */0, /* width */510, /* height */600, /* fontSize */40))
 
     this.menus.push(this.SettingsMenu = new Menu([
       new MenuItem('Keybinds', 1, 1, 'rgb(230, 200, 0)', function () {
@@ -190,7 +201,7 @@ export class MenuController {
       new MenuItem('Comming Soon', 1, 3, 'rgb(0, 200, 0)', function () {
         // gameStates.SetGameState(settingStates.Sound, "Settings")
       })
-    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* Used to find textOffsetY and fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */95))
 
     this.menus.push(this.LoseMenu = new Menu([
       new MenuItem('Retry', 1, 1, 'rgb(120, 0, 225)', function () {
@@ -209,7 +220,7 @@ export class MenuController {
         gameStates.currentStartingMenusState = startingMenusStates.Menu
         levelTools.loseCounterStop = false
       })
-    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */175, /* width */850, /* height */425, /* Used to find textOffsetY and fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */175, /* width */850, /* height */425, /* fontSize */90))
 
     this.menus.push(this.WinMenu = new Menu([
       new MenuItem('Continue', 1, 1, 'rgb(255, 0, 75)', function () {
@@ -228,7 +239,7 @@ export class MenuController {
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
       })
-    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */150, /* width */850, /* height */450, /* Used to find textOffsetY and fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */150, /* width */850, /* height */450, /* fontSize */100))
 
     this.menus.push(this.PauseMenu = new Menu([
       new MenuItem('Resume', 1, 1, 'rgb(255, 0, 86)', function () {
@@ -250,7 +261,7 @@ export class MenuController {
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
       })
-    ], /* itemWidth */1, /* itemHeight */4, /* x */0, /* y */0, /* width */850, /* height */600, /* Used to find textOffsetY and fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */4, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */90))
   }
 
   CheckMenu () {

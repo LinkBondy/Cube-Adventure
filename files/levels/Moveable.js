@@ -309,13 +309,13 @@ export class Enemy extends GameObject {
   }
 
   Draw () {
-    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-        draw.DrawImage(images.RedCube, this.x, this.y)
-      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-        draw.DrawImage(images.RedCubePlastic, this.x, this.y)
-      }
+    // if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+      draw.DrawImage(images.RedCube, this.x, this.y)
+    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+      draw.DrawImage(images.RedCubePlastic, this.x, this.y)
     }
+  // }
   }
 };
 
