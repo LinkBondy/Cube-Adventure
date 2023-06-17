@@ -146,10 +146,12 @@ export class Keybind {
   }
 
   Draw () {
-    canvas.context.font = '100px'
+    canvas.context.font = '40px Arial'
     canvas.context.fillStyle = 'darkgray'
+    // canvas.context.textBaseline = 'middle'
     canvas.context.fillText(this.name, this.x, this.y)
     canvas.context.fillText('Reset', this.x, 8 * 75 - 15)
+    canvas.context.textBaseline = 'alphabetic'
   }
 
   Update () {

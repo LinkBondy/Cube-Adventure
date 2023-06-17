@@ -93,7 +93,7 @@ export class LevelController {
       finishAreas: [
         new FinishArea(350, 550, 150, 50)
       ]
-    }, /* Requirements */0, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
+    }, /* Requirements */0, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 100))
 
     // Level 2
     this.levels.push(new Level({
@@ -116,7 +116,7 @@ export class LevelController {
       finishAreas: [
         new FinishArea(350, 550, 150, 50)
       ]
-    }, /* Requirements */1, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
+    }, /* Requirements */1, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 150))
 
     // Level 3
     this.levels.push(new Level({
@@ -163,48 +163,66 @@ export class LevelController {
         ///
         new ChangeDirectionSquare(500, 350, 50, 50, false, true, true, false, true)
       ]
-    }, /* Requirements */2, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
+    }, /* Requirements */2, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 150))
 
     // Level 4
     this.levels.push(new Level({
       players: [
-        new Player(100, 100, 50, 50)
+        new Player(400, 550, 50, 50)
       ],
       enemies: [
         new Enemy(400, 50, 50, 50, [true, true, false, false], 5.5),
         ///
-        new Enemy(300, 300, 50, 50, [true, false, false, false], 5),
-        new Enemy(300, 500, 50, 50, [true, false, false, false], 5),
+        new Enemy(100, 250, 50, 50, [true, false, false, false], 5),
+        new Enemy(300, 400, 50, 50, [true, false, false, false], 5),
         ///
-        new Enemy(500, 300, 50, 50, [false, true, false, false], 5),
-        new Enemy(500, 500, 50, 50, [false, true, false, false], 5)
+        new Enemy(700, 250, 50, 50, [false, true, false, false], 5),
+        new Enemy(500, 400, 50, 50, [false, true, false, false], 5)
       ],
       walls: [
+        /// Borders
+        // Top
         new TallGrass(0, 0, 850, 50),
-        ///
+        // Left
         new TallGrass(0, 50, 100, 550),
+        // Right
         new TallGrass(750, 50, 100, 550),
+        // Bottom
+        new TallGrass(100, 550, 250, 50),
+        new TallGrass(500, 550, 250, 50),
         ///
-        new TallGrass(150, 100, 250, 50),
-        new TallGrass(450, 100, 250, 50),
-        ///
-        new TallGrass(0, 150, 400, 50),
-        new TallGrass(450, 150, 400, 50),
-        ///
-        new TallGrass(350, 200, 50, 350),
-        new TallGrass(450, 200, 50, 350)
+        /// Bottom of Boxes
+        new TallGrass(100, 500, 100, 50),
+        new TallGrass(250, 500, 100, 50),
+        //
+        new TallGrass(500, 500, 100, 50),
+        new TallGrass(650, 500, 100, 50),
+        // Left Side
+        new TallGrass(100, 100, 50, 50),
+        new TallGrass(300, 100, 50, 50),
+        //
+        new TallGrass(100, 150, 100, 50),
+        new TallGrass(250, 150, 100, 50),
+        // Right Side
+        new TallGrass(500, 100, 50, 50),
+        new TallGrass(700, 100, 50, 50),
+        //
+        new TallGrass(500, 150, 100, 50),
+        new TallGrass(650, 150, 100, 50),
+        // Middle Walls
+        new TallGrass(350, 100, 50, 500),
+        new TallGrass(450, 100, 50, 500)
       ],
       rocks: [
-        new Rock(400, 500, 50, 50, 'lightblue', 'aqua', '4Blue', false, 1, 1)
+        new Rock(600, 150, 50, 50, 'lightblue', 'aqua', '4Blue', false, 1, 1)
       ],
       finishAreas: [
-        new FinishArea(100, 200, 250, 50),
-        new FinishArea(500, 200, 250, 50)
+        new FinishArea(600, 500, 50, 50)
       ],
       unlocks: [
-        new Unlock(700, 100, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '4Blue', 1)
+        new Unlock(200, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '4Blue', 1)
       ]
-    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
+    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 250))
 
     // Level 5
     this.levels.push(new Level({
@@ -291,9 +309,111 @@ export class LevelController {
         new Unlock(250, 100, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '5Blue', 1),
         new Unlock(300 + 850, 275, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '5Purple', 2)
       ]
-    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 500))
+    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 300))
 
     // Level 6
+    this.levels.push(new Level({
+      players: [
+        new Player(800, 250, 50, 50)
+      ],
+      enemies: [
+        new Enemy(700, 50, 50, 50, [false, false, false, true], 5),
+        new Enemy(450, 500, 50, 50, [false, false, true, false], 5),
+        new Enemy(250, 50, 50, 50, [false, false, false, true], 5),
+        new Enemy(50, 500, 50, 50, [false, false, true, false], 5),
+        new Enemy(100, 450 + 600, 50, 50, [false, true, false, false], 4)
+      ],
+      walls: [
+        // Top Border
+        new TallGrass(0, 0, 850, 50),
+        // Bottom Border
+        new TallGrass(0, 550, 350, 150),
+        new TallGrass(400, 550, 450, 100),
+        // Left Border
+        new TallGrass(750, 50, 100, 200),
+        new TallGrass(750, 350, 100, 200),
+        // Left Border
+        new TallGrass(0, 50, 50, 200),
+        new TallGrass(0, 350, 50, 200),
+        // First Segment
+        new TallGrass(650, 50, 50, 100),
+        new TallGrass(650, 200, 50, 300),
+        // Second Segment
+        new TallGrass(550, 350, 50, 100),
+        new TallGrass(550, 500, 50, 50),
+        new TallGrass(550, 100, 50, 250),
+        new TallGrass(600, 300, 50, 50),
+        new TallGrass(500, 100, 50, 450),
+        // Third Segment
+        new TallGrass(400, 50, 50, 250),
+        new TallGrass(400, 350, 50, 200),
+        // Fourth Segment
+        new TallGrass(300, 100, 50, 450),
+        new TallGrass(350, 250, 50, 50),
+        // Upper Fifth Segment
+        new TallGrass(200, 50, 50, 150),
+        new TallGrass(100, 100, 50, 150),
+        // Lower Fifth Segment
+        new TallGrass(100, 250, 150, 150),
+        new TallGrass(100, 450, 150, 100),
+        /// Second Screen
+        new TallGrass(500, 50 + 600, 350, 50),
+        // Begining
+        new TallGrass(0, 100 + 600, 400, 50),
+        new TallGrass(550, 100 + 600, 300, 50),
+        //
+        new TallGrass(0, 150 + 600, 450, 50),
+        new TallGrass(600, 150 + 600, 250, 50),
+        //
+        new TallGrass(0, 200 + 600, 500, 50),
+        new TallGrass(700, 200 + 600, 150, 50),
+        // Middle
+        new TallGrass(0, 250 + 600, 600, 50),
+        new TallGrass(800, 250 + 600, 50, 50),
+        //
+        new TallGrass(0, 300 + 600, 550, 50),
+        new TallGrass(800, 300 + 600, 50, 50),
+        // End
+        new TallGrass(0, 300 + 600, 550, 50),
+        new TallGrass(800, 300 + 600, 50, 50),
+        //
+        new TallGrass(0, 350 + 600, 150, 50),
+        new TallGrass(200, 350 + 600, 250, 50),
+        new TallGrass(650, 350 + 600, 200, 50),
+        //
+        new TallGrass(250, 400 + 600, 150, 50),
+        //
+        new TallGrass(550, 400 + 600, 300, 50),
+        new TallGrass(500, 450 + 600, 350, 50),
+        //
+        new TallGrass(0, 500 + 600, 250, 50),
+        new TallGrass(400, 500 + 600, 450, 50),
+        new TallGrass(0, 550 + 600, 850, 50),
+        //
+        new TallGrass(0, 400 + 600, 100, 100)
+      ],
+      rocks: [
+        new Rock(300, 50, 50, 50, 'lightblue', 'aqua', '6Blue', false, 1, 1),
+        new Rock(650, 500, 50, 50, 'lightblue', 'aqua', '6Blue', false, 1, 1)
+      ],
+      finishAreas: [
+        new FinishArea(0, 250, 50, 100)
+      ],
+      changeDirectionSquares: [
+        // new ChangeDirectionSquare(500, 200, 50, 50, false, true, true, true, true),
+        // new ChangeDirectionSquare(600, 200, 50, 50, true, false, true, true, true)
+      ],
+      unlocks: [
+        new Unlock(150, 350 + 600, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '6Blue', 1)
+        // new Unlock(300, 275, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '6Purple', 2)
+      ],
+      teleporters: [
+        new Teleporter(550, 450, 50, 50, '6Teleporter', 2),
+        new Teleporter(350, 200, 50, 50, '6Teleporter', 2)
+      ]
+    }, /* Requirements */5, undefined, /* Level Borders */1, 1, 1, 2, /* Time Limit */ 350))
+
+    // Level 7
     this.levels.push(new Level({
       players: [
         new Player(750, 100, 50, 50)
@@ -341,10 +461,10 @@ export class LevelController {
         new TallGrass(550, 500, 50, 50)
       ],
       rocks: [
-        new Rock(450, 500, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1),
+        new Rock(450, 500, 50, 50, 'plum', 'orchid', '7Purple', false, 2, 1),
         ///
-        new Rock(700, 300, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1),
-        new Rock(700, 250, 50, 50, 'plum', 'orchid', '6Purple', false, 2, 1)
+        new Rock(700, 300, 50, 50, 'plum', 'orchid', '7Purple', false, 2, 1),
+        new Rock(700, 250, 50, 50, 'plum', 'orchid', '7Purple', false, 2, 1)
       ],
       finishAreas: [
         new FinishArea(650, 150, 50, 300)
@@ -370,15 +490,15 @@ export class LevelController {
         new ChangeDirectionSquare(100, 500, 50, 50, false, true, true, false, true)
       ],
       unlocks: [
-        new Unlock(350, 500, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '6Purple', 2)
+        new Unlock(350, 500, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '7Purple', 2)
       ],
       teleporters: [
-        new Teleporter(750, 450, 50, 50, '6Teleporter', 1),
-        new Teleporter(50, 300, 50, 50, '6Teleporter', 1)
+        new Teleporter(750, 450, 50, 50, '7Teleporter', 1),
+        new Teleporter(50, 300, 50, 50, '7Teleporter', 1)
       ]
-    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 500))
+    }, /* Requirements */6, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 200))
 
-    // Level 7
+    // Level 8
     this.levels.push(new Level({
       players: [
         new Player(150, 50 + 600, 50, 50)
@@ -463,23 +583,23 @@ export class LevelController {
         new Item(450, 400, 50, 50, 1)
       ],
       rocks: [
-        new Rock(300, 100 + 600, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1),
-        new Rock(300, 250 + 600, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1),
-        new Rock(300, 400 + 600, 50, 50, 'lightblue', 'aqua', '7Blue', false, 1, 1)
+        new Rock(300, 100 + 600, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1),
+        new Rock(300, 250 + 600, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1),
+        new Rock(300, 400 + 600, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1)
       ],
       finishAreas: [
         new FinishArea(800, 200 + 600, 50, 150)
       ],
       unlocks: [
-        new Unlock(350, 450 + 600, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '7Blue', 1)
+        new Unlock(350, 450 + 600, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '8Blue', 1)
       ],
       teleporters: [
-        new Teleporter(150, 500 + 600, '7Teleporter', 50, 50, 2),
-        new Teleporter(650, 50 + 600, '7Teleporter', 50, 50, 2)
+        new Teleporter(150, 500 + 600, '8Teleporter', 50, 50, 2),
+        new Teleporter(650, 50 + 600, '8Teleporter', 50, 50, 2)
       ]
-    }, /* Requirements */5, 6, /* Level Borders */1, 2, 1, 2, /* Time Limit */ 500))
+    }, /* Requirements */7, undefined, /* Level Borders */1, 2, 1, 2, /* Time Limit */ 300))
 
-    // Level 8
+    // Level 9
     this.levels.push(new Level({
       players: [
         new Player(100, 250, 50, 50)
@@ -590,9 +710,9 @@ export class LevelController {
         new Item(0, 600 + 550, 50, 50, 2)
       ],
       rocks: [
-        new Rock(500, 100, 50, 50, 'plum', 'orchid', '8Purple', false, 2, 1),
-        new Rock(550, 100, 50, 50, 'plum', 'orchid', '8Purple', false, 2, 1),
-        new Rock(50, 250, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1)
+        new Rock(500, 100, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
+        new Rock(550, 100, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
+        new Rock(50, 250, 50, 50, 'lightblue', 'aqua', '9Blue', false, 1, 1)
       ],
       holes: [
         new Hole(550, 200, 50, 50, false, 0, 1),
@@ -630,15 +750,15 @@ export class LevelController {
         new ChangeDirectionSquare(750, 200, 50, 50, true, false, true, false, true),
         new ChangeDirectionSquare(750, 100, 50, 50, true, false, false, true, true),
         new ChangeDirectionSquare(500, 100, 50, 50, false, true, false, true, true),
-        new ChangeDirectionSquare(500, 200, 50, 50, true, false, true, false, false, '8Purple')
+        new ChangeDirectionSquare(500, 200, 50, 50, true, false, true, false, false, '9Purple')
       ],
       unlocks: [
-        new Unlock(750, 400, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '8Purple', 2),
-        new Unlock(200, 150, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '8Blue', 1)
+        new Unlock(750, 400, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '9Purple', 2),
+        new Unlock(200, 150, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '9Blue', 1)
       ]
-    }, /* Requirements */7, undefined, /* Level Borders */1, 1, 1, 2, /* Time Limit */ 500))
+    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 1, 2, /* Time Limit */ 500))
 
-    // Level 9
+    // Level 10
     this.levels.push(new Level({
       players: [
         new Player(700, 500, 50, 50)
@@ -713,33 +833,33 @@ export class LevelController {
       ],
       rocks: [
         // Red Teleporter Puzzle Right Entracne
-        new Rock(650, 300, 50, 50, 'lightblue', 'aqua', '9Blue', true, 1, 1),
-        new Rock(700, 300, 50, 50, 'lightblue', 'aqua', '9Blue', true, 1, 1),
+        new Rock(650, 300, 50, 50, 'lightblue', 'aqua', '10Blue', true, 1, 1),
+        new Rock(700, 300, 50, 50, 'lightblue', 'aqua', '10Blue', true, 1, 1),
         // Red Teleporter Puzzle Right Exit
-        new Rock(550, 100, 50, 50, 'lightblue', 'aqua', '9Blue', true, 1, 1),
+        new Rock(550, 100, 50, 50, 'lightblue', 'aqua', '10Blue', true, 1, 1),
         // Red Teleporter Puzzle Centre Exit 2
-        new Rock(400, 200, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
+        new Rock(400, 200, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
         // Exit Puzzle Entracne
-        new Rock(800, 350, 50, 50, 'lightblue', 'aqua', '9Blue', false, 1, 1),
-        new Rock(800, 400, 50, 50, 'lightblue', 'aqua', '9Blue', false, 1, 1),
-        new Rock(800, 450, 50, 50, 'lightblue', 'aqua', '9Blue', false, 1, 1),
-        new Rock(800, 500, 50, 50, 'lightblue', 'aqua', '9Blue', false, 1, 1),
+        new Rock(800, 350, 50, 50, 'lightblue', 'aqua', '10Blue', false, 1, 1),
+        new Rock(800, 400, 50, 50, 'lightblue', 'aqua', '10Blue', false, 1, 1),
+        new Rock(800, 450, 50, 50, 'lightblue', 'aqua', '10Blue', false, 1, 1),
+        new Rock(800, 500, 50, 50, 'lightblue', 'aqua', '10Blue', false, 1, 1),
         // Water Rocks
-        new Rock(150, 400, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(150, 450, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(150, 500, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
+        new Rock(150, 400, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
+        new Rock(150, 450, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
+        new Rock(150, 500, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
         // Exit Puzzle
-        new Rock(350 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(400 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
-        new Rock(450 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
-        new Rock(500 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
-        new Rock(550 + 850, 250, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
+        new Rock(350 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
+        new Rock(400 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
+        new Rock(450 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
+        new Rock(500 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
+        new Rock(550 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
         ///
-        new Rock(350 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(400 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
-        new Rock(450 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
-        new Rock(500 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', true, 2, 1),
-        new Rock(550 + 850, 350, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1)
+        new Rock(350 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
+        new Rock(400 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
+        new Rock(450 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
+        new Rock(500 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
+        new Rock(550 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1)
       ],
       holes: [
         // Exit Puzzle Entracne
@@ -752,14 +872,14 @@ export class LevelController {
       changeDirectionSquares: [
       ],
       unlocks: [
-        new Unlock(350, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '9Blue', 1),
-        new Unlock(700 + 850, 300, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '9Purple', 2)
+        new Unlock(350, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '10Blue', 1),
+        new Unlock(700 + 850, 300, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '10Purple', 2)
       ],
       teleporters: [
-        new Teleporter(100, 300, '8Teleporter', 50, 50, 1),
-        new Teleporter(550 + 850, 100, '8Teleporter', 50, 50, 1)
+        new Teleporter(100, 300, '10Teleporter', 50, 50, 1),
+        new Teleporter(550 + 850, 100, '10Teleporter', 50, 50, 1)
       ]
-    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 500))
+    }, /* Requirements */9, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 300))
 
     // Level 1 + 2 + 3
     this.specialLevels.push(new Level({

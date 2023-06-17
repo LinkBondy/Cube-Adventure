@@ -123,9 +123,10 @@ class Menu {
       console.log(self.fontSize)
       canvas.context.textAlign = 'center'
       canvas.context.textBaseline = 'middle'
+      // canvas.context.lineWidth = 3
       // canvas.context.storkeStyle = 'rgb(0, 0, 0)'
       canvas.context.fillText(menuItem.title, textX + widthPerItem / 2 + 2.5, textY + heightPerItem / 2 + 2.5)
-      // canvas.context.strokeText(menuItem.title, textX + widthPerItem / 2 + 2.5, textY + heightPerItem / 2 + 5)
+      // canvas.context.strokeText(menuItem.title, textX + widthPerItem / 2 + 2.5, textY + heightPerItem / 2 + 2.5)
       canvas.context.fillStyle = 'black'
       canvas.context.textAlign = 'left'
       canvas.context.textBaseline = 'alphabetic'
@@ -147,7 +148,7 @@ export class MenuController {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.Shop
       }),
-      new MenuItem('Items Info', 1, 3, 'rgb(0, 67, 190)', function () {
+      new MenuItem('Adventure Log', 1, 3, 'rgb(0, 67, 190)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.ItemsInfo
       }),

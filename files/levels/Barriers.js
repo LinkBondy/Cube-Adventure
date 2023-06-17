@@ -11,13 +11,36 @@ export class Wall extends GameObject {
     this.type = type
   }
 
-  AllowMovement (wall) {
+  AllowMovement (wall, objectIntersecting) {
     // If the object calling the function is TallGrass
     if (wall.type === 'tallGrass') {
       return false
     }
     // If the object calling the function is FakeTallGrass
     if (wall.type === 'fakeTallGrass') {
+      return true
+    }
+
+    if (wall.type === 'selectiveWall') {
+      switch (wall.selectionType) {
+        case 'player':
+          if (objectIntersecting === 'player') {
+            return true
+          }
+          if (objectIntersecting === 'enemy') {
+            return false
+          }
+          break
+
+        case 'enemy':
+          if (objectIntersecting === 'player') {
+            return false
+          }
+          if (objectIntersecting === 'enemy') {
+            return true
+          }
+          break
+      }
       return true
     }
   }
@@ -111,6 +134,37 @@ export class FakeTallGrass extends Wall {
       canvas.context.fillStyle = this.color1
       canvas.context.fillRect(this.x, this.y, this.width, this.height)
     }
+  }
+
+  reset () {
+    this.x = this.original_x
+    this.y = this.original_y
+  }
+};
+
+export class SelectiveWall extends Wall {
+  constructor (x, y, width, height, selectionType) {
+    super(x, y, width, height, 'rgb(255, 120, 120)', 'selectiveWall')
+    this.original_x = this.x
+    this.original_y = this.y
+    this.color2 = 'rgb(120, 120, 255)'
+    this.selectionType = selectionType
+  }
+
+  Draw () {
+    /* if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+      for (let x = this.left(); x < this.right(); x += 50) {
+        for (let y = this.top(); y < this.bottom(); y += 50) {
+          canvas.context.save()
+          canvas.context.translate(x - 2, y - 2)
+          canvas.context.restore()
+        }
+      }
+    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) { */
+    if (this.selectionType === 'enemy') { canvas.context.fillStyle = this.color1 }
+    if (this.selectionType === 'player') { canvas.context.fillStyle = this.color2 }
+    canvas.context.fillRect(this.x + 5, this.y + 5, this.width - 10, this.height - 10)
+    // }
   }
 
   reset () {

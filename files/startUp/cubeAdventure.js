@@ -1,5 +1,5 @@
 'use strict'
-const { KeybindController } = require('../events/Keybinds')
+const { KeybindController } = require('../events/KeyBinds')
 const { ArrayChartController } = require('../menuModes/ArrayChart')
 const { MenuController } = require('../menuModes/Menu')
 const { LevelController } = require('../levels/Levels')

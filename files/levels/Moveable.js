@@ -175,7 +175,7 @@ export class Enemy extends GameObject {
 
     // Check if touching walls
     gameStates.CurrentLevel().walls.forEach(function (wall) {
-      if (wall.intersects(self) && !wall.AllowMovement(wall)) {
+      if (wall.intersects(self) && !wall.AllowMovement(wall, 'enemy')) {
         intersectsBarrier = true
         currentBarrierIntersected = wall
       }
@@ -335,7 +335,7 @@ export class Player extends GameObject {
     let intersectsBarrier = false
     const self = this
     gameStates.CurrentLevel().walls.forEach(function (wall) {
-      if (!wall.AllowMovement(wall) && wall.intersects(self)) {
+      if (!wall.AllowMovement(wall, 'player') && wall.intersects(self)) {
         intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
@@ -397,7 +397,7 @@ export class Player extends GameObject {
     let intersectsBarrier = false
     const self = this
     gameStates.CurrentLevel().walls.forEach(function (wall) {
-      if (!wall.AllowMovement(wall) && wall.intersects(self)) {
+      if (!wall.AllowMovement(wall, 'player') && wall.intersects(self)) {
         intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
@@ -459,7 +459,7 @@ export class Player extends GameObject {
     let intersectsBarrier = false
     const self = this
     gameStates.CurrentLevel().walls.forEach(function (wall) {
-      if (!wall.AllowMovement(wall) && wall.intersects(self)) {
+      if (!wall.AllowMovement(wall, 'player') && wall.intersects(self)) {
         intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true
@@ -521,7 +521,7 @@ export class Player extends GameObject {
     let intersectsBarrier = false
     const self = this
     gameStates.CurrentLevel().walls.forEach(function (wall) {
-      if (!wall.AllowMovement(wall) && wall.intersects(self)) {
+      if (!wall.AllowMovement(wall, 'player') && wall.intersects(self)) {
         intersectsBarrier = true
         gameStates.CurrentLevel().holes.forEach(function (hole) {
           hole.stopPlayer = true

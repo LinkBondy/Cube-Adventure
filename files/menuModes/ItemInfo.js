@@ -6,22 +6,22 @@ const { gameStates } = require('../data/GameData')
 
 const LockedFeature = {
   infoCuber: 1,
-  infoCuber2: 9,
-  infoCuber3: 10,
-  infoRollphant1: 11,
+  infoCuber2: 10,
+  infoCuber3: 11,
+  infoRollphant1: 20,
   ///
   infoWall: 2,
   infoInvisibleWall: 5,
-  infoWater: 7,
+  infoWater: 8,
   ///
   infoSwitch: 4,
   infoTeleporter: 6,
   ///
   infoRock: 4,
   ///
-  infoLifeJacket: 7,
-  infoFinishItems: 10,
-  infoFireShard: 10,
+  infoLifeJacket: 8,
+  infoFinishItems: 11,
+  infoPryoShard: 11,
   ///
   infoHole: 8
 }
@@ -29,6 +29,7 @@ const LockedFeature = {
 export class InfoController {
   constructor () {
     this.items = [
+      new Tutorials(),
       new EnemyInfo(),
       new BarrierInfo(),
       new IntractableInfo(),
@@ -163,6 +164,26 @@ class ItemSlide {
   }
 };
 
+class Tutorials {
+  constructor () {
+    const titleSlide = new ItemSlide([
+      new ItemText('Tutorials', '200px Arial', 'purple', 10, 400)
+    ], 0)
+
+    const slide1 = new ItemSlide([
+      new ItemText('Basics', '125px Arial', 'purple', 200, 125),
+      ///
+      new ItemText('Get to the finish line to beat levels.', '48px Arial', 'rgb(2, 0, 139)', 10, 225),
+      new ItemText('Watch out for enemies.', '48px Arial', 'rgb(2, 0, 139)', 10, 315),
+      new ItemText('Use A, W, S, D or Arrow Keys to move.', '48px Arial', 'rgb(2, 0, 139)', 10, 415),
+      new ItemText('Tap above, below, to the left or to the', '48px Arial', 'rgb(2, 0, 139)', 10, 515),
+      new ItemText('right of the player to move.', '48px Arial', 'rgb(2, 0, 139)', 10, 575)
+    ], 0)
+
+    this.slides = [titleSlide, slide1]
+  }
+};
+
 class EnemyInfo {
   constructor () {
     const titleSlide = new ItemSlide([
@@ -200,13 +221,13 @@ class EnemyInfo {
       new ItemText('defeated.', '60px Arial', 'rgb(2, 0, 139)', 10, 550)
     ], LockedFeature.infoCuber3)
 
-    const slide4 = new ItemSlide([
-      new ItemImage(false, images.RedCube_200x200/* images.Rollphant_200x200 */, 600, 10),
+    /* const slide4 = new ItemSlide([
+      new ItemImage(false, images.Rollphant_200x200, 600, 10),
       ///
       new ItemText('Rollphant', '125px Arial', 'purple', 10, 150)
-    ], LockedFeature.infoRollphant1)
+    ], LockedFeature.infoRollphant1) */
 
-    this.slides = [titleSlide, slide1, slide2, slide3, slide4]
+    this.slides = [titleSlide, slide1, slide2, slide3/*, slide4 */]
   }
 };
 
@@ -330,17 +351,17 @@ class CollectableInfo {
       new ItemText('they can move at nomral speed in', '50px Arial', 'rgb(2, 0, 139)', 10, 500),
       new ItemText('water.', '50px Arial', 'rgb(2, 0, 139)', 10, 575)
     ], LockedFeature.infoLifeJacket)
-    const slide2 = new ItemSlide([
-      new ItemImage(false, images.LifeJacket_200x200/* images.YellowKey_200x200 */, 625, 10),
+    /* const slide2 = new ItemSlide([
+      new ItemImage(false, images.YellowKey_200x200, 625, 10),
       //
       new ItemText(' ', '120px Arial', 'purple', 10, 150)
     ], LockedFeature.infoFinishItems)
     const slide3 = new ItemSlide([
-      new ItemImage(false, images.LifeJacket_200x200/* images.FireShard_200x200 */, 625, 10),
+      new ItemImage(false, images.PryoShard_200x200, 625, 10),
       //
       new ItemText('', '120px Arial', 'purple', 10, 150)
-    ], LockedFeature.infoFireShard)
-    this.slides = [titleSlide, slide1, slide2, slide3]
+    ], LockedFeature.infoPryoShard) */
+    this.slides = [titleSlide, slide1/*, slide2, slide3 */]
   }
 };
 
