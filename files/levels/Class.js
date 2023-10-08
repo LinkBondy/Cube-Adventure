@@ -155,10 +155,16 @@ export class Background {
 
   DrawBackround () {
     if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      if (gameStates.levelController.currentWorld === 1) {
-        this.color1 = 'rgb(100, 200, 100)'
-      } else if (gameStates.levelController.currentWorld === 2) {
-        this.color1 = 'rgb(153, 63, 33)'
+      switch (gameStates.levelController.currentWorld) {
+        case 1:
+          this.color1 = 'rgb(100, 200, 100)'
+          break
+        case 2 :
+          this.color1 = 'rgb(153, 63, 33)'
+          break
+        case 3 :
+          this.color1 = 'rgb(80, 80, 80)'
+          break
       }
     } else {
       this.color1 = 'lightgray'

@@ -2,7 +2,7 @@
 const { Player, Enemy, ChangeDirectionSquare } = require('./Moveable')
 const { TallGrass, FakeTallGrass, Rock, Water } = require('./Barriers')
 const { Unlock, Teleporter, Hole, FinishArea } = require('./Interactable')
-const { Item } = require('./Collectable')
+const { LifeJacket, ThreeBead } = require('./Collectable')
 const { gameStates } = require('../data/GameData')
 
 class Level {
@@ -222,7 +222,7 @@ export class LevelController {
       unlocks: [
         new Unlock(200, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '4Blue', 1)
       ]
-    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 250))
+    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 200))
 
     // Level 5
     this.levels.push(new Level({
@@ -580,7 +580,7 @@ export class LevelController {
         new Water(400, 550 + 600, 50, 50)
       ],
       items: [
-        new Item(450, 400, 50, 50, 1)
+        new LifeJacket(450, 400, 50, 50)
       ],
       rocks: [
         new Rock(300, 100 + 600, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1),
@@ -597,15 +597,17 @@ export class LevelController {
         new Teleporter(150, 500 + 600, '8Teleporter', 50, 50, 2),
         new Teleporter(650, 50 + 600, '8Teleporter', 50, 50, 2)
       ]
-    }, /* Requirements */7, undefined, /* Level Borders */1, 2, 1, 2, /* Time Limit */ 300))
+    }, /* Requirements */7, undefined, /* Level Borders */1, 2, 1, 2, /* Time Limit */ 250))
 
     // Level 9
     this.levels.push(new Level({
       players: [
-        new Player(100, 250, 50, 50)
+        new Player(0, 300, 50, 50)
       ],
       enemies: [
-        new Enemy(500, 200, 50, 50, [true, false, false, false], 4),
+        new Enemy(600, 300, 50, 50, [false, false, true, true], 6),
+        new Enemy(400, 350 + 600, 50, 50, [true, true, false, false], 4)
+        /* new Enemy(500, 200, 50, 50, [true, false, false, false], 4),
         // Pink Switch Puzzle
         new Enemy(450, 300, 50, 50, [false, false, false, true], 3),
         new Enemy(550, 300, 50, 50, [false, false, false, true], 3),
@@ -613,155 +615,193 @@ export class LevelController {
         //
         new Enemy(350, 600 + 50, 50, 50, [false, false, false, true], 4),
         new Enemy(400, 600 + 400, 50, 50, [false, false, true, false], 4),
-        new Enemy(450, 600 + 50, 50, 50, [false, false, false, true], 4)
+        new Enemy(450, 600 + 50, 50, 50, [false, false, false, true], 4) */
       ],
       walls: [
-        new TallGrass(350, 550, 450, 50),
-        new TallGrass(800, 0, 50, 600),
-        /// Middle
-        new TallGrass(0, 200, 350, 50),
-        new TallGrass(550, 150, 200, 50),
-        /// Bottom
-        new TallGrass(0, 300, 300, 50),
-        new TallGrass(0, 350, 50, 250),
-        new TallGrass(100, 400, 200, 200),
-        new FakeTallGrass(100, 350, 200, 50),
-        new FakeTallGrass(50, 350, 50, 250),
-        new TallGrass(300, 400, 50, 200),
-        new TallGrass(400, 250, 400, 50),
-        // Pink Switch Puzzle Entrance
-        new TallGrass(350, 300, 100, 50),
-        new TallGrass(400, 350, 50, 50),
-        // new FakeTallGrass(350, 400, 100, 50)
-        new TallGrass(350, 450, 100, 100),
-        /// Pink Switch Puzzle
-        // Row 1
-        new TallGrass(500, 450, 50, 50),
-        new TallGrass(600, 450, 50, 50),
-        // Row 2
-        new TallGrass(500, 350, 50, 50),
-        new TallGrass(600, 350, 50, 50),
-        // Pathway
-        new TallGrass(700, 350, 50, 150),
-        /// Blue Switch Puzzle
-        // Middle and Right
-        // new TallGrass(0, 0, 800, 50),
-        new TallGrass(300, 150, 200, 50),
-
-        new TallGrass(400, 100, 100, 50),
-        new TallGrass(550, 50, 250, 50),
-        // Left
-        new TallGrass(0, 150, 200, 50),
-        new TallGrass(0, 100, 250, 50),
-        new TallGrass(0, 50, 350, 50),
-        new TallGrass(0, 0, 800, 50),
-        /// /
-        /// /
-        /// /
-        /// Secret Puzzle
-        // Entrance
-        new TallGrass(0, 600 + 0, 50, 50),
-        new FakeTallGrass(50, 600 + 0, 50, 50),
-        new TallGrass(100, 600 + 0, 750, 50),
-        // Left Side
-        new TallGrass(0, 600 + 50, 50, 350),
-        new TallGrass(50, 600 + 100, 150, 50),
-        new TallGrass(100, 600 + 200, 150, 50),
-        new TallGrass(50, 600 + 300, 100, 50),
-        new TallGrass(200, 600 + 250, 50, 100),
-        // Water Enterance
-        new TallGrass(50, 600 + 350, 100, 50),
-        new TallGrass(200, 600 + 450, 50, 50),
-        new FakeTallGrass(100, 600 + 400, 100, 50),
-        new FakeTallGrass(150, 600 + 450, 50, 50),
-        // Middle-Left Side
-        new TallGrass(250, 600 + 450, 50, 150),
-        new TallGrass(250, 600 + 200, 50, 200),
-        new TallGrass(250, 600 + 50, 50, 100),
-        new TallGrass(300, 600 + 450, 50, 150),
-        new TallGrass(300, 600 + 200, 50, 200),
-        new TallGrass(300, 600 + 50, 50, 100),
+        /// A
+        // Top-Left
+        new TallGrass(0, 0, 400, 200),
+        new TallGrass(0, 200, 250, 50),
+        new TallGrass(0, 250, 200, 50),
+        // Top-Right
+        new TallGrass(450, 0, 400, 200),
+        new TallGrass(600, 200, 250, 50),
+        new TallGrass(650, 250, 200, 50),
+        // Bottom-Left
+        new TallGrass(0, 450, 400, 150),
+        new TallGrass(0, 400, 250, 50),
+        new TallGrass(0, 350, 200, 50),
+        // Bottom-Right
+        new TallGrass(450, 450, 400, 150),
+        new TallGrass(600, 400, 250, 50),
+        new TallGrass(650, 350, 200, 50),
+        // Centre
+        new TallGrass(250, 300, 50, 50),
+        new TallGrass(300, 250, 250, 150),
+        new TallGrass(550, 300, 50, 50),
+        // Middle-Right
+        new FakeTallGrass(700, 300, 150, 50),
+        /// B
+        // Top
+        new TallGrass(0, 0 + 600, 400, 150),
+        new TallGrass(450, 0 + 600, 400, 150),
+        //
+        new TallGrass(0, 150 + 600, 350, 50),
+        new TallGrass(500, 150 + 600, 350, 50),
+        //
+        new TallGrass(100, 250 + 600, 250, 50),
+        new TallGrass(500, 250 + 600, 250, 50),
         // Middle
-        new TallGrass(350, 600 + 450, 150, 150),
+        new TallGrass(0, 200 + 600, 50, 250),
+        new TallGrass(800, 200 + 600, 50, 350),
+        //
+        new TallGrass(100, 300 + 600, 650, 50),
+        new TallGrass(200, 400 + 600, 150, 50),
+        // Bottom
+        new TallGrass(50, 400 + 600, 300, 50),
+        new TallGrass(300, 450 + 600, 200, 50),
+        //
+        new TallGrass(500, 400 + 600, 100, 150),
+        new TallGrass(650, 400 + 600, 100, 100),
+        ///
+        new FakeTallGrass(750, 400 + 600, 50, 100),
+        new FakeTallGrass(600, 500 + 600, 200, 50),
+        ///
+        new TallGrass(0, 550 + 600, 300, 50),
+        new TallGrass(550, 550 + 600, 300, 50),
+        ///
+        /// Secret Puzzle
+        ///
+        // Entrance
+        new TallGrass(850 + 0, 0, 850, 50),
+        new TallGrass(850 + 50, 550, 450, 50),
+        // Left Wall
+        new TallGrass(850 + 0, 50, 50, 250),
+        new FakeTallGrass(850 + 0, 300, 50, 50),
+        new TallGrass(850 + 0, 350, 50, 250),
+        // Left Side
+        new TallGrass(850 + 100, 100, 150, 50),
+        new TallGrass(850 + 50, 200, 150, 100),
+        // Water End
+        new TallGrass(850 + 50, 350, 200, 50),
+        new TallGrass(850 + 50, 400, 100, 50),
+        new TallGrass(850 + 200, 400, 50, 50),
+        new TallGrass(850 + 50, 450, 50, 50),
+        // Water Enterance
+        new TallGrass(850 + 350, 400, 50, 50),
+        // First Wall
+        new TallGrass(850 + 250, 100, 100, 350),
         // Right Side
-        new TallGrass(500, 600 + 50, 50, 100),
-        new TallGrass(700, 600 + 50, 100, 50),
-        new TallGrass(700, 600 + 150, 50, 150),
+        new TallGrass(850 + 500, 50, 50, 100),
+        new TallGrass(850 + 700, 50, 100, 50),
+        new TallGrass(850 + 700, 150, 50, 150),
         // Life Jacket Puzzle
-        new TallGrass(500, 600 + 200, 50, 350),
-        new TallGrass(500, 600 + 550, 350, 50),
-        new TallGrass(550, 600 + 300, 200, 50),
-        new TallGrass(600, 600 + 500, 250, 50),
-        new TallGrass(600, 600 + 400, 50, 50),
-        new FakeTallGrass(650, 600 + 400, 50, 50),
-        new FakeTallGrass(550, 600 + 350, 150, 50),
-        new FakeTallGrass(550, 600 + 400, 50, 50),
-        new TallGrass(800, 600 + 50, 50, 450),
-        new TallGrass(700, 600 + 350, 50, 100)
+        new TallGrass(850 + 500, 200, 50, 350),
+        new TallGrass(850 + 500, 550, 350, 50),
+        new TallGrass(850 + 550, 300, 200, 50),
+        new TallGrass(850 + 600, 500, 250, 50),
+        new TallGrass(850 + 600, 400, 50, 50),
+        new FakeTallGrass(850 + 650, 400, 50, 50),
+        new FakeTallGrass(850 + 550, 350, 150, 50),
+        new FakeTallGrass(850 + 550, 400, 50, 50),
+        new TallGrass(850 + 800, 50, 50, 450),
+        new TallGrass(850 + 700, 350, 50, 100)
       ],
       waters: [
-        new Water(-50, 600 + 400, 100, 150),
-        new Water(50, 600 + 400, 50, 200),
-        new Water(100, 600 + 450, 50, 150),
-        new Water(150, 600 + 500, 100, 100)
+        new Water(0, 600 + 450, 300, 100),
+        new Water(300, 600 + 500, 200, 100),
+        new Water(500, 600 + 550, 50, 50),
+
+        /// Secret Puzzle
+        // new Water(850 + 0, 400, 100, 150),
+        new Water(850 + 50, 450, 450, 100),
+        new Water(850 + 400, 400, 100, 50)
+        // new Water(850 + 150, 500, 100, 100)
       ],
       items: [
-        new Item(550, 600 + 500, 50, 50, 1),
-        new Item(0, 600 + 550, 50, 50, 2)
+        new LifeJacket(850 + 550, 500, 50, 50),
+        new ThreeBead(850 + 150, 400, 50, 50)
       ],
       rocks: [
-        new Rock(500, 100, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(550, 100, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1),
-        new Rock(50, 250, 50, 50, 'lightblue', 'aqua', '9Blue', false, 1, 1)
+        new Rock(400, 50, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1)
       ],
       holes: [
-        new Hole(550, 200, 50, 50, false, 0, 1),
+        new Hole(300, 200 + 600, 50, 50, false, 0, 1),
+        new Hole(500, 200 + 600, 50, 50, false, 0, 1),
+        new Hole(600, 400 + 600, 50, 50, true, 0, 0),
         /// Secret Puzzle
+        // Access Puzzle
+        // Col 1
+        new Hole(850 + 350, 50, 50, 50, false, 0, 2),
+        new Hole(850 + 350, 100, 50, 50, false, 1, 2),
+        new Hole(850 + 350, 150, 50, 50, false, 1, 2),
+        new Hole(850 + 350, 200, 50, 50, false, 1, 2),
+        new Hole(850 + 350, 250, 50, 50, false, 1, 2),
+        new Hole(850 + 350, 300, 50, 50, false, 1, 2),
+        new Hole(850 + 350, 350, 50, 50, false, 1, 2),
+        // Col 2
+        new Hole(850 + 400, 50, 50, 50, false, 1, 2),
+        new Hole(850 + 400, 100, 50, 50, false, 1, 2),
+        new Hole(850 + 400, 150, 50, 50, false, 1, 2),
+        new Hole(850 + 400, 200, 50, 50, false, 1, 2),
+        new Hole(850 + 400, 250, 50, 50, false, 1, 2),
+        new Hole(850 + 400, 300, 50, 50, false, 1, 2),
+        new Hole(850 + 400, 350, 50, 50, false, 1, 2),
+        // Col 3
+        new Hole(850 + 450, 50, 50, 50, false, 1, 2),
+        new Hole(850 + 450, 100, 50, 50, false, 1, 2),
+        new Hole(850 + 450, 150, 50, 50, false, 0, 2),
+        new Hole(850 + 450, 200, 50, 50, false, 1, 2),
+        new Hole(850 + 450, 250, 50, 50, false, 1, 2),
+        new Hole(850 + 450, 300, 50, 50, false, 1, 2),
+        new Hole(850 + 450, 350, 50, 50, false, 1, 2),
         // Life Jacket Puzzle
-        new Hole(700, 600 + 450, 50, 50, false, 0, 2),
-        new Hole(650, 600 + 450, 50, 50, false, 0, 2),
-        new Hole(600, 600 + 450, 50, 50, false, 0, 1),
+        new Hole(850 + 700, 450, 50, 50, false, 0, 2),
+        new Hole(850 + 650, 450, 50, 50, false, 0, 2),
+        new Hole(850 + 600, 450, 50, 50, false, 0, 1),
         ///
-        new Hole(650, 600 + 400, 50, 50, false, 0, 1),
-        new Hole(650, 600 + 350, 50, 50, false, 0, 1),
-        new Hole(600, 600 + 350, 50, 50, false, 0, 1),
-        new Hole(550, 600 + 350, 50, 50, false, 0, 1),
-        new Hole(550, 600 + 400, 50, 50, false, 0, 1),
-        // Middle-Left
-        new Hole(250, 600 + 150, 50, 50, false, 0, 1),
-        new Hole(300, 600 + 150, 50, 50, false, 0, 1),
+        new Hole(850 + 650, 400, 50, 50, false, 0, 1),
+        new Hole(850 + 650, 350, 50, 50, false, 0, 1),
+        new Hole(850 + 600, 350, 50, 50, false, 0, 1),
+        new Hole(850 + 550, 350, 50, 50, false, 0, 1),
+        new Hole(850 + 550, 400, 50, 50, false, 0, 1),
         // Right
-        new Hole(600, 600 + 50, 50, 50, true, 0, 0),
-        new Hole(600, 600 + 100, 50, 50, true, 0, 0),
-        new Hole(600, 600 + 150, 50, 50, true, 0, 0),
-        new Hole(600, 600 + 200, 50, 50, true, 0, 0),
-        // Left
-        new Hole(100, 600 + 200, 50, 50, true, 0, 0),
-        new Hole(150, 600 + 200, 50, 50, true, 0, 0),
-        new Hole(200, 600 + 200, 50, 50, true, 0, 0),
-        /// Pink Switch Puzzle
-        new Hole(700, 500, 50, 50, false, 0, 1),
-        new Hole(700, 300, 50, 50, false, 0, 1)
+        new Hole(850 + 600, 50, 50, 50, true, 0, 0),
+        new Hole(850 + 600, 100, 50, 50, true, 0, 0),
+        new Hole(850 + 600, 150, 50, 50, true, 0, 0),
+        new Hole(850 + 600, 200, 50, 50, true, 0, 0)
       ],
       finishAreas: [
-        new FinishArea(0, 250, 50, 50)
+        new FinishArea(400, 0, 50, 50)
       ],
       changeDirectionSquares: [
-        new ChangeDirectionSquare(750, 200, 50, 50, true, false, true, false, true),
-        new ChangeDirectionSquare(750, 100, 50, 50, true, false, false, true, true),
-        new ChangeDirectionSquare(500, 100, 50, 50, false, true, false, true, true),
-        new ChangeDirectionSquare(500, 200, 50, 50, true, false, true, false, false, '9Purple')
+        new ChangeDirectionSquare(600, 250, 50, 50, true, false, false, true, true),
+        new ChangeDirectionSquare(600, 350, 50, 50, true, false, true, false, true),
+        //
+        new ChangeDirectionSquare(550, 250, 50, 50, false, true, true, false, true),
+        new ChangeDirectionSquare(550, 350, 50, 50, false, true, false, true, true),
+        //
+        new ChangeDirectionSquare(550, 200, 50, 50, true, false, false, true, true),
+        new ChangeDirectionSquare(550, 400, 50, 50, true, false, true, false, true),
+        ///
+        new ChangeDirectionSquare(250, 200, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(250, 400, 50, 50, false, true, true, false, true),
+        //
+        new ChangeDirectionSquare(250, 250, 50, 50, true, false, true, false, true),
+        new ChangeDirectionSquare(250, 350, 50, 50, true, false, false, true, true),
+        //
+        new ChangeDirectionSquare(200, 250, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(200, 350, 50, 50, false, true, true, false, true)
       ],
       unlocks: [
-        new Unlock(750, 400, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '9Purple', 2),
-        new Unlock(200, 150, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '9Blue', 1)
+        new Unlock(600, 450 + 600, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '9Purple', 2)
       ]
-    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 1, 2, /* Time Limit */ 500))
+    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 2, /* Time Limit */ 200))
 
     // Level 10
     this.levels.push(new Level({
       players: [
-        new Player(700, 500, 50, 50)
+        new Player(700, 550, 50, 50)
       ],
       enemies: [
         new Enemy(350, 50, 50, 50, [false, false, false, true], 3.5, 750),
@@ -773,7 +813,8 @@ export class LevelController {
         new TallGrass(0, 0, 850, 50),
         // Bottom Water Walls
         new TallGrass(400, 500, 250, 50),
-        new TallGrass(0, 550, 850, 50),
+        new TallGrass(0, 550, 700, 50),
+        new TallGrass(750, 550, 100, 50),
         // Centre Water Walls
         new TallGrass(300, 200, 100, 50),
         new TallGrass(450, 200, 100, 50),
@@ -829,7 +870,7 @@ export class LevelController {
         new Water(50, 500, 350, 50)
       ],
       items: [
-        new Item(350 + 850, 100, 50, 50, 1)
+        new LifeJacket(350 + 850, 100, 50, 50)
       ],
       rocks: [
         // Red Teleporter Puzzle Right Entracne
@@ -869,8 +910,6 @@ export class LevelController {
       finishAreas: [
         new FinishArea(0, 400, 50, 150)
       ],
-      changeDirectionSquares: [
-      ],
       unlocks: [
         new Unlock(350, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '10Blue', 1),
         new Unlock(700 + 850, 300, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '10Purple', 2)
@@ -888,21 +927,33 @@ export class LevelController {
       ],
       enemies: [
         new Enemy(700, 400, 50, 50, [true, false, false, false], 10),
-        new Enemy(100, 150, 50, 50, [false, true, false, false], 10)
+        new Enemy(100, 150, 50, 50, [false, true, false, false], 10),
+        new Enemy(400, 450 + 600, 50, 50, [false, false, true, false], 5.5),
+        new Enemy(200, 450 + 1200, 50, 50, [true, false, false, false], 6),
+        new Enemy(400, 350 + 1200, 50, 50, [true, true, false, false], 5),
+        new Enemy(600, 50 + 1200, 50, 50, [false, true, false, false], 6)
       ],
       walls: [
+        /// Level 1
+        ///
         /// Left Wall
         new TallGrass(0, 0, 50, 200),
         new TallGrass(0, 400, 50, 200),
         //
         new TallGrass(50, 100, 50, 150),
         new TallGrass(50, 350, 50, 150),
+        //
+        new TallGrass(50, 250, 50, 100),
+        new TallGrass(0, 200, 50, 200),
         /// Right Wall
         new TallGrass(800, 0, 50, 200),
         new TallGrass(800, 400, 50, 200),
         //
         new TallGrass(750, 100, 50, 150),
         new TallGrass(750, 350, 50, 150),
+        ///
+        new TallGrass(750, 250, 50, 100),
+        new TallGrass(800, 200, 50, 200),
         /// Top Wall
         new TallGrass(50, 0, 300, 50),
         new TallGrass(500, 0, 300, 50),
@@ -914,10 +965,54 @@ export class LevelController {
         new TallGrass(500, 550, 300, 50),
         //
         new TallGrass(50, 500, 350, 50),
-        new TallGrass(450, 500, 350, 50)
+        new TallGrass(450, 500, 350, 50),
+        /// Level 2
+        ///
+        new TallGrass(400, 0 + 600, 50, 50),
+        new TallGrass(0, 0 + 600, 350, 600),
+        new TallGrass(500, 0 + 600, 350, 600),
+        ///
+        new TallGrass(350, 100 + 600, 50, 50),
+        new TallGrass(350, 250 + 600, 50, 250),
+        ///
+        new TallGrass(450, 100 + 600, 50, 200),
+        new TallGrass(450, 400 + 600, 50, 100),
+        new TallGrass(400, 550 + 600, 50, 50),
+        /// Level 3
+        ///
+        new TallGrass(0, 0 + 1200, 200, 550),
+        new TallGrass(650, 0 + 1200, 200, 550),
+        ///
+        new TallGrass(200, 0 + 1200, 150, 50),
+        new TallGrass(500, 0 + 1200, 150, 50),
+        ///
+        new TallGrass(500, 100 + 1200, 150, 50),
+        new TallGrass(200, 100 + 1200, 150, 50),
+        ///
+        new TallGrass(350, 200 + 1200, 150, 150),
+        new TallGrass(550, 150 + 1200, 100, 250),
+        new TallGrass(200, 150 + 1200, 100, 250),
+        ///
+        new TallGrass(0, 550 + 1200, 350, 50),
+        new TallGrass(500, 550 + 1200, 350, 50),
+        ///
+        new TallGrass(200, 400 + 1200, 150, 50),
+        new TallGrass(500, 400 + 1200, 150, 50),
+        ///
+        new TallGrass(200, 500 + 1200, 150, 50),
+        new TallGrass(500, 500 + 1200, 150, 50)
       ],
       finishAreas: [
-        new FinishArea(350, 550 + 850, 150, 50)
+        new FinishArea(350, 550 + 1200, 150, 50)
+      ],
+      changeDirectionSquares: [
+        new ChangeDirectionSquare(300, 150 + 1200, 50, 50, false, true, false, true, true),
+        ///
+        new ChangeDirectionSquare(500, 150 + 1200, 50, 50, true, false, false, true, true),
+        ///
+        new ChangeDirectionSquare(300, 350 + 1200, 50, 50, true, false, true, false, true),
+        ///
+        new ChangeDirectionSquare(500, 350 + 1200, 50, 50, false, true, true, false, true)
       ]
     }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 3, /* Time Limit */ 500))
   }

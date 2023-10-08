@@ -192,7 +192,7 @@ export const dataManagement = {
       const AlienLock = JSON.parse(window.localStorage.getItem('PlayerAlienLock'))
       drawUpdate.blueCubeAlienLock = AlienLock
       if (!drawUpdate.blueCubeAlienLock) {
-        gameStates.levelController.levels[8].items[1].stopCollecting = true
+        gameStates.levelController.levels[8].items.splice(1, 1)
       }
     }
 

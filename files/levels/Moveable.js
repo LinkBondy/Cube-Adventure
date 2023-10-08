@@ -327,6 +327,7 @@ export class Player extends GameObject {
     this.original_y = this.y
     // Other
     this.previousIntersectsHole = false
+    this.waterMovement = false
   }
 
   moveRight () {
@@ -353,14 +354,12 @@ export class Player extends GameObject {
     })
 
     gameStates.CurrentLevel().waters.forEach(function (water) {
-      gameStates.CurrentLevel().items.forEach(function (item) {
-        if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
-          intersectsBarrier = true
-          gameStates.CurrentLevel().holes.forEach(function (hole) {
-            hole.stopPlayer = true
-          })
-        }
-      })
+      if (!self.waterMovement && water.intersects(self)) {
+        intersectsBarrier = true
+        gameStates.CurrentLevel().holes.forEach(function (hole) {
+          hole.stopPlayer = true
+        })
+      }
     })
 
     gameStates.CurrentLevel().holes.forEach(function (hole) {
@@ -375,11 +374,9 @@ export class Player extends GameObject {
     })
 
     gameStates.CurrentLevel().items.forEach(function (item) {
-      if (item.intersects(self)) {
-        if (item.typeNumber === 1) {
-          item.allowMovementWater = true
-        }
-        item.collected = true
+      if (item.intersects(self) && !item.collected) {
+        self.waterMovement = true
+        item.UseItem(item, self)
       }
     })
 
@@ -415,14 +412,12 @@ export class Player extends GameObject {
     })
 
     gameStates.CurrentLevel().waters.forEach(function (water) {
-      gameStates.CurrentLevel().items.forEach(function (item) {
-        if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
-          intersectsBarrier = true
-          gameStates.CurrentLevel().holes.forEach(function (hole) {
-            hole.stopPlayer = true
-          })
-        }
-      })
+      if (!self.waterMovement && water.intersects(self)) {
+        intersectsBarrier = true
+        gameStates.CurrentLevel().holes.forEach(function (hole) {
+          hole.stopPlayer = true
+        })
+      }
     })
 
     gameStates.CurrentLevel().holes.forEach(function (hole) {
@@ -437,11 +432,8 @@ export class Player extends GameObject {
     })
 
     gameStates.CurrentLevel().items.forEach(function (item) {
-      if (item.intersects(self)) {
-        if (item.typeNumber === 1) {
-          item.allowMovementWater = true
-        }
-        item.collected = true
+      if (item.intersects(self) && !item.collected) {
+        item.UseItem(item, self)
       }
     })
 
@@ -477,14 +469,12 @@ export class Player extends GameObject {
     })
 
     gameStates.CurrentLevel().waters.forEach(function (water) {
-      gameStates.CurrentLevel().items.forEach(function (item) {
-        if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
-          intersectsBarrier = true
-          gameStates.CurrentLevel().holes.forEach(function (hole) {
-            hole.stopPlayer = true
-          })
-        }
-      })
+      if (!self.waterMovement && water.intersects(self)) {
+        intersectsBarrier = true
+        gameStates.CurrentLevel().holes.forEach(function (hole) {
+          hole.stopPlayer = true
+        })
+      }
     })
 
     gameStates.CurrentLevel().holes.forEach(function (hole) {
@@ -499,11 +489,8 @@ export class Player extends GameObject {
     })
 
     gameStates.CurrentLevel().items.forEach(function (item) {
-      if (item.intersects(self)) {
-        if (item.typeNumber === 1) {
-          item.allowMovementWater = true
-        }
-        item.collected = true
+      if (item.intersects(self) && !item.collected) {
+        item.UseItem(item, self)
       }
     })
 
@@ -539,14 +526,12 @@ export class Player extends GameObject {
     })
 
     gameStates.CurrentLevel().waters.forEach(function (water) {
-      gameStates.CurrentLevel().items.forEach(function (item) {
-        if (!item.allowMovementWater && item.typeNumber === 1 && water.intersects(self)) {
-          intersectsBarrier = true
-          gameStates.CurrentLevel().holes.forEach(function (hole) {
-            hole.stopPlayer = true
-          })
-        }
-      })
+      if (!self.waterMovement && water.intersects(self)) {
+        intersectsBarrier = true
+        gameStates.CurrentLevel().holes.forEach(function (hole) {
+          hole.stopPlayer = true
+        })
+      }
     })
 
     gameStates.CurrentLevel().holes.forEach(function (hole) {
@@ -561,11 +546,8 @@ export class Player extends GameObject {
     })
 
     gameStates.CurrentLevel().items.forEach(function (item) {
-      if (item.intersects(self)) {
-        if (item.typeNumber === 1) {
-          item.allowMovementWater = true
-        }
-        item.collected = true
+      if (item.intersects(self) && !item.collected) {
+        item.UseItem(item, self)
       }
     })
 
@@ -608,6 +590,7 @@ export class Player extends GameObject {
   reset () {
     this.x = this.original_x
     this.y = this.original_y
+    this.waterMovement = false
   }
 
   Draw () {

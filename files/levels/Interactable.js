@@ -153,7 +153,14 @@ export class Hole extends GameObject {
       if (this.fullHole) { this.DrawingX = 100 } else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } else { this.DrawingX = 0 }
 
       if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-        canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+        switch (gameStates.levelController.currentWorld) {
+          case 1:
+            canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+            break
+          case 3 :
+            canvas.context.drawImage(images.UndergroundHole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+            break
+        }
       }
 
       if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
@@ -185,8 +192,16 @@ export class FinishArea extends GameObject {
 
   Draw () {
     if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
-      canvas.context.fillStyle = this.color1
-      canvas.context.fillRect(this.x, this.y, this.width, this.height)
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        for (let x = this.left(); x < this.right(); x += 50) {
+          for (let y = this.top(); y < this.bottom(); y += 50) {
+            draw.DrawImage(images.finishLine, x, y)
+          }
+        }
+      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        canvas.context.fillStyle = this.color1
+        canvas.context.fillRect(this.x, this.y, this.width, this.height)
+      }
     }
   }
 

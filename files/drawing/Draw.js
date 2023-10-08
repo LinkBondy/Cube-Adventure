@@ -30,7 +30,8 @@ export const draw = {
     gameStates.background.DrawToolBar()
     this.DrawToolBarButtons()
     if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting /* && gameStates.levelController.CheckLocked() */)) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
-      this.DrawCollectedItems()
+      this.DrawCollectedItems(2, 2)
+      this.DrawSlotFrame(2, 2)
       this.DrawTimer()
     }
   },
@@ -260,8 +261,42 @@ export const draw = {
         break
     }
   },
-  DrawCollectedItems: function () {
+  DrawCollectedItems: function (slotRow, slotCol) {
+    const startCol = 850 + 26
+    const startRow = 215 + 10
     const items = gameStates.CurrentLevel().collectedItems
+    let totalItemsDrawn = 0
+    for (let row = 0; row < slotRow; row++) {
+      for (let col = 0; col < slotCol; col++) {
+        let image = images.BlueCube
+        if (totalItemsDrawn === items.length) {
+          return
+        } else {
+          switch (items[totalItemsDrawn].type) {
+            case 'lifeJacket':
+              if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+                image = images.LifeJacket_80x80
+              }
+              if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+                image = images.LifeJacketPlastic_80x80
+              }
+              break
+
+            case 'threeBead':
+              if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+                image = images.ThreeBead_80x80
+              }
+              if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+                image = images.ThreeBeadPlastic_80x80
+              }
+              break
+          }
+          draw.DrawImage(image, 120 * col + startCol, 125 * row + startRow)
+          totalItemsDrawn += 1
+        }
+      }
+    }
+    /* const items = gameStates.CurrentLevel().collectedItems
     for (let row = 0; row < Math.round(items.length / 2 + 0.4); row++) {
       for (let col = 0; col < 2; col++) {
         let image = images.BlueCube
@@ -287,13 +322,18 @@ export const draw = {
           draw.DrawImage(image, 860 + (50 / 3) * (col + 1) + 100 * col, 225 + row * 125)
         }
       }
-    }
-    for (let row = 0; row < 2; row++) {
-      for (let col = 0; col < 2; col++) {
-        draw.DrawImage(images.Frame, 850 + (50 / 3) * (row + 1) + 100 * row, 215 + (125 * col))
+    } */
+  },
+  DrawSlotFrame: function (slotRow, slotCol) {
+    const startCol = 850 + 16
+    const startRow = 215
+    for (let row = 0; row < slotRow; row++) {
+      for (let col = 0; col < slotCol; col++) {
+        draw.DrawImage(images.Frame, 120 * col + startCol, 125 * row + startRow)
       }
     }
   },
+
   DrawTimer: function () {
     canvas.context.font = '75px Arial'
     canvas.context.fillStyle = 'black'

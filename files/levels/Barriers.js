@@ -66,23 +66,33 @@ export class TallGrass extends Wall {
           ///
           canvas.context.save()
           canvas.context.translate(x - 2, y - 2)
-          if (gameStates.levelController.currentWorld === 1) {
-            // if (this.randomList[i] % 2 === 0)
-            // canvas.context.rotate(90 * Math.PI / 180)
-            if (this.randomList[i] % 40 === 0) {
-              draw.DrawImage(images.WallGrassPuddleA, 0, 0)
-            } else if (this.randomList[i] % 9 === 0) { draw.DrawImage(images.WallGrassRockA, 0, 0) } else if (this.randomList[i] % 507 === 0) {
-              draw.DrawImage(images.WallGrassTree, 0, 0)
-            } else {
-              // if (Math.floor(Math.random() * 2 + 1) === 1)
-              draw.DrawImage(images.WallGrassClassicA, 0, 0)
-            }
-          } else if (gameStates.levelController.currentWorld === 2) {
-          /* if (this.randomList[i] % 9 === 0) {
-            // canvas.context.drawImage(images.WorldTwoLedges, 104, 10, 54, 54, 0, 0, 54, 54)
-          // } else {
-            canvas.context.drawImage(images.WorldTwoLedges, 100, 6, 54, 54, 0, 0, 54, 54)
-             } */
+          switch (gameStates.levelController.currentWorld) {
+            case 1:
+              // if (this.randomList[i] % 2 === 0)
+              // canvas.context.rotate(90 * Math.PI / 180)
+              if (this.randomList[i] % 40 === 0) {
+                draw.DrawImage(images.WallGrassPuddleA, 0, 0)
+              } else if (this.randomList[i] % 9 === 0) { draw.DrawImage(images.WallGrassRockA, 0, 0) } else if (this.randomList[i] % 507 === 0) {
+                draw.DrawImage(images.WallGrassTree, 0, 0)
+              } else {
+                // if (Math.floor(Math.random() * 2 + 1) === 1)
+                draw.DrawImage(images.WallGrassClassicA, 0, 0)
+              }
+              break
+            case 2 :
+              if (this.randomList[i] % 9 === 0) {
+                canvas.context.drawImage(images.WorldTwoLedges, 104, 10, 54, 54, 0, 0, 54, 54)
+              } else {
+                canvas.context.drawImage(images.WorldTwoLedges, 100, 6, 54, 54, 0, 0, 54, 54)
+              }
+              break
+            case 3 :
+              if (this.randomList[i] % 7 === 0) {
+                draw.DrawImage(images.UndergroundWallCrystalA, 0, 0)
+              } else {
+                draw.DrawImage(images.UndergroundWallA, 0, 0)
+              }
+              break
           }
           canvas.context.restore()
         }
@@ -120,8 +130,8 @@ export class FakeTallGrass extends Wall {
   Draw () {
     if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
       let i = 0
-      for (let x = this.left(); x < this.right(); x = x + 50) {
-        for (let y = this.top(); y < this.bottom(); y = y + 50) {
+      for (let x = this.left(); x < this.right(); x += 50) {
+        for (let y = this.top(); y < this.bottom(); y += 50) {
           i++
           canvas.context.save()
           canvas.context.translate(x - 2, y - 2)
@@ -226,6 +236,7 @@ export class Rock extends GameObject {
   }
 
   Draw () {
+    let size
     if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
       const self = this
       if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic && this.typeNumber === 1) {
@@ -248,12 +259,18 @@ export class Rock extends GameObject {
         }
       } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic && this.typeNumber === 1) {
         gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-          if (!self.allowMovement && unlock.title === self.title) { canvas.context.fillStyle = self.color1 }
+          if (!self.allowMovement && unlock.title === self.title) {
+            canvas.context.fillStyle = self.color1
+            size = 25
+          }
 
-          if (self.allowMovement && unlock.title === self.title) { canvas.context.fillStyle = self.color2 }
+          if (self.allowMovement && unlock.title === self.title) {
+            canvas.context.fillStyle = self.color2
+            size = 17.5
+          }
         })
         canvas.context.beginPath()
-        canvas.context.arc(this.x + 25, this.y + 25, 25, 0, 360)
+        canvas.context.arc(this.x + 25, this.y + 25, size, 0, 360)
         canvas.context.fill()
       }
     }

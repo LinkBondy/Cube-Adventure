@@ -51,9 +51,6 @@ export const update = {
       gameStates.CurrentLevel().holes.forEach(function (hole) {
         hole.update(delta)
       })
-      gameStates.CurrentLevel().items.forEach(function (item) {
-        item.update(delta)
-      })
       gameStates.CurrentLevel().teleporters.forEach(function (teleporter) {
         teleporter.update(delta)
       })

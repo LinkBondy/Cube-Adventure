@@ -2,15 +2,16 @@
 export const images = {
   stillLoading: 0,
   LoadImages: function () {
-    ///
     images.WallGrassClassicA = LoadImage('images/WallGrassClassicA.png')
-    images.WallGrassClassicB = LoadImage('images/WallGrassClassicB.png')
     images.WallGrassClassicA_200x200 = LoadImage('images/WallGrassClassicA_200x200.png')
     images.WallGrassClassicA_400x400 = LoadImage('images/WallGrassClassicA_400x400.png')
     images.WallGrassRockA = LoadImage('images/WallGrassRockA.png')
     images.WallGrassPuddleA = LoadImage('images/WallGrassPuddleA.png')
     images.WallGrassTree = LoadImage('images/WallGrassTree.png')
     images.WallGrassTreeV2 = LoadImage('images/WallGrassTreeV2.png')
+    //
+    images.UndergroundWallCrystalA = LoadImage('images/UndergroundWallCrystalA.png')
+    images.UndergroundWallA = LoadImage('images/UndergroundWallA.png')
     ///
     images.BlueCube = LoadImage('images/BlueCube.png')
     images.BlueCubePyro = LoadImage('images/BlueCubePyro.png')
@@ -67,6 +68,7 @@ export const images = {
     images.UnlockedRockBlue = LoadImage('images/UnlockedRockBlue.png')
     ///
     images.Hole = LoadImage('images/Hole.png')
+    images.UndergroundHole = LoadImage('images/UndergroundHole.png')
     images.Hole_200x200 = LoadImage('images/Hole_200x200.png')
     images.HolePlastic = LoadImage('images/HolePlastic.png')
     ///
@@ -80,6 +82,8 @@ export const images = {
     images.Frame = LoadImage('images/Frame.png')
     images.Clock = LoadImage('images/Clock.png')
     images.WorldTwoLedges = LoadImage('images/WorldTwoLedges.png')
+    ///
+    images.finishLine = LoadImage('images/finishLine.png')
   }
 }
 

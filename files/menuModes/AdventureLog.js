@@ -15,15 +15,15 @@ const LockedFeature = {
   infoWater: 8,
   ///
   infoSwitch: 4,
-  infoTeleporter: 6,
+  infoTeleporter: 7,
   ///
   infoRock: 4,
   ///
   infoLifeJacket: 8,
   infoFinishItems: 11,
-  infoPryoShard: 11,
+  infoPryoShard: 12,
   ///
-  infoHole: 8
+  infoHole: 9
 }
 
 export class InfoController {
