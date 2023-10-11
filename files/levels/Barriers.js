@@ -223,52 +223,70 @@ export class Water extends GameObject {
 };
 
 export class Rock extends GameObject {
-  constructor (x, y, width, height, color1, color2, title, allowMovement, colorNumber, typeNumber) {
-    super(x, y, width, height, color1)
+  constructor (x, y, width, height, colorType, allowMovement) {
+    super(x, y, width, height)
     this.original_x = this.x
     this.original_y = this.y
-    this.color2 = color2
-    this.title = title
+    this.soildColorA = 'rgb(49, 141, 165)'
+    this.brokenColorA = 'rgb(0, 241, 254)'
+    this.soildColorB = 'rgb(204, 153, 204)'
+    this.brokenColorB = 'rgb(242, 124, 238)'
     this.allowMovement = allowMovement
     this.originalAllowMovement = this.allowMovement
-    this.colorNumber = colorNumber
-    this.typeNumber = typeNumber
+    this.colorType = colorType
   }
 
   Draw () {
-    let size
     if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
-      const self = this
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic && this.typeNumber === 1) {
-        if (this.colorNumber === 1) {
-          gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-            if (self.allowMovement && unlock.title === self.title) {
-              draw.DrawImage(images.UnlockedRockBlue, self.x, self.y)
-            } else if (!self.allowMovement && unlock.title === self.title) {
-              draw.DrawImage(images.UnlockRockBlue, self.x, self.y)
-            }
-          })
-        } else if (this.colorNumber === 2) {
-          gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-            if (self.allowMovement && unlock.title === self.title) {
-              draw.DrawImage(images.UnlockedRockPurple, self.x, self.y)
-            } else if (!self.allowMovement && unlock.title === self.title) {
-              draw.DrawImage(images.UnlockRockPurple, self.x, self.y)
-            }
-          })
-        }
-      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic && this.typeNumber === 1) {
-        gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-          if (!self.allowMovement && unlock.title === self.title) {
-            canvas.context.fillStyle = self.color1
-            size = 25
-          }
+      let image
+      let size
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        if (!this.allowMovement) {
+          switch (this.colorType) {
+            case 'blue':
+              image = images.UnlockRockBlue
+              break
 
-          if (self.allowMovement && unlock.title === self.title) {
-            canvas.context.fillStyle = self.color2
-            size = 17.5
+            case 'pink':
+              image = images.UnlockRockPurple
+              break
           }
-        })
+        } else if (this.allowMovement) {
+          switch (this.colorType) {
+            case 'blue':
+              image = images.UnlockedRockBlue
+              break
+
+            case 'pink':
+              image = images.UnlockedRockPurple
+              break
+          }
+        }
+        draw.DrawImage(image, this.x, this.y)
+      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        if (!this.allowMovement) {
+          size = 25
+          switch (this.colorType) {
+            case 'blue':
+              canvas.context.fillStyle = this.soildColorA
+              break
+
+            case 'pink':
+              canvas.context.fillStyle = this.soildColorB
+              break
+          }
+        } else if (this.allowMovement) {
+          size = 17.5
+          switch (this.colorType) {
+            case 'blue':
+              canvas.context.fillStyle = this.brokenColorA
+              break
+
+            case 'pink':
+              canvas.context.fillStyle = this.brokenColorB
+              break
+          }
+        }
         canvas.context.beginPath()
         canvas.context.arc(this.x + 25, this.y + 25, size, 0, 360)
         canvas.context.fill()

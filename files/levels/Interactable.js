@@ -4,15 +4,18 @@ const { draw } = require('../drawing/Draw')
 const { gameStates, BackgroundStyles } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 const { GameObject } = require('./Class')
-export class Unlock extends GameObject {
-  constructor (x, y, width, height, color1, color2, activatedcolor, title, colorNumber) {
-    super(x, y, width, height, color1)
+export class ReverseTile extends GameObject {
+  constructor (x, y, width, height, colorType) {
+    super(x, y, width, height)
     this.original_x = this.x
     this.original_y = this.y
-    this.color2 = color2
-    this.activatedcolor = activatedcolor
-    this.title = title
-    this.colorNumber = colorNumber
+    this.borderColour = 'rgb(150, 150, 150)'
+    this.deactivatedColorA = 'rgb(49, 141, 165)'
+    this.activatedColorA = 'rgb(0, 241, 254)'
+    this.deactivatedColorB = 'rgb(204, 153, 204)'
+    this.activatedColorB = 'rgb(242, 124, 238)'
+    this.colorType = colorType
+    this.activated = false
   }
 
   update () {
@@ -20,12 +23,12 @@ export class Unlock extends GameObject {
     gameStates.CurrentLevel().players.forEach(function (player) {
       if (self.intersects(/* 0, */ player)) {
         gameStates.CurrentLevel().rocks.forEach(function (rock) {
-          if (self.title === rock.title && rock.allowMovement === rock.originalAllowMovement) {
+          if (self.colorType === rock.colorType && rock.allowMovement === rock.originalAllowMovement) {
             rock.allowMovement = !rock.allowMovement
           }
         })
         gameStates.CurrentLevel().changeDirectionSquares.forEach(function (changeDirectionSquare) {
-          if (self.title === changeDirectionSquare.title) {
+          if (self.colorType === changeDirectionSquare.colorType) {
             changeDirectionSquare.allowDirectionChange = true
           }
         })
@@ -36,12 +39,12 @@ export class Unlock extends GameObject {
     gameStates.CurrentLevel().enemies.forEach(function (enemy) {
       if (self.intersects(/* 1, */ enemy)) {
         gameStates.CurrentLevel().rocks.forEach(function (rock) {
-          if (self.title === rock.title && rock.allowMovement === rock.originalAllowMovement) {
+          if (self.colorType === rock.colorType && rock.allowMovement === rock.originalAllowMovement) {
             rock.allowMovement = !rock.allowMovement
           }
         })
         gameStates.CurrentLevel().changeDirectionSquares.forEach(function (changeDirectionSquare) {
-          if (self.title === changeDirectionSquare.title) {
+          if (self.colorType === changeDirectionSquare.colorType) {
             changeDirectionSquare.allowDirectionChange = true
           }
         })
@@ -53,15 +56,53 @@ export class Unlock extends GameObject {
   Draw () {
     if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
       if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-        if (this.colorNumber === 1) {
-          if (this.activated) { draw.DrawImage(images.SwitchW1ActivatedBlue, this.x, this.y) } else { draw.DrawImage(images.SwitchW1Blue, this.x, this.y) }
-        } else if (this.colorNumber === 2) {
-          if (this.activated) { draw.DrawImage(images.SwitchW1ActivatedPurple, this.x, this.y) } else { draw.DrawImage(images.SwitchW1Purple, this.x, this.y) }
+        let image
+        if (!this.activated) {
+          switch (this.colorType) {
+            case 'blue':
+              image = images.SwitchW1Blue
+              break
+
+            case 'pink':
+              image = images.SwitchW1Purple
+              break
+          }
+        } else if (this.activated) {
+          switch (this.colorType) {
+            case 'blue':
+              image = images.SwitchW1ActivatedBlue
+              break
+
+            case 'pink':
+              image = images.SwitchW1ActivatedPurple
+              break
+          }
         }
+        draw.DrawImage(image, this.x, this.y)
       } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-        canvas.context.fillStyle = this.color1
+        canvas.context.fillStyle = this.borderColour
         canvas.context.fillRect(this.x, this.y, this.width, this.height)
-        if (this.activated) { canvas.context.fillStyle = this.activatedcolor } else { canvas.context.fillStyle = this.color2 }
+        if (!this.activated) {
+          switch (this.colorType) {
+            case 'blue':
+              canvas.context.fillStyle = this.deactivatedColorA
+              break
+
+            case 'pink':
+              canvas.context.fillStyle = this.deactivatedColorB
+              break
+          }
+        } else if (this.activated) {
+          switch (this.colorType) {
+            case 'blue':
+              canvas.context.fillStyle = this.activatedColorA
+              break
+
+            case 'pink':
+              canvas.context.fillStyle = this.activatedColorB
+              break
+          }
+        }
         canvas.context.fillRect(this.x + 10, this.y + 10, 30, 30)
       }
     }

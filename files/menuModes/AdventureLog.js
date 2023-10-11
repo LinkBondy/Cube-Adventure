@@ -15,7 +15,7 @@ const LockedFeature = {
   infoWater: 8,
   ///
   infoSwitch: 4,
-  infoTeleporter: 7,
+  infoTeleporter: 6,
   ///
   infoRock: 4,
   ///

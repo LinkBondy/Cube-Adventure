@@ -114,8 +114,8 @@ export const levelTools = {
       hole.reset()
     })
 
-    gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-      unlock.reset()
+    gameStates.CurrentLevel().reverseTiles.forEach(function (reverseTile) {
+      reverseTile.reset()
     })
 
     gameStates.CurrentLevel().teleporters.forEach(function (teleporter) {

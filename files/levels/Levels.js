@@ -1,7 +1,7 @@
 'use strict'
 const { Player, Enemy, ChangeDirectionSquare } = require('./Moveable')
 const { TallGrass, FakeTallGrass, Rock, Water } = require('./Barriers')
-const { Unlock, Teleporter, Hole, FinishArea } = require('./Interactable')
+const { ReverseTile, Teleporter, Hole, FinishArea } = require('./Interactable')
 const { LifeJacket, ThreeBead } = require('./Collectable')
 const { gameStates } = require('../data/GameData')
 
@@ -16,7 +16,7 @@ class Level {
     this.holes = levelData.holes ?? []
     this.finishAreas = levelData.finishAreas ?? []
     this.changeDirectionSquares = levelData.changeDirectionSquares ?? []
-    this.unlocks = levelData.unlocks ?? []
+    this.reverseTiles = levelData.reverseTiles ?? []
     this.teleporters = levelData.teleporters ?? []
     this.requirement1 = requirement1
     this.requirement2 = requirement2
@@ -214,13 +214,13 @@ export class LevelController {
         new TallGrass(450, 100, 50, 500)
       ],
       rocks: [
-        new Rock(600, 150, 50, 50, 'lightblue', 'aqua', '4Blue', false, 1, 1)
+        new Rock(600, 150, 50, 50, 'blue', false)
       ],
       finishAreas: [
         new FinishArea(600, 500, 50, 50)
       ],
-      unlocks: [
-        new Unlock(200, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '4Blue', 1)
+      reverseTiles: [
+        new ReverseTile(200, 500, 50, 50, 'blue')
       ]
     }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 200))
 
@@ -277,13 +277,13 @@ export class LevelController {
         new TallGrass(400 + 850, 0, 450, 400)
       ],
       rocks: [
-        new Rock(600, 250, 50, 50, 'lightblue', 'aqua', '5Blue', false, 1, 1),
-        new Rock(600, 300, 50, 50, 'lightblue', 'aqua', '5Blue', false, 1, 1),
+        new Rock(600, 250, 50, 50, 'blue', false),
+        new Rock(600, 300, 50, 50, 'blue', false),
         ///
-        new Rock(50, 200, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1),
-        new Rock(50, 250, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1),
-        new Rock(50, 300, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1),
-        new Rock(50, 350, 50, 50, 'plum', 'orchid', '5Purple', false, 2, 1)
+        new Rock(50, 200, 50, 50, 'pink', false),
+        new Rock(50, 250, 50, 50, 'pink', false),
+        new Rock(50, 300, 50, 50, 'pink', false),
+        new Rock(50, 350, 50, 50, 'pink', false)
       ],
       finishAreas: [
         new FinishArea(0, 250, 50, 100)
@@ -305,9 +305,9 @@ export class LevelController {
         new ChangeDirectionSquare(200 + 850, 100, 50, 50, true, false, false, true, true),
         new ChangeDirectionSquare(150 + 850, 150, 50, 50, true, false, false, true, true)
       ],
-      unlocks: [
-        new Unlock(250, 100, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '5Blue', 1),
-        new Unlock(300 + 850, 275, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '5Purple', 2)
+      reverseTiles: [
+        new ReverseTile(250, 100, 50, 50, 'blue'),
+        new ReverseTile(300 + 850, 275, 50, 50, 'pink')
       ]
     }, /* Requirements */4, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 300))
 
@@ -393,8 +393,8 @@ export class LevelController {
         new TallGrass(0, 400 + 600, 100, 100)
       ],
       rocks: [
-        new Rock(300, 50, 50, 50, 'lightblue', 'aqua', '6Blue', false, 1, 1),
-        new Rock(650, 500, 50, 50, 'lightblue', 'aqua', '6Blue', false, 1, 1)
+        new Rock(300, 50, 50, 50, 'blue', false),
+        new Rock(650, 500, 50, 50, 'blue', false)
       ],
       finishAreas: [
         new FinishArea(0, 250, 50, 100)
@@ -403,9 +403,8 @@ export class LevelController {
         // new ChangeDirectionSquare(500, 200, 50, 50, false, true, true, true, true),
         // new ChangeDirectionSquare(600, 200, 50, 50, true, false, true, true, true)
       ],
-      unlocks: [
-        new Unlock(150, 350 + 600, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '6Blue', 1)
-        // new Unlock(300, 275, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '6Purple', 2)
+      reverseTiles: [
+        new ReverseTile(150, 350 + 600, 50, 50, 'blue')
       ],
       teleporters: [
         new Teleporter(550, 450, 50, 50, '6Teleporter', 2),
@@ -461,10 +460,10 @@ export class LevelController {
         new TallGrass(550, 500, 50, 50)
       ],
       rocks: [
-        new Rock(450, 500, 50, 50, 'plum', 'orchid', '7Purple', false, 2, 1),
+        new Rock(450, 500, 50, 50, 'pink', false),
         ///
-        new Rock(700, 300, 50, 50, 'plum', 'orchid', '7Purple', false, 2, 1),
-        new Rock(700, 250, 50, 50, 'plum', 'orchid', '7Purple', false, 2, 1)
+        new Rock(700, 300, 50, 50, 'pink', false),
+        new Rock(700, 250, 50, 50, 'pink', false)
       ],
       finishAreas: [
         new FinishArea(650, 150, 50, 300)
@@ -489,8 +488,8 @@ export class LevelController {
         ///
         new ChangeDirectionSquare(100, 500, 50, 50, false, true, true, false, true)
       ],
-      unlocks: [
-        new Unlock(350, 500, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '7Purple', 2)
+      reverseTiles: [
+        new ReverseTile(350, 500, 50, 50, 'pink')
       ],
       teleporters: [
         new Teleporter(750, 450, 50, 50, '7Teleporter', 1),
@@ -583,15 +582,15 @@ export class LevelController {
         new LifeJacket(450, 400, 50, 50)
       ],
       rocks: [
-        new Rock(300, 100 + 600, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1),
-        new Rock(300, 250 + 600, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1),
-        new Rock(300, 400 + 600, 50, 50, 'lightblue', 'aqua', '8Blue', false, 1, 1)
+        new Rock(300, 100 + 600, 50, 50, 'blue', false),
+        new Rock(300, 250 + 600, 50, 50, 'blue', false),
+        new Rock(300, 400 + 600, 50, 50, 'blue', false)
       ],
       finishAreas: [
         new FinishArea(800, 200 + 600, 50, 150)
       ],
-      unlocks: [
-        new Unlock(350, 450 + 600, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '8Blue', 1)
+      reverseTiles: [
+        new ReverseTile(350, 450 + 600, 50, 50, 'blue')
       ],
       teleporters: [
         new Teleporter(150, 500 + 600, '8Teleporter', 50, 50, 2),
@@ -723,7 +722,7 @@ export class LevelController {
         new ThreeBead(850 + 150, 400, 50, 50)
       ],
       rocks: [
-        new Rock(400, 50, 50, 50, 'plum', 'orchid', '9Purple', false, 2, 1)
+        new Rock(400, 50, 50, 50, 'pink', false)
       ],
       holes: [
         new Hole(300, 200 + 600, 50, 50, false, 0, 1),
@@ -793,8 +792,8 @@ export class LevelController {
         new ChangeDirectionSquare(200, 250, 50, 50, false, true, false, true, true),
         new ChangeDirectionSquare(200, 350, 50, 50, false, true, true, false, true)
       ],
-      unlocks: [
-        new Unlock(600, 450 + 600, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '9Purple', 2)
+      reverseTiles: [
+        new ReverseTile(600, 450 + 600, 50, 50, 'pink')
       ]
     }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 2, /* Time Limit */ 200))
 
@@ -874,33 +873,33 @@ export class LevelController {
       ],
       rocks: [
         // Red Teleporter Puzzle Right Entracne
-        new Rock(650, 300, 50, 50, 'lightblue', 'aqua', '10Blue', true, 1, 1),
-        new Rock(700, 300, 50, 50, 'lightblue', 'aqua', '10Blue', true, 1, 1),
+        new Rock(650, 300, 50, 50, 'blue', true),
+        new Rock(700, 300, 50, 50, 'blue', true),
         // Red Teleporter Puzzle Right Exit
-        new Rock(550, 100, 50, 50, 'lightblue', 'aqua', '10Blue', true, 1, 1),
+        new Rock(550, 100, 50, 50, 'blue', true),
         // Red Teleporter Puzzle Centre Exit 2
-        new Rock(400, 200, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
+        new Rock(400, 200, 50, 50, 'pink', false),
         // Exit Puzzle Entracne
-        new Rock(800, 350, 50, 50, 'lightblue', 'aqua', '10Blue', false, 1, 1),
-        new Rock(800, 400, 50, 50, 'lightblue', 'aqua', '10Blue', false, 1, 1),
-        new Rock(800, 450, 50, 50, 'lightblue', 'aqua', '10Blue', false, 1, 1),
-        new Rock(800, 500, 50, 50, 'lightblue', 'aqua', '10Blue', false, 1, 1),
+        new Rock(800, 350, 50, 50, 'blue', false),
+        new Rock(800, 400, 50, 50, 'blue', false),
+        new Rock(800, 450, 50, 50, 'blue', false),
+        new Rock(800, 500, 50, 50, 'blue', false),
         // Water Rocks
-        new Rock(150, 400, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
-        new Rock(150, 450, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
-        new Rock(150, 500, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
+        new Rock(150, 400, 50, 50, 'pink', false),
+        new Rock(150, 450, 50, 50, 'pink', false),
+        new Rock(150, 500, 50, 50, 'pink', false),
         // Exit Puzzle
-        new Rock(350 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
-        new Rock(400 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
-        new Rock(450 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
-        new Rock(500 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
-        new Rock(550 + 850, 250, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
+        new Rock(350 + 850, 250, 50, 50, 'pink', false),
+        new Rock(400 + 850, 250, 50, 50, 'pink', true),
+        new Rock(450 + 850, 250, 50, 50, 'pink', true),
+        new Rock(500 + 850, 250, 50, 50, 'pink', true),
+        new Rock(550 + 850, 250, 50, 50, 'pink', false),
         ///
-        new Rock(350 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1),
-        new Rock(400 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
-        new Rock(450 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
-        new Rock(500 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', true, 2, 1),
-        new Rock(550 + 850, 350, 50, 50, 'plum', 'orchid', '10Purple', false, 2, 1)
+        new Rock(350 + 850, 350, 50, 50, 'pink', false),
+        new Rock(400 + 850, 350, 50, 50, 'pink', true),
+        new Rock(450 + 850, 350, 50, 50, 'pink', true),
+        new Rock(500 + 850, 350, 50, 50, 'pink', true),
+        new Rock(550 + 850, 350, 50, 50, 'pink', false)
       ],
       holes: [
         // Exit Puzzle Entracne
@@ -910,9 +909,9 @@ export class LevelController {
       finishAreas: [
         new FinishArea(0, 400, 50, 150)
       ],
-      unlocks: [
-        new Unlock(350, 500, 50, 50, 'rgb(180, 180, 180)', 'lightblue', 'aqua', '10Blue', 1),
-        new Unlock(700 + 850, 300, 50, 50, 'rgb(180, 180, 180)', 'plum', 'orchid', '10Purple', 2)
+      reverseTiles: [
+        new ReverseTile(350, 500, 50, 50, 'blue'),
+        new ReverseTile(700 + 850, 300, 50, 50, 'pink')
       ],
       teleporters: [
         new Teleporter(100, 300, '10Teleporter', 50, 50, 1),

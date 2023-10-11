@@ -104,8 +104,8 @@ export const draw = {
       hole.Draw()
     })
 
-    gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-      unlock.Draw()
+    gameStates.CurrentLevel().reverseTiles.forEach(function (reverseTile) {
+      reverseTile.Draw()
     })
 
     gameStates.CurrentLevel().teleporters.forEach(function (teleporter) {

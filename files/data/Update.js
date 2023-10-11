@@ -45,8 +45,8 @@ export const update = {
         player.update(delta)
         player.changeSlideVariables()
       })
-      gameStates.CurrentLevel().unlocks.forEach(function (unlock) {
-        unlock.update(delta)
+      gameStates.CurrentLevel().reverseTiles.forEach(function (reverseTile) {
+        reverseTile.update(delta)
       })
       gameStates.CurrentLevel().holes.forEach(function (hole) {
         hole.update(delta)
