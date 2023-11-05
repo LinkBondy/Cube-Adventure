@@ -84,14 +84,6 @@ export const drawUpdate = {
 }
 
 export const levelTools = {
-  currentLosses: 0,
-  loseCounterStop: false,
-  winLevel: false,
-  NextLevel: function () {
-    levelTools.Restart()
-    if (gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex) { gameStates.infoController.unlockedLevel++ }
-  },
-
   Restart: function () {
     gameStates.CurrentLevel().reset()
     gameStates.CurrentLevel().players.forEach(function (player) {

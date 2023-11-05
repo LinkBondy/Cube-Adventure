@@ -208,37 +208,40 @@ export class MenuController {
       new MenuItem('Retry', 1, 1, 'rgb(120, 0, 225)', function () {
         levelTools.Restart()
         gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
-        levelTools.loseCounterStop = false
+        gameStates.lossScreen.loseLevel = false
       }),
       new MenuItem('Selection Menu', 1, 2, 'rgb(90, 0, 225)', function () {
         levelTools.Restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
-        levelTools.loseCounterStop = false
+        gameStates.lossScreen.loseLevel = false
       }),
       new MenuItem('Main Menu', 1, 3, 'rgb(60, 0, 225)', function () {
         levelTools.Restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
-        levelTools.loseCounterStop = false
+        gameStates.lossScreen.loseLevel = false
       })
     ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */175, /* width */850, /* height */425, /* fontSize */90))
 
     this.menus.push(this.WinMenu = new Menu([
       new MenuItem('Continue', 1, 1, 'rgb(255, 0, 75)', function () {
         if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1) {
-          levelTools.NextLevel()
+          levelTools.Restart()
           gameStates.currentLevelIndex++
           gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
+          gameStates.winScreen.winLevel = false
         }
       }),
       new MenuItem('Selection Menu', 1, 2, 'rgb(255, 5, 115)', function () {
-        levelTools.NextLevel()
+        levelTools.Restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
+        gameStates.winScreen.winLevel = false
       }),
       new MenuItem('Main Menu', 1, 3, 'rgb(255, 10, 150)', function () {
-        levelTools.NextLevel()
+        levelTools.Restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
+        gameStates.winScreen.winLevel = false
       })
     ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */150, /* width */850, /* height */450, /* fontSize */100))
 

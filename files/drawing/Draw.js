@@ -1,5 +1,5 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, BackgroundStyles, gameStates, levelTools, settingStates } = require('../data/GameData')
+const { gameMode, startingMenusStates, storyModeStates, ShopMode, BackgroundStyles, gameStates, settingStates } = require('../data/GameData')
 const { canvas } = require('./Canvas')
 const { images } = require('./Images')
 export const draw = {
@@ -11,8 +11,13 @@ export const draw = {
     canvas.context.shadowOffsetY = offsetY
     canvas.context.shadowColor = offsetColour
   },
-  DrawGame: function () {
+  MainDraw: function () {
     gameStates.background.DrawBackround()
+    this.MainDrawGame()
+    gameStates.background.DrawToolBar()
+    this.MainDrawToolBar()
+  },
+  MainDrawGame: function () {
     if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
       if (gameStates.currentGameMode === gameMode.StoryMode) { this.StoryModeDraw() }
 
@@ -27,13 +32,23 @@ export const draw = {
       if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) { this.StartingSreenDraw() }
       if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { gameStates.menuController.MainMenu.Draw() }
     }
-    gameStates.background.DrawToolBar()
-    this.DrawToolBarButtons()
-    if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting /* && gameStates.levelController.CheckLocked() */)) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
-      this.DrawCollectedItems(2, 2)
-      this.DrawSlotFrame(2, 2)
+  },
+  MainDrawToolBar: function () {
+    if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
+      switch (gameStates.currentStoryModeState) {
+        case storyModeStates.Lost:
+          gameStates.lossScreen.DrawSideBar()
+          break
+        case storyModeStates.WonStage:
+          break
+        default:
+          this.DrawCollectedItems(2, 2)
+          this.DrawSlotFrame(2, 2)
+          break
+      }
       this.DrawTimer()
     }
+    this.DrawToolBarButtons()
   },
   StoryModeDraw: function () {
     if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelController.CheckLocked())) {
@@ -45,13 +60,13 @@ export const draw = {
 
     if (gameStates.currentStoryModeState === storyModeStates.WonStage) {
       gameStates.menuController.WinMenu.Draw()
-      this.DrawFinishText()
+      gameStates.winScreen.DrawScreen()
       return
     }
 
     if (gameStates.currentStoryModeState === storyModeStates.Lost) {
       gameStates.menuController.LoseMenu.Draw()
-      this.DrawLoseText()
+      gameStates.lossScreen.DrawScreen()
     }
 
     if (gameStates.currentStoryModeState === storyModeStates.Paused) {
@@ -156,20 +171,6 @@ export const draw = {
     canvas.context.fillStyle = 'blue'
     canvas.context.fillText('Press space to start', 80, 550)
   },
-  DrawFinishText: function () {
-    canvas.context.font = '88px Arial'
-    canvas.context.fillStyle = 'red'
-    canvas.context.fillText('Level ' + (gameStates.currentLevelIndex + 1) + ' Complete!', 60, 100)
-  },
-  DrawLoseText: function () {
-    canvas.context.font = '130px Arial'
-    canvas.context.fillStyle = 'darkorchid'
-    canvas.context.fillText('You Lose', 10, 120)
-    canvas.context.font = '75px Arial'
-    canvas.context.fillStyle = 'darkmagenta'
-    canvas.context.fillText('Losses', 575, 75)
-    canvas.context.fillText((levelTools.currentLosses), 675, 150)
-  },
   DrawSelectLevel: function () {
     canvas.context.font = '125px Arial'
     canvas.context.fillStyle = 'rgba(255, 255, 132, 0.788)'
@@ -262,8 +263,8 @@ export const draw = {
     }
   },
   DrawCollectedItems: function (slotRow, slotCol) {
-    const startCol = 850 + 26
-    const startRow = 215 + 10
+    const startCol = 850 + 25
+    const startRow = 200 + 10
     const items = gameStates.CurrentLevel().collectedItems
     let totalItemsDrawn = 0
     for (let row = 0; row < slotRow; row++) {
@@ -296,55 +297,27 @@ export const draw = {
         }
       }
     }
-    /* const items = gameStates.CurrentLevel().collectedItems
-    for (let row = 0; row < Math.round(items.length / 2 + 0.4); row++) {
-      for (let col = 0; col < 2; col++) {
-        let image = images.BlueCube
-        if (!(items.length % 2 === 1 && col === 1 && row === (Math.round(items.length / 2 + 0.4)) - 1)) {
-          switch (items[row * 2 + col].typeNumber) {
-            case 1:
-              if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-                image = images.LifeJacket_80x80
-              }
-              if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-                image = images.LifeJacketPlastic_80x80
-              }
-              break
-            case 2:
-              if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-                image = images.ThreeBead_80x80
-              }
-              if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-                image = images.ThreeBeadPlastic_80x80
-              }
-              break
-          }
-          draw.DrawImage(image, 860 + (50 / 3) * (col + 1) + 100 * col, 225 + row * 125)
-        }
-      }
-    } */
   },
   DrawSlotFrame: function (slotRow, slotCol) {
     const startCol = 850 + 16
-    const startRow = 215
+    const startRow = 200
     for (let row = 0; row < slotRow; row++) {
       for (let col = 0; col < slotCol; col++) {
         draw.DrawImage(images.Frame, 120 * col + startCol, 125 * row + startRow)
       }
     }
   },
-
   DrawTimer: function () {
     canvas.context.font = '75px Arial'
     canvas.context.fillStyle = 'black'
     if (gameStates.levelController.CheckLocked()) {
-      canvas.context.fillText(gameStates.CurrentLevel().timeLimit, 965, 105)
+      canvas.context.fillText(gameStates.CurrentLevel().timeLimit, 965, 110)
     } else {
       canvas.context.fillText('???', 965, 105)
     }
     this.AnimateClock()
     // this.DrawImage(images.Clock, 860, 10)
-    canvas.context.drawImage(images.Clock, gameStates.CurrentLevel().clockFrame, 0, 96, 116, 860, 10, 48 * 2, 58 * 2)
+    canvas.context.drawImage(images.Clock, gameStates.CurrentLevel().clockFrame, 0, 96, 116, 860, 15, 48 * 2, 58 * 2)
   },
   AnimateClock: function () {
     if (gameStates.currentStoryModeState === storyModeStates.Playing) {

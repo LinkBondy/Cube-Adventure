@@ -5,25 +5,25 @@ const { canvas } = require('../drawing/Canvas')
 const { gameStates } = require('../data/GameData')
 
 const LockedFeature = {
-  infoCuber: 1,
-  infoCuber2: 10,
+  infoCuber: 0,
+  infoCuber2: 9,
   infoCuber3: 11,
   infoRollphant1: 20,
   ///
-  infoWall: 2,
-  infoInvisibleWall: 5,
-  infoWater: 8,
+  infoWall: 1,
+  infoInvisibleWall: 4,
+  infoWater: 7,
   ///
-  infoSwitch: 4,
-  infoTeleporter: 6,
+  infoSwitch: 3,
+  infoTeleporter: 5,
   ///
-  infoRock: 4,
+  infoRock: 3,
   ///
-  infoLifeJacket: 8,
+  infoLifeJacket: 7,
   infoFinishItems: 11,
   infoPryoShard: 12,
   ///
-  infoHole: 9
+  infoHole: 8
 }
 
 export class InfoController {

@@ -26,13 +26,15 @@ export class LifeJacket extends Item {
   }
 
   Draw () {
-    if (!this.collected) {
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-        draw.DrawImage(images.LifeJacket, this.x, this.y)
-      }
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (!this.collected) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+          draw.DrawImage(images.LifeJacket, this.x, this.y)
+        }
 
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-        draw.DrawImage(images.LifeJacketPlastic, this.x, this.y)
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+          draw.DrawImage(images.LifeJacketPlastic, this.x, this.y)
+        }
       }
     }
   }
@@ -52,13 +54,15 @@ export class ThreeBead extends Item {
   }
 
   Draw () {
-    if (!this.collected) {
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-        draw.DrawImage(images.ThreeBead, this.x, this.y)
-      }
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (!this.collected) {
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+          draw.DrawImage(images.ThreeBead, this.x, this.y)
+        }
 
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-        draw.DrawImage(images.ThreeBeadPlastic, this.x, this.y)
+        if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+          draw.DrawImage(images.ThreeBeadPlastic, this.x, this.y)
+        }
       }
     }
   }
@@ -70,5 +74,6 @@ export class ThreeBead extends Item {
       drawUpdate.blueCubeAlienLock = false
       gameStates.levelController.levels[8].items.splice(1, 1)
     }
+    this.collected = false
   }
 };

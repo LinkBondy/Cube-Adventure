@@ -5,6 +5,7 @@ const { MenuController } = require('../menuModes/Menu')
 const { LevelController } = require('../levels/Levels')
 const { Background } = require('../levels/Class')
 const { InfoController } = require('../menuModes/adventureLog')
+const { LossScreen, WinScreen } = require('../drawing/GameScreens')
 const { images } = require('../drawing/Images')
 const { draw } = require('../drawing/Draw')
 const { update } = require('../data/Update')
@@ -34,7 +35,7 @@ export const game = {
     if (!game.isRunning) { delta = 0 }
     dataManagement.Save(draw)
     update.UpdateGame(delta)
-    draw.DrawGame()
+    draw.MainDraw()
     // window.setTimeout(game.mainLoop, 1000 / 120)
     window.requestAnimationFrame(game.mainLoop)
   }
@@ -68,6 +69,8 @@ function StartGame () {
   gameStates.menuController = new MenuController()
   gameStates.arrayChartController = new ArrayChartController()
   gameStates.keybindController = new KeybindController()
+  gameStates.lossScreen = new LossScreen()
+  gameStates.winScreen = new WinScreen()
   gameStates.levelController.createLevels()
   dataManagement.Load()
   game.mainLoop()
@@ -76,7 +79,7 @@ function StartGame () {
 
 function LoadGame () {
   ///
-  if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i)) { gameStates.mobile = true } else { gameStates.mobile = false }
+  if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/Windows Phone/i)) { gameStates.mobile = true } else { gameStates.mobile = false }
   images.LoadImages()
   // audio.MusicW1.src = "musicName";
   ImageLoadingLoop()
