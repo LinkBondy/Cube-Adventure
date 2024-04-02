@@ -15,9 +15,10 @@ export const gameMode = {
 export const storyModeStates = {
   Selecting: 1,
   Playing: 2,
-  Lost: 3,
-  WonStage: 4,
-  Paused: 5
+  Tutorials: 3,
+  Lost: 4,
+  WonStage: 5,
+  Paused: 6
 }
 
 export const ShopMode/* shopStates */ = {
@@ -42,7 +43,8 @@ export const settingStates = {
   Selecting: 1,
   Keybinds: 2,
   ThemeColourSelection: 3,
-  Sound: 4
+  Saving: 4,
+  Sound: 5
 }
 
 export const gameStates = {
@@ -142,22 +144,30 @@ export const levelTools = {
 }
 
 export const dataManagement = {
-  Save: function () {
-    window.localStorage.setItem('level', gameStates.infoController.unlockedLevel)
-    window.localStorage.setItem('newUpdate', false)
-    if (gameStates.infoController.unlockedLevel !== gameStates.levelController.levels.length && gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex - 1) {
-      window.localStorage.setItem('stateGame', gameStates.currentStoryModeState)
-    } else { window.localStorage.setItem('stateGame', -1) }
-    window.localStorage.setItem('PlayerAlienLock', drawUpdate.blueCubeAlienLock)
-    window.localStorage.setItem('PlayerSadLock', drawUpdate.blueCubeSadLock)
-    window.localStorage.setItem('highestLevelLock', drawUpdate.highestLevelLock)
-    window.localStorage.setItem('StyleCube', gameStates.currentCubeStyle)
-    window.localStorage.setItem('backgroundStyle', gameStates.currentBackgroundStyle)
-    window.localStorage.setItem('currentThemeColourSelection', gameStates.arrayChartController.arrayCharts[0].currentSelection)
-    window.localStorage.setItem('keybindArray', JSON.stringify(gameStates.keybindController.keybinds))
+  autoSave: true,
+  Save: function (override) {
+    window.localStorage.setItem('autoSave', this.autoSave)
+    if (this.autoSave || override) {
+      window.localStorage.setItem('level', gameStates.infoController.unlockedLevel)
+      window.localStorage.setItem('newUpdate', false)
+      if (gameStates.infoController.unlockedLevel !== gameStates.levelController.levels.length && gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex - 1) {
+        window.localStorage.setItem('stateGame', gameStates.currentStoryModeState)
+      } else { window.localStorage.setItem('stateGame', -1) }
+      window.localStorage.setItem('PlayerAlienLock', drawUpdate.blueCubeAlienLock)
+      window.localStorage.setItem('PlayerSadLock', drawUpdate.blueCubeSadLock)
+      window.localStorage.setItem('highestLevelLock', drawUpdate.highestLevelLock)
+      window.localStorage.setItem('StyleCube', gameStates.currentCubeStyle)
+      window.localStorage.setItem('backgroundStyle', gameStates.currentBackgroundStyle)
+      window.localStorage.setItem('currentThemeColourSelection', gameStates.arrayChartController.arrayCharts[0].currentSelection)
+      window.localStorage.setItem('keybindArray', JSON.stringify(gameStates.keybindController.keybinds))
+    }
   },
 
   Load: function () {
+    if (window.localStorage.getItem('autoSave') !== null) {
+      this.autoSave = JSON.parse(window.localStorage.getItem('autoSave'))
+    }
+
     const newUpdate = window.localStorage.getItem('newUpdate')
     if (newUpdate !== null) {
       const level = Number(window.localStorage.getItem('level'))

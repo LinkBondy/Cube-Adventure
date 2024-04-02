@@ -1,5 +1,5 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, BackgroundStyles, gameStates, settingStates } = require('../data/GameData')
+const { gameMode, startingMenusStates, storyModeStates, ShopMode, BackgroundStyles, gameStates, settingStates, dataManagement } = require('../data/GameData')
 const { canvas } = require('./Canvas')
 const { images } = require('./Images')
 export const draw = {
@@ -48,6 +48,10 @@ export const draw = {
       }
       this.DrawTimer()
     }
+
+    if (gameStates.currentGameMode === gameMode.Settings && gameStates.currentSettingState === settingStates.Saving) {
+      this.SavingSettingsDraw()
+    }
     this.DrawToolBarButtons()
   },
   StoryModeDraw: function () {
@@ -56,7 +60,8 @@ export const draw = {
     }
 
     if (gameStates.currentStoryModeState === storyModeStates.Selecting) { this.DrawSelectLevel() }
-    // this.DrawRules()
+
+    // if (gameStates.currentStoryModeState === storyModeStates.Tutorials) { gameStates.infoController.DrawTutorials() }
 
     if (gameStates.currentStoryModeState === storyModeStates.WonStage) {
       gameStates.menuController.WinMenu.Draw()
@@ -152,25 +157,6 @@ export const draw = {
     })
     canvas.context.restore()
   },
-  DrawRules: function () {
-    canvas.context.font = '175px Arial'
-    canvas.context.fillStyle = 'purple'
-    canvas.context.fillText('Rules', 200, 175)
-    ///
-    canvas.context.font = '45px Arial'
-    canvas.context.fillStyle = 'rgb(2, 0, 139)'
-    canvas.context.fillText('Get to the pink to beat levels', 150, 275)
-    canvas.context.fillText('Watch out for enemies', 200, 350)
-    if (!gameStates.mobile) {
-      canvas.context.fillText('Use A, W, S, D or Arrow Keys to move', 50, 425)
-    } else if (gameStates.mobile) {
-      canvas.context.font = '35px Arial'
-      canvas.context.fillText('Tap above, below, to the left or to the right to move', 35, 415)
-    }
-    canvas.context.font = '75px Arial'
-    canvas.context.fillStyle = 'blue'
-    canvas.context.fillText('Press space to start', 80, 550)
-  },
   DrawSelectLevel: function () {
     canvas.context.font = '125px Arial'
     canvas.context.fillStyle = 'rgba(255, 255, 132, 0.788)'
@@ -189,13 +175,39 @@ export const draw = {
   SettingsDraw: function () {
     if (gameStates.currentSettingState === settingStates.Selecting) { gameStates.menuController.SettingsMenu.Draw() }
 
-    if (gameStates.keybindController.seletingKeybind === true) {
-      this.DrawRebindingText()
-    } else if (gameStates.currentSettingState === settingStates.Keybinds) {
-      gameStates.menuController.KeybindsSelector.Draw()
-      gameStates.keybindController.keybinds.forEach(function (keybind) {
-        keybind.Draw()
-      })
+    if (gameStates.currentSettingState === settingStates.Keybinds) {
+      if (gameStates.keybindController.seletingKeybind === true) {
+        this.DrawRebindingText()
+      } else {
+        gameStates.menuController.KeybindsSelector.Draw()
+        gameStates.keybindController.keybinds.forEach(function (keybind) {
+          keybind.Draw()
+        })
+      }
+    }
+
+    if (gameStates.currentSettingState === settingStates.Saving) {
+      gameStates.menuController.SavingMenu.Draw()
+    }
+
+    if (gameStates.currentSettingState === settingStates.Sound) {
+      gameStates.menuController.SoundMenu.Draw()
+    }
+  },
+  SavingSettingsDraw: function () {
+    // Set Alignment
+    canvas.context.textAlign = 'center'
+    // Set font and size
+    canvas.context.font = '40px Arial'
+    // Set font colour
+    canvas.context.fillStyle = 'black'
+    canvas.context.fillText('Auto Save:', 975, 75)
+
+    // Draws Images
+    if (dataManagement.autoSave) {
+      this.DrawImage(images.activated, 885, 100)
+    } else if (!dataManagement.autoSave) {
+      this.DrawImage(images.notActivated, 885, 100)
     }
   },
   DrawCharts: function () {

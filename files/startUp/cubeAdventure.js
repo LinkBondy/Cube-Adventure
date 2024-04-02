@@ -4,7 +4,7 @@ const { ArrayChartController } = require('../menuModes/ArrayChart')
 const { MenuController } = require('../menuModes/Menu')
 const { LevelController } = require('../levels/Levels')
 const { Background } = require('../levels/Class')
-const { InfoController } = require('../menuModes/adventureLog')
+const { InfoController } = require('../menuModes/AdventureLog')
 const { LossScreen, WinScreen } = require('../drawing/GameScreens')
 const { images } = require('../drawing/Images')
 const { draw } = require('../drawing/Draw')
@@ -33,7 +33,7 @@ export const game = {
     game.lastTime = new Date().getTime()
     let delta = 1
     if (!game.isRunning) { delta = 0 }
-    dataManagement.Save(draw)
+    dataManagement.Save(false)
     update.UpdateGame(delta)
     draw.MainDraw()
     // window.setTimeout(game.mainLoop, 1000 / 120)

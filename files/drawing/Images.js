@@ -84,6 +84,9 @@ export const images = {
     images.WorldTwoLedges = LoadImage('images/WorldTwoLedges.png')
     ///
     images.finishLine = LoadImage('images/finishLine.png')
+    ///
+    images.activated = LoadImage('images/Activated.png')
+    images.notActivated = LoadImage('images/Not-Activated.png')
   }
 }
 

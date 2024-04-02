@@ -1,6 +1,7 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates } = require('../data/GameData')
+const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates, dataManagement } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
+
 class MenuItem {
   constructor (title, valueX, valueY, color, action) {
     this.title = title
@@ -105,7 +106,7 @@ class Menu {
         canvas.context.shadowBlur = 10
         canvas.context.fillStyle = 'rgba(145, 145, 145, 0.8)'
         canvas.context.beginPath()
-        canvas.context.roundRect(self.x + widthPerItem * (menuItem.valueX - 1) + 2.5, self.y + heightPerItem * (menuItem.valueY - 1) + 2.5, widthPerItem - 10, heightPerItem - 10, 100)
+        canvas.context.roundRect(self.x + widthPerItem * (menuItem.valueX - 1) + 2.5, self.y + heightPerItem * (menuItem.valueY - 1), widthPerItem - 9.5, heightPerItem - 9.5, 100)
         canvas.context.fill()
         // Stating the MenuItem's size and colour
         canvas.context.font = self.fontSize + 'px Arial'
@@ -114,19 +115,17 @@ class Menu {
         canvas.context.font = self.fontSize / 1.5 + 'px Arial'
         canvas.context.fillStyle = 'gray'
       }
-      // Drawing the MenuItem's text
+      // Drawing the MenuItem's text and images
       canvas.context.shadowBlur = 0
       canvas.context.shadowOffsetX = 0
       canvas.context.shadowOffsetY = 0
       const textX = widthPerItem * (menuItem.valueX - 1) + self.x
       const textY = heightPerItem * (menuItem.valueY - 1) + self.y
-      console.log(self.fontSize)
       canvas.context.textAlign = 'center'
       canvas.context.textBaseline = 'middle'
-      // canvas.context.lineWidth = 3
-      // canvas.context.storkeStyle = 'rgb(0, 0, 0)'
+
       canvas.context.fillText(menuItem.title, textX + widthPerItem / 2 + 2.5, textY + heightPerItem / 2 + 2.5)
-      // canvas.context.strokeText(menuItem.title, textX + widthPerItem / 2 + 2.5, textY + heightPerItem / 2 + 2.5)
+
       canvas.context.fillStyle = 'black'
       canvas.context.textAlign = 'left'
       canvas.context.textBaseline = 'alphabetic'
@@ -196,13 +195,37 @@ export class MenuController {
       new MenuItem('Keybinds', 1, 1, 'rgb(230, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Keybinds, 'Settings')
       }),
-      new MenuItem('Theme Colour', 1, 2, 'rgb(135, 200, 0)', function () {
+      new MenuItem('Theme Colour', 1, 2, 'rgb(182, 200, 0)', function () {
         gameStates.SetGameState(settingStates.ThemeColourSelection, 'Settings')
       }),
-      new MenuItem('Comming Soon', 1, 3, 'rgb(0, 200, 0)', function () {
-        // gameStates.SetGameState(settingStates.Sound, "Settings")
+      new MenuItem('Saving', 1, 3, 'rgb(135, 200, 0)', function () {
+        gameStates.SetGameState(settingStates.Saving, 'Settings')
       })
+      /* new MenuItem('Sound', 1, 4, 'rgb(0, 200, 0)', function () {
+        gameStates.SetGameState(settingStates.Sound, 'Settings')
+      }) */
     ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */95))
+
+    this.menus.push(this.SavingMenu = new Menu([
+      new MenuItem('Auto Save', 1, 1, 'limeGreen', function () {
+        dataManagement.autoSave = !dataManagement.autoSave
+      }),
+      new MenuItem('Save Game', 1, 2, 'rgb(40, 200, 150)', function () {
+        dataManagement.Save(true)
+      })
+    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */115))
+
+    this.menus.push(this.SoundMenu = new Menu([
+      new MenuItem('Music', 1, 1, 'limeGreen', function () {
+        // Changes the Volume of Music
+      }),
+      new MenuItem('Sound Effects', 1, 2, 'limeGreen', function () {
+        // Changes the Volume of Sound Effects
+      }),
+      new MenuItem('Mute', 1, 3, 'rgb(40, 200, 150)', function () {
+        // Mutes the Volume
+      })
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */90))
 
     this.menus.push(this.LoseMenu = new Menu([
       new MenuItem('Retry', 1, 1, 'rgb(120, 0, 225)', function () {
@@ -279,14 +302,18 @@ export class MenuController {
         if (gameStates.currentSettingState === settingStates.Keybinds && !gameStates.keybindController.seletingKeybind) { return 2 }
         ///
         if (gameStates.currentSettingState === settingStates.Selecting) { return 3 }
+
+        if (gameStates.currentSettingState === settingStates.Saving) { return 4 }
+
+        if (gameStates.currentSettingState === settingStates.Sound) { return 5 }
       }
       ///
       if (gameStates.currentGameMode === gameMode.StoryMode) {
-        if (gameStates.currentStoryModeState === storyModeStates.Lost) { return 4 }
+        if (gameStates.currentStoryModeState === storyModeStates.Lost) { return 6 }
         ///
-        if (gameStates.currentStoryModeState === storyModeStates.WonStage) { return 5 }
+        if (gameStates.currentStoryModeState === storyModeStates.WonStage) { return 7 }
         ///
-        if (gameStates.currentStoryModeState === storyModeStates.Paused) { return 6 }
+        if (gameStates.currentStoryModeState === storyModeStates.Paused) { return 8 }
       }
     }
   }
