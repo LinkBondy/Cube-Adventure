@@ -1,5 +1,5 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, levelTools, settingStates, dataManagement } = require('../data/GameData')
+const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, settingStates, dataManagement } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 
 class MenuItem {
@@ -229,17 +229,18 @@ export class MenuController {
 
     this.menus.push(this.LoseMenu = new Menu([
       new MenuItem('Retry', 1, 1, 'rgb(120, 0, 225)', function () {
-        levelTools.Restart()
+        gameStates.CurrentLevel().startLevelTime()
+        gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
         gameStates.lossScreen.loseLevel = false
       }),
       new MenuItem('Selection Menu', 1, 2, 'rgb(90, 0, 225)', function () {
-        levelTools.Restart()
+        gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.lossScreen.loseLevel = false
       }),
       new MenuItem('Main Menu', 1, 3, 'rgb(60, 0, 225)', function () {
-        levelTools.Restart()
+        gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
         gameStates.lossScreen.loseLevel = false
@@ -249,19 +250,20 @@ export class MenuController {
     this.menus.push(this.WinMenu = new Menu([
       new MenuItem('Continue', 1, 1, 'rgb(255, 0, 75)', function () {
         if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1) {
-          levelTools.Restart()
+          gameStates.CurrentLevel().startLevelTime()
+          gameStates.CurrentLevel().restart()
           gameStates.currentLevelIndex++
           gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
           gameStates.winScreen.winLevel = false
         }
       }),
       new MenuItem('Selection Menu', 1, 2, 'rgb(255, 5, 115)', function () {
-        levelTools.Restart()
+        gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.winScreen.winLevel = false
       }),
       new MenuItem('Main Menu', 1, 3, 'rgb(255, 10, 150)', function () {
-        levelTools.Restart()
+        gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
         gameStates.winScreen.winLevel = false
@@ -270,21 +272,23 @@ export class MenuController {
 
     this.menus.push(this.PauseMenu = new Menu([
       new MenuItem('Resume', 1, 1, 'rgb(255, 0, 86)', function () {
+        gameStates.CurrentLevel().resumeLevelTime()
         gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
-        gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-          enemy.setTimer()
+        gameStates.CurrentLevel().cubers.forEach(function (cuber) {
+          cuber.setTimer()
         })
       }),
       new MenuItem('Retry', 1, 2, 'rgb(255, 85, 20)', function () {
-        levelTools.Restart()
+        gameStates.CurrentLevel().startLevelTime()
+        gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
       }),
       new MenuItem('Selection Menu', 1, 3, 'rgb(255, 124, 0)', function () {
-        levelTools.Restart()
+        gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
       }),
       new MenuItem('Main Menu', 1, 4, 'rgb(255, 170, 0)', function () {
-        levelTools.Restart()
+        gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
       })

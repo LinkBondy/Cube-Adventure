@@ -29,18 +29,22 @@ export const images = {
     images.RedCube_200x200 = LoadImage('images/RedCube_200x200.png')
     images.RedCubePlastic = LoadImage('images/RedCubePlastic.png')
     ///
+    images.ExpanderSpike = LoadImage('images/ExpanderSpike.png')
+    images.ExpanderSpikeAnimation = LoadImage('images/ExpanderSpikeAnimation.png')
+    images.Expander_200x200 = LoadImage('images/Expander_200x200.png')
+    ///
     images.TeleporterTomato = LoadImage('images/TeleporterTomato.png')
     images.TeleporterTomatoSprite = LoadImage('images/TeleporterTomatoSprite.png')
     images.TeleporterTomatoSprite_200x200 = LoadImage('images/TeleporterTomatoSprite_200x200.png')
     images.TeleporterPurple = LoadImage('images/TeleporterPurple.png')
     images.TeleporterPurpleSprite = LoadImage('images/TeleporterPurpleSprite.png')
     ///
-    images.SwitchW1Blue = LoadImage('images/SwitchW1Blue.png')
-    images.SwitchW1Blue_200x200 = LoadImage('images/SwitchW1Blue_200x200.png')
-    images.SwitchW1Purple = LoadImage('images/SwitchW1Purple.png')
-    images.SwitchW1Purple_200x200 = LoadImage('images/SwitchW1Purple_200x200.png')
-    images.SwitchW1ActivatedBlue = LoadImage('images/SwitchW1ActivatedBlue.png')
-    images.SwitchW1ActivatedPurple = LoadImage('images/SwitchW1ActivatedPurple.png')
+    images.BlueSwitch = LoadImage('images/BlueSwitch.png')
+    images.BlueSwitchActivated = LoadImage('images/BlueSwitchActivated.png')
+    images.BlueSwitch_200x200 = LoadImage('images/BlueSwitch_200x200.png')
+    images.PinkSwitch = LoadImage('images/PinkSwitch.png')
+    images.PinkSwitchActivated = LoadImage('images/PinkSwitchActivated.png')
+    images.PinkSwitch_200x200 = LoadImage('images/PinkSwitch_200x200.png')
     ///
     images.InvisibleWall = LoadImage('images/InvisibleWall.png')
     images.InvisibleWallV2 = LoadImage('images/InvisibleWallV2.png')

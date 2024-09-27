@@ -1,7 +1,7 @@
 'use strict'
 const { startingMenusStates, storyModeStates, gameMode, ShopMode, settingStates, gameStates } = require('../data/GameData')
 export function Keydown (event) {
-  console.log(event)
+  // console.log(event)
   const keybindArray = gameStates.keybindController.keybinds
   // Start Game "Menu"
   if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
@@ -38,6 +38,7 @@ export function Keydown (event) {
     // Level Selector to Game
     if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && gameStates.levelController.CheckLocked()) {
       gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
+      gameStates.CurrentLevel().startLevelTime()
       return
     }
     ///
@@ -48,8 +49,9 @@ export function Keydown (event) {
     // Game to Pause Menu
     if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
       gameStates.SetGameState(storyModeStates.Paused, 'StoryMode')
-      gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-        enemy.stopTimer()
+      gameStates.CurrentLevel().pauseLevelTime()
+      gameStates.CurrentLevel().cubers.forEach(function (cuber) {
+        cuber.stopTimer()
       })
       return
     }

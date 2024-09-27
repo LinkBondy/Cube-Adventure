@@ -1,14 +1,16 @@
 'use strict'
-const { Player, Enemy, ChangeDirectionSquare } = require('./Moveable')
+const { Player, Cuber, Expander, ChangeDirectionSquare } = require('./Moveable')
 const { TallGrass, FakeTallGrass, Rock, Water } = require('./Barriers')
 const { ReverseTile, Teleporter, Hole, FinishArea } = require('./Interactable')
 const { LifeJacket, ThreeBead } = require('./Collectable')
 const { gameStates } = require('../data/GameData')
+const { canvas } = require('../drawing/Canvas')
 
 class Level {
-  constructor (levelData, requirement1, requirement2, currentX, currentY, width, height, timeLimit) {
+  constructor (levelData, requirement1, requirement2, currentX, currentY, width, height, collectedItems, currentArea, timeLimit) {
     this.players = levelData.players ?? []
-    this.enemies = levelData.enemies ?? []
+    this.cubers = levelData.cubers ?? []
+    this.expanders = levelData.expanders ?? []
     this.walls = levelData.walls ?? []
     this.waters = levelData.waters ?? []
     this.items = levelData.items ?? []
@@ -26,18 +28,193 @@ class Level {
     this.startingY = this.currentY
     this.width = width
     this.height = height
-    this.collectedItems = []
+    this.collectedItems = collectedItems
+    this.currentArea = currentArea
+    this.originalCollectedItems = []
+    this.originalCollectedItems.push(...this.collectedItems)
     this.timeLimit = timeLimit
     this.originalTimeLimit = this.timeLimit
     this.clockFrame = 0
     this.timeWaited = 0
+    this.timeRemaining = undefined
+  }
+
+  draw () {
+    canvas.context.save()
+    canvas.context.translate(0 - 850 * (this.currentX - 1), 0 - 600 * (this.currentY - 1))
+    this.waters.forEach(function (water) {
+      water.Draw()
+    })
+
+    this.finishAreas.forEach(function (finishArea) {
+      finishArea.Draw()
+    })
+
+    this.holes.forEach(function (hole) {
+      hole.Draw()
+    })
+
+    this.reverseTiles.forEach(function (reverseTile) {
+      reverseTile.Draw()
+    })
+
+    this.teleporters.forEach(function (teleporter) {
+      teleporter.Draw()
+    })
+
+    this.items.forEach(function (item) {
+      item.Draw()
+    })
+
+    this.rocks.forEach(function (rock) {
+      rock.Draw()
+    })
+
+    /* this.changeDirectionSquares.forEach(function (changeDirectionSquare) {
+      changeDirectionSquare.Draw()
+    }) */
+
+    this.players.forEach(function (player) {
+      player.Draw()
+    })
+
+    this.cubers.forEach(function (cuber) {
+      cuber.Draw()
+    })
+
+    this.expanders.forEach(function (expander) {
+      expander.Draw()
+    })
+
+    this.walls.forEach(function (wall) {
+      wall.Draw()
+    })
+    canvas.context.restore()
+  }
+
+  update () {
+    this.cubers.forEach(function (cuber) {
+      cuber.update()
+    })
+    this.expanders.forEach(function (expander) {
+      expander.updateHitboxes()
+      expander.update()
+    })
+    this.players.forEach(function (player) {
+      player.update()
+      player.changeSlideVariables()
+    })
+    this.reverseTiles.forEach(function (reverseTile) {
+      reverseTile.update()
+    })
+    this.holes.forEach(function (hole) {
+      hole.update()
+    })
+    this.teleporters.forEach(function (teleporter) {
+      teleporter.update()
+    })
+  }
+
+  restart () {
+    this.reset()
+    this.players.forEach(function (player) {
+      player.reset()
+    })
+
+    this.finishAreas.forEach(function (finishArea) {
+      finishArea.reset()
+    })
+
+    this.cubers.forEach(function (cuber) {
+      cuber.reset()
+    })
+
+    this.expanders.forEach(function (expander) {
+      expander.reset()
+    })
+
+    this.waters.forEach(function (water) {
+      water.reset()
+    })
+
+    this.holes.forEach(function (hole) {
+      hole.reset()
+    })
+
+    this.reverseTiles.forEach(function (reverseTile) {
+      reverseTile.reset()
+    })
+
+    this.teleporters.forEach(function (teleporter) {
+      teleporter.reset()
+    })
+
+    this.items.forEach(function (item) {
+      item.reset()
+    })
+
+    this.rocks.forEach(function (rock) {
+      rock.reset()
+    })
+
+    this.changeDirectionSquares.forEach(function (changeDirectionSquare) {
+      changeDirectionSquare.reset()
+    })
+
+    this.walls.forEach(function (wall) {
+      wall.reset()
+    })
+  }
+
+  startLevelTime () {
+    this.startDate = new Date()
+    this.currentTimeout = window.setTimeout(function () { gameStates.CurrentLevel().updateLevelTime() }, 1000 * gameStates.delta)
+  }
+
+  pauseLevelTime () {
+    gameStates.pausedDate = new Date()
+    window.clearTimeout(gameStates.CurrentLevel().currentTimeout)
+  }
+
+  resumeLevelTime () {
+    window.clearTimeout(this.currentTimeout)
+    if (this.timeRemaining === undefined) {
+      this.timeRemaining = 1000 - (gameStates.pausedDate - this.startDate)
+      this.currentTimeout = window.setTimeout(function () { gameStates.CurrentLevel().updateLevelTime() }, this.timeRemaining * gameStates.delta)
+    } else {
+      const oldRemainingTime = this.timeRemaining
+      this.timeRemaining = oldRemainingTime - (gameStates.pausedDate - this.startDate)
+      this.currentTimeout = window.setTimeout(function () { gameStates.CurrentLevel().updateLevelTime() }, this.timeRemaining * gameStates.delta)
+    }
+    this.startDate = new Date()
+  }
+
+  updateLevelTime () {
+    this.currentTimeout = window.setTimeout(function () { gameStates.CurrentLevel().updateLevelTime() }, 1000 * gameStates.delta)
+    this.timeRemaining = undefined
+    this.startDate = new Date()
+    if (gameStates.isRunning) {
+      this.timeLimit -= 1
+    }
   }
 
   reset () {
-    this.collectedItems = []
+    this.currentX = this.startingX
+    this.currentY = this.startingY
     this.timeLimit = this.originalTimeLimit
+    this.collectedItems = []
+    this.collectedItems.push(...this.originalCollectedItems)
     this.clockFrame = 0
     this.timeWaited = 0
+  }
+
+  haveItem (item) {
+    for (let i = 0; i < this.collectedItems.length; i++) {
+      if (item === this.collectedItems[i]) {
+        return true
+      }
+    }
+    return false
   }
 }
 
@@ -45,7 +222,6 @@ export class LevelController {
   constructor () {
     this.levels = []
     this.specialLevels = []
-    this.currentWorld = 1
   }
 
   createLevels () {
@@ -54,9 +230,9 @@ export class LevelController {
       players: [
         new Player(400, 0, 50, 50)
       ],
-      enemies: [
-        new Enemy(700, 400, 50, 50, [true, false, false, false], 10),
-        new Enemy(100, 150, 50, 50, [false, true, false, false], 10)
+      cubers: [
+        new Cuber(700, 400, 50, 50, [true, false, false, false], 10),
+        new Cuber(100, 150, 50, 50, [false, true, false, false], 10)
       ],
       walls: [
         /// Left Wall
@@ -93,15 +269,15 @@ export class LevelController {
       finishAreas: [
         new FinishArea(350, 550, 150, 50)
       ]
-    }, /* Requirements */0, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 100))
+    }, /* Requirements */0, undefined, /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 75))
 
     // Level 2
     this.levels.push(new Level({
       players: [
         new Player(400, 0, 50, 50)
       ],
-      enemies: [
-        new Enemy(400, 500, 50, 50, [false, false, true, false], 5.5)
+      cubers: [
+        new Cuber(400, 500, 50, 50, [false, false, true, false], 5.5)
       ],
       walls: [
         new TallGrass(0, 0, 350, 600),
@@ -116,17 +292,17 @@ export class LevelController {
       finishAreas: [
         new FinishArea(350, 550, 150, 50)
       ]
-    }, /* Requirements */1, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 150))
+    }, /* Requirements */1, undefined, /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 100))
 
     // Level 3
     this.levels.push(new Level({
       players: [
         new Player(400, 0, 50, 50)
       ],
-      enemies: [
-        new Enemy(200, 450, 50, 50, [true, false, false, false], 6),
-        new Enemy(400, 350, 50, 50, [true, true, false, false], 5),
-        new Enemy(600, 50, 50, 50, [false, true, false, false], 6)
+      cubers: [
+        new Cuber(200, 450, 50, 50, [true, false, false, false], 6),
+        new Cuber(400, 350, 50, 50, [true, true, false, false], 5),
+        new Cuber(600, 50, 50, 50, [false, true, false, false], 6)
       ],
       walls: [
         new TallGrass(0, 0, 200, 550),
@@ -163,21 +339,21 @@ export class LevelController {
         ///
         new ChangeDirectionSquare(500, 350, 50, 50, false, true, true, false, true)
       ]
-    }, /* Requirements */2, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 150))
+    }, /* Requirements */2, undefined, /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 100))
 
     // Level 4
     this.levels.push(new Level({
       players: [
         new Player(400, 550, 50, 50)
       ],
-      enemies: [
-        new Enemy(400, 50, 50, 50, [true, true, false, false], 5.5),
+      cubers: [
+        new Cuber(400, 50, 50, 50, [true, true, false, false], 5.5),
         ///
-        new Enemy(100, 250, 50, 50, [true, false, false, false], 5),
-        new Enemy(300, 400, 50, 50, [true, false, false, false], 5),
+        new Cuber(100, 250, 50, 50, [true, false, false, false], 5),
+        new Cuber(300, 400, 50, 50, [true, false, false, false], 5),
         ///
-        new Enemy(700, 250, 50, 50, [false, true, false, false], 5),
-        new Enemy(500, 400, 50, 50, [false, true, false, false], 5)
+        new Cuber(700, 250, 50, 50, [false, true, false, false], 5),
+        new Cuber(500, 400, 50, 50, [false, true, false, false], 5)
       ],
       walls: [
         /// Borders
@@ -222,18 +398,18 @@ export class LevelController {
       reverseTiles: [
         new ReverseTile(200, 500, 50, 50, 'blue')
       ]
-    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 200))
+    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 150))
 
     // Level 5
     this.levels.push(new Level({
       players: [
         new Player(400, 550, 50, 50)
       ],
-      enemies: [
-        new Enemy(250, 50, 50, 50, [false, true, false, false], 5),
+      cubers: [
+        new Cuber(250, 50, 50, 50, [false, true, false, false], 5),
         ///
-        new Enemy(150 + 850, 275, 50, 50, [false, false, false, true], 6),
-        new Enemy(200 + 850, 275, 50, 50, [false, false, true, false], 6)
+        new Cuber(150 + 850, 275, 50, 50, [false, false, false, true], 6),
+        new Cuber(200 + 850, 275, 50, 50, [false, false, true, false], 6)
       ],
       walls: [
         // Top Borders
@@ -309,19 +485,19 @@ export class LevelController {
         new ReverseTile(250, 100, 50, 50, 'blue'),
         new ReverseTile(300 + 850, 275, 50, 50, 'pink')
       ]
-    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 300))
+    }, /* Requirements */4, undefined, /* Level Borders */1, 1, 2, 1, [], /* Area */ 1, /* Time Limit */ 200))
 
     // Level 6
     this.levels.push(new Level({
       players: [
         new Player(800, 250, 50, 50)
       ],
-      enemies: [
-        new Enemy(700, 50, 50, 50, [false, false, false, true], 5),
-        new Enemy(450, 500, 50, 50, [false, false, true, false], 5),
-        new Enemy(250, 50, 50, 50, [false, false, false, true], 5),
-        new Enemy(50, 500, 50, 50, [false, false, true, false], 5),
-        new Enemy(100, 450 + 600, 50, 50, [false, true, false, false], 4)
+      cubers: [
+        new Cuber(700, 50, 50, 50, [false, false, false, true], 5),
+        new Cuber(450, 500, 50, 50, [false, false, true, false], 5),
+        new Cuber(250, 50, 50, 50, [false, false, false, true], 5),
+        new Cuber(50, 500, 50, 50, [false, false, true, false], 5),
+        new Cuber(100, 450 + 600, 50, 50, [false, true, false, false], 4)
       ],
       walls: [
         // Top Border
@@ -410,15 +586,15 @@ export class LevelController {
         new Teleporter(550, 450, 50, 50, '6Teleporter', 2),
         new Teleporter(350, 200, 50, 50, '6Teleporter', 2)
       ]
-    }, /* Requirements */5, undefined, /* Level Borders */1, 1, 1, 2, /* Time Limit */ 350))
+    }, /* Requirements */5, undefined, /* Level Borders */1, 1, 1, 2, [], /* Area */ 1, /* Time Limit */ 200))
 
     // Level 7
     this.levels.push(new Level({
       players: [
         new Player(750, 100, 50, 50)
       ],
-      enemies: [
-        new Enemy(500, 500, 50, 50, [true, false, false, false], 3.5)
+      cubers: [
+        new Cuber(500, 500, 50, 50, [true, false, false, false], 3.5)
       ],
       walls: [
         // Top and Bottom
@@ -495,17 +671,17 @@ export class LevelController {
         new Teleporter(750, 450, 50, 50, '7Teleporter', 1),
         new Teleporter(50, 300, 50, 50, '7Teleporter', 1)
       ]
-    }, /* Requirements */6, undefined, /* Level Borders */1, 1, 1, 1, /* Time Limit */ 200))
+    }, /* Requirements */6, undefined, /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 200))
 
     // Level 8
     this.levels.push(new Level({
       players: [
         new Player(150, 50 + 600, 50, 50)
       ],
-      enemies: [
-        new Enemy(250, 100 + 600, 50, 50, [true, false, false, false], 4),
-        new Enemy(50, 250 + 600, 50, 50, [false, true, false, false], 4.5),
-        new Enemy(250, 400 + 600, 50, 50, [true, false, false, false], 4)
+      cubers: [
+        new Cuber(250, 100 + 600, 50, 50, [true, false, false, false], 4),
+        new Cuber(50, 250 + 600, 50, 50, [false, true, false, false], 4.5),
+        new Cuber(250, 400 + 600, 50, 50, [true, false, false, false], 4)
       ],
       walls: [
         new TallGrass(0, 0, 250, 100),
@@ -596,25 +772,16 @@ export class LevelController {
         new Teleporter(150, 500 + 600, '8Teleporter', 50, 50, 2),
         new Teleporter(650, 50 + 600, '8Teleporter', 50, 50, 2)
       ]
-    }, /* Requirements */7, undefined, /* Level Borders */1, 2, 1, 2, /* Time Limit */ 250))
+    }, /* Requirements */7, undefined, /* Level Borders */1, 2, 1, 2, [], /* Area */ 1, /* Time Limit */ 200))
 
     // Level 9
     this.levels.push(new Level({
       players: [
         new Player(0, 300, 50, 50)
       ],
-      enemies: [
-        new Enemy(600, 300, 50, 50, [false, false, true, true], 6),
-        new Enemy(400, 350 + 600, 50, 50, [true, true, false, false], 4)
-        /* new Enemy(500, 200, 50, 50, [true, false, false, false], 4),
-        // Pink Switch Puzzle
-        new Enemy(450, 300, 50, 50, [false, false, false, true], 3),
-        new Enemy(550, 300, 50, 50, [false, false, false, true], 3),
-        new Enemy(650, 300, 50, 50, [false, false, false, true], 3),
-        //
-        new Enemy(350, 600 + 50, 50, 50, [false, false, false, true], 4),
-        new Enemy(400, 600 + 400, 50, 50, [false, false, true, false], 4),
-        new Enemy(450, 600 + 50, 50, 50, [false, false, false, true], 4) */
+      cubers: [
+        new Cuber(600, 300, 50, 50, [false, false, true, true], 6),
+        new Cuber(400, 350 + 600, 50, 50, [true, true, false, false], 4)
       ],
       walls: [
         /// A
@@ -795,18 +962,18 @@ export class LevelController {
       reverseTiles: [
         new ReverseTile(600, 450 + 600, 50, 50, 'pink')
       ]
-    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 2, /* Time Limit */ 200))
+    }, /* Requirements */8, undefined, /* Level Borders */1, 1, 2, 2, [], /* Area */ 1, /* Time Limit */ 300))
 
     // Level 10
     this.levels.push(new Level({
       players: [
         new Player(700, 550, 50, 50)
       ],
-      enemies: [
-        new Enemy(350, 50, 50, 50, [false, false, false, true], 3.5, 750),
-        new Enemy(450, 50, 50, 50, [false, false, false, true], 3.5, 750),
+      cubers: [
+        new Cuber(350, 50, 50, 50, [false, false, false, true], 3.5, 750),
+        new Cuber(450, 50, 50, 50, [false, false, false, true], 3.5, 750),
         ///
-        new Enemy(200 + 850, 300, 50, 50, [false, true, false, false], 5, 750)
+        new Cuber(200 + 850, 300, 50, 50, [false, true, false, false], 5, 750)
       ],
       walls: [
         new TallGrass(0, 0, 850, 50),
@@ -917,20 +1084,125 @@ export class LevelController {
         new Teleporter(100, 300, '10Teleporter', 50, 50, 1),
         new Teleporter(550 + 850, 100, '10Teleporter', 50, 50, 1)
       ]
-    }, /* Requirements */9, undefined, /* Level Borders */1, 1, 2, 1, /* Time Limit */ 300))
+    }, /* Requirements */9, undefined, /* Level Borders */1, 1, 2, 1, [], /* Area */ 1, /* Time Limit */ 200))
+
+    // Level 11
+    this.levels.push(new Level({
+      players: [
+        new Player(800 + 850, 450 + 600, 50, 50)
+      ],
+      expanders: [
+        new Expander(205 + 850, 255 + 600, /* startLength */40, 40, /* endLength */140, 140, /* speed */ 1, 1, /* waitTime */1000),
+        new Expander(505, 405 + 600, /* startLength */90, 40, /* endLength */180, 140, /* speed */ 1, 1, /* waitTime */1000),
+        new Expander(305, 55 + 600, /* startLength */40, 40, /* endLength */140, 140, /* speed */ 2, 2, /* waitTime */1250)
+      ],
+      walls: [
+        // First Screen
+        // Top
+        new TallGrass(700 + 850, 0 + 600, 150, 400),
+        new TallGrass(650 + 850, 300 + 600, 50, 50),
+        new TallGrass(550 + 850, 0 + 600, 150, 300),
+        new TallGrass(350 + 850, 0 + 600, 200, 250),
+        new TallGrass(0 + 850, 0 + 600, 350, 200),
+        new TallGrass(0 + 850, 200 + 600, 100, 50),
+
+        // Bottom
+        new TallGrass(0 + 850, 550 + 600, 850, 50),
+        new TallGrass(0 + 850, 500 + 600, 650, 50),
+        new TallGrass(0 + 850, 450 + 600, 550, 50),
+        new TallGrass(0 + 850, 400 + 600, 400, 50),
+        new TallGrass(150 + 850, 350 + 600, 150, 50),
+
+        // Second Screen
+        // Top
+        new TallGrass(700, 0 + 600, 150, 250),
+        new TallGrass(600, 0 + 600, 100, 300),
+        new TallGrass(500, 0 + 600, 100, 350),
+        // Bottom
+        new TallGrass(750, 400 + 600, 100, 50),
+        new TallGrass(650, 450 + 600, 250, 50),
+        new TallGrass(0, 500 + 600, 850, 100),
+        // Tunnle Right Side
+        new TallGrass(450, 0 + 600, 50, 300),
+        new TallGrass(400, 0 + 600, 50, 150),
+        // Tunnle Left Side
+        new TallGrass(0, 0 + 600, 250, 500),
+        new TallGrass(250, 150 + 600, 50, 350),
+        new TallGrass(300, 250 + 600, 50, 250),
+        // Tunnle Bottom
+        new TallGrass(400, 450 + 600, 50, 50),
+        new TallGrass(350, 400 + 600, 50, 100),
+
+        // Third Screen
+        // Enterance
+        new TallGrass(0, 550, 250, 50),
+        new TallGrass(0, 500, 300, 50),
+        new TallGrass(0, 450, 350, 50),
+        new TallGrass(400, 550, 450, 50),
+        new TallGrass(450, 500, 400, 50),
+        new TallGrass(500, 450, 350, 50),
+
+        // Top
+        new TallGrass(0, 0, 100, 450),
+
+        // Left
+        new TallGrass(100, 0, 650, 100),
+        new TallGrass(100, 100, 50, 100),
+        new TallGrass(100, 350, 50, 100),
+
+        // Right
+        new TallGrass(700, 350, 50, 100),
+        new TallGrass(700, 100, 50, 100),
+        new TallGrass(750, 0, 100, 450)
+
+      ],
+      waters: [
+        // Screen One
+        new Water(700 + 850, 400 + 600, 150, 150),
+        new Water(650 + 850, 350 + 600, 50, 200),
+        new Water(550 + 850, 300 + 600, 100, 200),
+        new Water(400 + 850, 250 + 600, 150, 200),
+        new Water(350 + 850, 250 + 600, 50, 150),
+        new Water(300 + 850, 200 + 600, 50, 200),
+        new Water(150 + 850, 200 + 600, 150, 150),
+        new Water(100 + 850, 200 + 600, 50, 200),
+        new Water(0 + 850, 250 + 600, 100, 150),
+
+        // Screen Two
+        new Water(750, 250 + 600, 100, 150),
+        new Water(700, 250 + 600, 50, 200),
+        new Water(650, 300 + 600, 50, 150),
+        new Water(600, 300 + 600, 50, 200),
+        new Water(500, 350 + 600, 100, 150),
+        new Water(450, 300 + 600, 50, 200),
+        new Water(400, 250 + 600, 50, 200),
+        new Water(350, 250 + 600, 50, 150),
+        new Water(300, 150 + 600, 150, 100),
+        new Water(250, 0 + 600, 150, 150),
+
+        // Screen Three
+        new Water(250, 550, 150, 50),
+        new Water(300, 500, 150, 50)
+      ],
+      finishAreas: [
+        new FinishArea(400, 200, 50, 50),
+        new FinishArea(350, 250, 150, 50),
+        new FinishArea(400, 300, 50, 50)
+      ]
+    }, /* Requirements */10, undefined, /* Level Borders */2, 2, 2, 2, ['lifeJacket'], /* Area */ 1, /* Time Limit */ 50))
 
     // Level 1 + 2 + 3
     this.specialLevels.push(new Level({
       players: [
         new Player(400, 0, 50, 50)
       ],
-      enemies: [
-        new Enemy(700, 400, 50, 50, [true, false, false, false], 10),
-        new Enemy(100, 150, 50, 50, [false, true, false, false], 10),
-        new Enemy(400, 450 + 600, 50, 50, [false, false, true, false], 5.5),
-        new Enemy(200, 450 + 1200, 50, 50, [true, false, false, false], 6),
-        new Enemy(400, 350 + 1200, 50, 50, [true, true, false, false], 5),
-        new Enemy(600, 50 + 1200, 50, 50, [false, true, false, false], 6)
+      cubers: [
+        new Cuber(700, 400, 50, 50, [true, false, false, false], 10),
+        new Cuber(100, 150, 50, 50, [false, true, false, false], 10),
+        new Cuber(400, 450 + 600, 50, 50, [false, false, true, false], 5.5),
+        new Cuber(200, 450 + 1200, 50, 50, [true, false, false, false], 6),
+        new Cuber(400, 350 + 1200, 50, 50, [true, true, false, false], 5),
+        new Cuber(600, 50 + 1200, 50, 50, [false, true, false, false], 6)
       ],
       walls: [
         /// Level 1
@@ -1013,7 +1285,7 @@ export class LevelController {
         ///
         new ChangeDirectionSquare(500, 350 + 1200, 50, 50, false, true, true, false, true)
       ]
-    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 3, /* Time Limit */ 500))
+    }, /* Requirements */3, undefined, /* Level Borders */1, 1, 1, 3, [], /* Area */ 1, /* Time Limit */ 200))
   }
 
   CheckLocked () {

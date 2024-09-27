@@ -8,14 +8,6 @@ export class Item extends GameObject {
     this.type = type
     this.collected = collected
   }
-
-  UseItem (item, objectIntersecting) {
-    if (item.type === 'lifeJacket') {
-      objectIntersecting.waterMovement = true
-    }
-    item.collected = true
-    gameStates.CurrentLevel().collectedItems.push(this)
-  }
 };
 
 export class LifeJacket extends Item {

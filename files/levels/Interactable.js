@@ -36,8 +36,8 @@ export class ReverseTile extends GameObject {
       }
     })
 
-    gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-      if (self.intersects(/* 1, */ enemy)) {
+    gameStates.CurrentLevel().cubers.forEach(function (cuber) {
+      if (self.intersects(/* 1, */ cuber)) {
         gameStates.CurrentLevel().rocks.forEach(function (rock) {
           if (self.colorType === rock.colorType && rock.allowMovement === rock.originalAllowMovement) {
             rock.allowMovement = !rock.allowMovement
@@ -60,21 +60,21 @@ export class ReverseTile extends GameObject {
         if (!this.activated) {
           switch (this.colorType) {
             case 'blue':
-              image = images.SwitchW1Blue
+              image = images.BlueSwitch
               break
 
             case 'pink':
-              image = images.SwitchW1Purple
+              image = images.PinkSwitch
               break
           }
         } else if (this.activated) {
           switch (this.colorType) {
             case 'blue':
-              image = images.SwitchW1ActivatedBlue
+              image = images.BlueSwitchActivated
               break
 
             case 'pink':
-              image = images.SwitchW1ActivatedPurple
+              image = images.PinkSwitchActivated
               break
           }
         }
@@ -194,7 +194,7 @@ export class Hole extends GameObject {
       if (this.fullHole) { this.DrawingX = 100 } else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } else { this.DrawingX = 0 }
 
       if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-        switch (gameStates.levelController.currentWorld) {
+        switch (gameStates.CurrentLevel().currentArea) {
           case 1:
             canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
             break
@@ -226,7 +226,7 @@ export class Hole extends GameObject {
 
 export class FinishArea extends GameObject {
   constructor (x, y, width, height) {
-    super(x, y, width, height, 'pink')
+    super(x, y, width, height, 'rgb(255, 176, 231)')
     this.original_x = this.x
     this.original_y = this.y
   }

@@ -13,6 +13,7 @@ const { gameStates, dataManagement } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 const { Keydown, KeyUp } = require('../events/Keydown')
 const { MouseDown } = require('../events/MouseDown')
+
 /* const audio = {
   MusicW1: new Audio(),
   SetMusic: function () {
@@ -25,18 +26,17 @@ const { MouseDown } = require('../events/MouseDown')
 
 export const game = {
   startTime: new Date(),
-  isRunning: true,
   lastTime: new Date().getTime(),
   ///
   mainLoop: function () {
     // const timePassed = new Date().getTime() - game.lastTime
-    game.lastTime = new Date().getTime()
-    let delta = 1
-    if (!game.isRunning) { delta = 0 }
-    dataManagement.Save(false)
-    update.UpdateGame(delta)
-    draw.MainDraw()
-    // window.setTimeout(game.mainLoop, 1000 / 120)
+    if (gameStates.isRunning) {
+      game.lastTime = new Date().getTime()
+      dataManagement.Save(false)
+      update.UpdateGame()
+      draw.MainDraw()
+      // window.setTimeout(game.mainLoop, 1000 / 120)
+    }
     window.requestAnimationFrame(game.mainLoop)
   }
 }
@@ -44,11 +44,11 @@ export const game = {
 function handleVisibilityChange () {
   if (document.visibilityState === 'hidden') {
     console.log('it is hidden')
-    game.isRunning = false
+    gameStates.isRunning = false
   } else {
     console.log('it is showing')
     game.lastTime = new Date().getTime()
-    game.isRunning = true
+    gameStates.isRunning = true
   }
 }
 

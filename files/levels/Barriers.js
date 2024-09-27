@@ -49,6 +49,7 @@ export class Wall extends GameObject {
 export class TallGrass extends Wall {
   constructor (x, y, width, height) {
     super(x, y, width, height, 'rgb(190, 190, 190)', 'tallGrass')
+    this.color2 = 'rgb(120, 120, 120)'
     this.original_x = this.x
     this.original_y = this.y
     this.randomList = Array(100)
@@ -66,7 +67,7 @@ export class TallGrass extends Wall {
           ///
           canvas.context.save()
           canvas.context.translate(x - 2, y - 2)
-          switch (gameStates.levelController.currentWorld) {
+          switch (gameStates.CurrentLevel().currentArea) {
             case 1:
               // if (this.randomList[i] % 2 === 0)
               // canvas.context.rotate(90 * Math.PI / 180)
@@ -98,7 +99,15 @@ export class TallGrass extends Wall {
         }
       }
     } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      canvas.context.fillStyle = this.color1
+      switch (gameStates.CurrentLevel().currentArea) {
+        case 1:
+          canvas.context.fillStyle = this.color1
+          break
+
+        case 3:
+          canvas.context.fillStyle = this.color2
+          break
+      }
       canvas.context.fillRect(this.x, this.y, this.width, this.height)
     }
 

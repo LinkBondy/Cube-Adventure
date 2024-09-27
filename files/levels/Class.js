@@ -60,6 +60,15 @@ export class GameObject {
     return false
   }
 
+  intersectsWithHitboxes (other) {
+    for (let i = 0; i < other.hitboxes.length; i++) {
+      if (this.intersects(other.hitboxes[i])) {
+        return true
+      }
+    }
+    return false
+  }
+
   intersectsAll (offset, otherBox) {
     // Check if the left-top point is inside otherBox
     if (offset === 0) {
@@ -155,7 +164,7 @@ export class Background {
 
   DrawBackround () {
     if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      switch (gameStates.levelController.currentWorld) {
+      switch (gameStates.CurrentLevel().currentArea) {
         case 1:
           this.color1 = 'rgb(100, 200, 100)'
           break

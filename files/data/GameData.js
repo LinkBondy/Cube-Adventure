@@ -57,8 +57,12 @@ export const gameStates = {
   currentCubeStyle: cubeStyle.BlueCube,
   currentThemeColour: 'lightgray',
   currentLevelIndex: 0,
+  delta: 1,
+  pausedDate: undefined,
+  isRunning: true,
   mobile: false,
   loading: true,
+  stopTime: false,
   CurrentLevel: function () {
     return gameStates.levelController.levels[gameStates.currentLevelIndex]
   },
@@ -69,9 +73,6 @@ export const gameStates = {
     }
     if (type === 'StoryMode') {
       gameStates.currentStoryModeState = gameState
-      if (gameStates.currentStoryModeState === storyModeStates.Playing) {
-        levelTools.UpdateLevelTime()
-      }
     }
     if (type === 'Settings') {
       gameStates.currentSettingState = gameState
@@ -83,64 +84,6 @@ export const drawUpdate = {
   highestLevelLock: true,
   blueCubeSadLock: true,
   blueCubeAlienLock: true
-}
-
-export const levelTools = {
-  Restart: function () {
-    gameStates.CurrentLevel().reset()
-    gameStates.CurrentLevel().players.forEach(function (player) {
-      player.reset()
-    })
-
-    gameStates.CurrentLevel().finishAreas.forEach(function (finishArea) {
-      finishArea.reset()
-    })
-
-    gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-      enemy.reset()
-    })
-
-    gameStates.CurrentLevel().waters.forEach(function (water) {
-      water.reset()
-    })
-
-    gameStates.CurrentLevel().holes.forEach(function (hole) {
-      hole.reset()
-    })
-
-    gameStates.CurrentLevel().reverseTiles.forEach(function (reverseTile) {
-      reverseTile.reset()
-    })
-
-    gameStates.CurrentLevel().teleporters.forEach(function (teleporter) {
-      teleporter.reset()
-    })
-
-    gameStates.CurrentLevel().items.forEach(function (item) {
-      item.reset()
-    })
-
-    gameStates.CurrentLevel().rocks.forEach(function (rock) {
-      rock.reset()
-    })
-
-    gameStates.CurrentLevel().changeDirectionSquares.forEach(function (changeDirectionSquare) {
-      changeDirectionSquare.reset()
-    })
-
-    gameStates.CurrentLevel().walls.forEach(function (wall) {
-      wall.reset()
-    })
-    gameStates.CurrentLevel().currentX = gameStates.CurrentLevel().startingX
-    gameStates.CurrentLevel().currentY = gameStates.CurrentLevel().startingY
-  },
-
-  UpdateLevelTime: function () {
-    if (gameStates.currentStoryModeState === storyModeStates.Playing) {
-      gameStates.CurrentLevel().timeLimit -= 1
-      window.setTimeout(levelTools.UpdateLevelTime, 1000)
-    }
-  }
 }
 
 export const dataManagement = {

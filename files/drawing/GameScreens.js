@@ -42,8 +42,13 @@ export class LossScreen {
     const self = this
     if (gameStates.currentStoryModeState !== storyModeStates.Lost && !this.loseLevel) {
       gameStates.CurrentLevel().players.forEach(function (player) {
-        gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-          if (player.intersects(enemy)) {
+        gameStates.CurrentLevel().cubers.forEach(function (cuber) {
+          if (player.intersects(cuber)) {
+            self.SetLoss(gameStates.CurrentLevel().timeLimit, 'enemy')
+          }
+        })
+        gameStates.CurrentLevel().expanders.forEach(function (expander) {
+          if (player.intersectsWithHitboxes(expander)) {
             self.SetLoss(gameStates.CurrentLevel().timeLimit, 'enemy')
           }
         })
@@ -63,6 +68,7 @@ export class LossScreen {
     const self = this
     this.loseLevel = true
     setTimeout(function () {
+      window.clearTimeout(gameStates.CurrentLevel().currentTimeout)
       self.loseReason = reason
       self.timeLeft = timeLeft
       self.currentLosses += 1
@@ -100,6 +106,7 @@ export class WinScreen {
   SetWin () {
     this.winLevel = true
     setTimeout(function () {
+      window.clearTimeout(gameStates.CurrentLevel().currentTimeout)
       gameStates.SetGameState(storyModeStates.WonStage, 'StoryMode')
       if (gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex) { gameStates.infoController.unlockedLevel++ }
       if (gameStates.infoController.unlockedLevel === gameStates.levelController.levels.length) { drawUpdate.highestLevelLock = false }

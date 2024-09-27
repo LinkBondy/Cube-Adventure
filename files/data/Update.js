@@ -2,12 +2,12 @@
 const { gameMode, startingMenusStates, storyModeStates, gameStates, settingStates } = require('./GameData')
 
 export const update = {
-  UpdateGame: function (delta) {
+  UpdateGame: function () {
     // if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { gameStates.menuController.MainMenu.Update() }
 
     if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
       if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
-        this.updateLevels(delta)
+        gameStates.CurrentLevel().update()
         gameStates.lossScreen.CheckLose()
         gameStates.winScreen.CheckWin()
       }
@@ -31,25 +31,5 @@ export const update = {
     gameStates.keybindController.keybinds.forEach(function (keybind) {
       keybind.Update()
     })
-  },
-  updateLevels: function (delta) {
-    if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
-      gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-        enemy.update(delta)
-      })
-      gameStates.CurrentLevel().players.forEach(function (player) {
-        player.update(delta)
-        player.changeSlideVariables()
-      })
-      gameStates.CurrentLevel().reverseTiles.forEach(function (reverseTile) {
-        reverseTile.update(delta)
-      })
-      gameStates.CurrentLevel().holes.forEach(function (hole) {
-        hole.update(delta)
-      })
-      gameStates.CurrentLevel().teleporters.forEach(function (teleporter) {
-        teleporter.update(delta)
-      })
-    }
   }
 }

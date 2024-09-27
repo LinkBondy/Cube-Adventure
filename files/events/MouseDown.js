@@ -24,17 +24,19 @@ export function MouseDown (event) {
   if (isTouching(925, 475, 100, 100, event.offsetX, event.offsetY)) {
     if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStoryModeState === storyModeStates.Playing) {
       gameStates.SetGameState(storyModeStates.Paused, 'StoryMode')
-      gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-        window.clearTimeout(enemy.timeoutID)
-        enemy.pausedDate = new Date()
+      gameStates.CurrentLevel().cubers.forEach(function (cuber) {
+        window.clearTimeout(cuber.timeoutID)
+        cuber.pausedDate = new Date()
       })
+      gameStates.CurrentLevel().pauseLevelTime()
       return
     }
 
     if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStoryModeState === storyModeStates.Paused) {
       gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
-      gameStates.CurrentLevel().enemies.forEach(function (enemy) {
-        enemy.setTimer()
+      gameStates.CurrentLevel().resumeLevelTime()
+      gameStates.CurrentLevel().cubers.forEach(function (cuber) {
+        cuber.setTimer()
       })
       return
     } else if (gameStates.currentShopMode > 1) {
@@ -82,6 +84,7 @@ export function MouseDown (event) {
 
     // Level Selector to Game
     if (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetY > 500 && event.offsetY < 600 && event.offsetX < 610 && event.offsetX > 225) {
+      gameStates.CurrentLevel().startLevelTime()
       gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
       return
     }

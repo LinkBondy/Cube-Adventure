@@ -7,7 +7,8 @@ const { gameStates } = require('../data/GameData')
 const LockedFeature = {
   infoCuber: 0,
   infoCuber2: 9,
-  infoCuber3: 11,
+  infoExpander: 11,
+  infoCuber3: 12,
   infoRollphant1: 20,
   ///
   infoWall: 1,
@@ -212,6 +213,17 @@ class EnemyInfo {
     ], LockedFeature.infoCuber2)
 
     const slide3 = new ItemSlide([
+      new ItemImage(false, images.Expander_200x200, 610, 10),
+      ///
+      new ItemText('Expanders', '120px Arial', 'purple', 10, 150),
+      new ItemText('Expanders can expand and shrink.', '50px Arial', 'rgb(2, 0, 139)', 10, 250),
+      new ItemText('Expanders can be different size and', '50px Arial', 'rgb(2, 0, 139)', 10, 340),
+      new ItemText('grow to be different sizes', '50px Arial', 'rgb(2, 0, 139)', 10, 410),
+      new ItemText('Expanders may wait when they', '50px Arial', 'rgb(2, 0, 139)', 10, 500),
+      new ItemText('expand or shink to a certain size.', '50px Arial', 'rgb(2, 0, 139)', 10, 570)
+    ], LockedFeature.infoExpander)
+
+    /* const slide4 = new ItemSlide([
       new ItemImage(false, images.RedCube_200x200, 562.5, 10),
       ///
       new ItemText('Cubers', '150px Arial', 'purple', 10, 150),
@@ -219,7 +231,7 @@ class EnemyInfo {
       new ItemText('Cubers can be defeated.', '60px Arial', 'rgb(2, 0, 139)', 10, 375),
       new ItemText('Cubers may drop items when', '60px Arial', 'rgb(2, 0, 139)', 10, 475),
       new ItemText('defeated.', '60px Arial', 'rgb(2, 0, 139)', 10, 550)
-    ], LockedFeature.infoCuber3)
+    ], LockedFeature.infoCuber3) */
 
     /* const slide4 = new ItemSlide([
       new ItemImage(false, images.Rollphant_200x200, 600, 10),
@@ -227,7 +239,7 @@ class EnemyInfo {
       new ItemText('Rollphant', '125px Arial', 'purple', 10, 150)
     ], LockedFeature.infoRollphant1) */
 
-    this.slides = [titleSlide, slide1, slide2, slide3/*, slide4 */]
+    this.slides = [titleSlide, slide1, slide2, slide3]
   }
 };
 
@@ -278,7 +290,7 @@ class IntractableInfo {
     ], 0)
 
     const switchSlide1 = new ItemSlide([
-      new ItemImage(false, images.SwitchW1Blue_200x200, 550, 10),
+      new ItemImage(false, images.BlueSwitch_200x200, 550, 10),
       ///
       new ItemText('Reverse', '125px Arial', 'purple', 10, 100),
       new ItemText('Tiles', '125px Arial', 'purple', 75, 220),
@@ -290,7 +302,7 @@ class IntractableInfo {
     ], LockedFeature.infoSwitch)
 
     const switchSlide2 = new ItemSlide([
-      new ItemImage(false, images.SwitchW1Purple_200x200, 550, 10),
+      new ItemImage(false, images.PinkSwitch_200x200, 550, 10),
       ///
       new ItemText('Reverse', '125px Arial', 'purple', 10, 100),
       new ItemText('Tiles', '125px Arial', 'purple', 75, 220),
