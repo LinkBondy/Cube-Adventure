@@ -335,85 +335,101 @@ export class Expander extends GameObject {
   Draw () {
     // const widthScale = 20 * (this.width / this.startWidth)
     // const heightScale = 10 * (this.height / this.startHeight)
-    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic || gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      if (gameStates.currentStoryModeState === storyModeStates.Paused && this.animating) {
-        this.animate()
-      } else if (this.animating) {
-        switch (this.animatingDirection) {
-          case 'forwards':
-            this.animationFrames += 1
-            this.animate()
-            if (this.animationFrames === 28) {
-              this.animating = false
-            }
-            break
+    let expanderSpike
+    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+      expanderSpike = images.ExpanderSpike
+    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+      expanderSpike = images.ExpanderSpikePlastic
+    } else {
+      console.log('Expander Draw: Background Not Found')
+    }
 
-          case 'backwards':
-            this.animationFrames -= 1
-            this.animate()
-            if (this.animationFrames === 0) {
-              this.animating = false
-              this.animatingDirection = 'forwards'
-            }
-            break
-        }
+    if (gameStates.currentStoryModeState === storyModeStates.Paused && this.animating) {
+      this.animate(expanderSpike)
+    } else if (this.animating) {
+      switch (this.animatingDirection) {
+        case 'forwards':
+          this.animationFrames += 1
+          this.animate()
+          if (this.animationFrames === 28) {
+            this.animating = false
+          }
+          break
+
+        case 'backwards':
+          this.animationFrames -= 1
+          this.animate()
+          if (this.animationFrames === 0) {
+            this.animating = false
+            this.animatingDirection = 'forwards'
+          }
+          break
+      }
+    }
+
+    if (this.waiting === true && this.animating === false) {
+      if (this.steps <= 280) {
+        this.animating = true
+        this.animationFrames = 28
+        this.animatingDirection = 'backwards'
+      }
+      for (let x = this.left() + 10; x <= this.right() - 20; x += 10) {
+        // Draw Top Spikes
+        draw.DrawImage(expanderSpike, x, this.top())
+
+        // Draw Bottom Spikes
+        canvas.context.save()
+        canvas.context.translate(x + 5, (this.bottom() - 5))
+        canvas.context.rotate(180 * Math.PI / 180)
+        canvas.context.scale(-1, 1)
+        canvas.context.translate(-(x + 5), -(this.bottom() - 5))
+        draw.DrawImage(expanderSpike, x, (this.bottom() - 10))
+        canvas.context.restore()
       }
 
-      if (this.waiting === true && this.animating === false) {
-        if (this.steps <= 280) {
-          this.animating = true
-          this.animationFrames = 28
-          this.animatingDirection = 'backwards'
-        }
-        for (let x = this.left() + 10; x <= this.right() - 20; x += 10) {
-          // Draw Top Spikes
-          draw.DrawImage(images.ExpanderSpike, x, this.top())
+      for (let y = this.top() + 10; y <= this.bottom() - 20; y += 10) {
+        // Draw Left Spikes
+        canvas.context.save()
+        canvas.context.translate(this.left() + 5, y + 5)
+        canvas.context.rotate(270 * Math.PI / 180)
+        canvas.context.translate(-(this.left() + 5), -(y + 5))
+        draw.DrawImage(expanderSpike, this.left(), y)
+        canvas.context.restore()
 
-          // Draw Bottom Spikes
-          canvas.context.save()
-          canvas.context.translate(x + 5, (this.bottom() - 5))
-          canvas.context.rotate(180 * Math.PI / 180)
-          canvas.context.translate(-(x + 5), -(this.bottom() - 5))
-          draw.DrawImage(images.ExpanderSpike, x, (this.bottom() - 10))
-          canvas.context.restore()
-        }
-
-        for (let y = this.top() + 10; y <= this.bottom() - 20; y += 10) {
-          // Draw Left Spikes
-          canvas.context.save()
-          canvas.context.translate(this.left() + 5, y + 5)
-          canvas.context.rotate(270 * Math.PI / 180)
-          canvas.context.translate(-(this.left() + 5), -(y + 5))
-          draw.DrawImage(images.ExpanderSpike, this.left(), y)
-          canvas.context.restore()
-
-          // Draw Right Spikes
-          canvas.context.save()
-          canvas.context.translate(this.right() - 5, y + 5)
-          canvas.context.rotate(90 * Math.PI / 180)
-          canvas.context.translate(-(this.right() - 5), -(y + 5))
-          draw.DrawImage(images.ExpanderSpike, this.right() - 10, y)
-          canvas.context.restore()
-        }
+        // Draw Right Spikes
+        canvas.context.save()
+        canvas.context.translate(this.right() - 5, y + 5)
+        canvas.context.rotate(90 * Math.PI / 180)
+        canvas.context.scale(-1, 1)
+        canvas.context.translate(-(this.right() - 5), -(y + 5))
+        draw.DrawImage(expanderSpike, this.right() - 10, y)
+        canvas.context.restore()
       }
-      canvas.context.fillStyle = 'purple'
-      canvas.context.fillRect(this.x + 10, this.y + 10, this.width - 20, this.height - 20)
+    }
+    canvas.context.fillStyle = 'purple'
+    canvas.context.fillRect(this.x + 10, this.y + 10, this.width - 20, this.height - 20)
 
-      // canvas.context.drawImage(images.Expander, 0, 0, images.Expander.width, images.Expander.height, this.x, this.y, this.width, this.height)
-    } /* else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-      canvas.context.fillStyle = 'purple'
-      canvas.context.fillRect(this.x, this.y, this.width, this.height)
-    } */
+    // canvas.context.drawImage(images.Expander, 0, 0, images.Expander.width, images.Expander.height, this.x, this.y, this.width, this.height)
   }
 
   animate () {
+    let expanderSpikeAnimation
+    if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+      expanderSpikeAnimation = images.ExpanderSpikeAnimation
+    } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+      expanderSpikeAnimation = images.ExpanderSpikePlasticAnimation
+    } else {
+      console.log('Expander Draw: Background Not Found')
+    }
     for (let x = this.left() + 10; x <= this.right() - 20; x += 10) {
-      canvas.context.drawImage(images.ExpanderSpikeAnimation, 10 * this.animationFrames, 0, 10, images.ExpanderSpikeAnimation.height, x, this.top() - 2, 10, 22)
+      canvas.context.drawImage(expanderSpikeAnimation, 10 * this.animationFrames, 0, 10, expanderSpikeAnimation.height, x, this.top() - 2, 10, 22)
+
       canvas.context.save()
       canvas.context.translate(x + 5, (this.bottom() - 5))
       canvas.context.rotate(180 * Math.PI / 180)
+      canvas.context.scale(-1, 1)
       canvas.context.translate(-(x + 5), -(this.bottom() - 5))
-      canvas.context.drawImage(images.ExpanderSpikeAnimation, 10 * this.animationFrames, 0, 10, images.ExpanderSpikeAnimation.height, x, this.bottom() - 12, 10, 22)
+      canvas.context.drawImage(expanderSpikeAnimation, 10 * this.animationFrames, 0, 10, expanderSpikeAnimation.height, x, this.bottom() - 12, 10, 22)
       canvas.context.restore()
       // canvas.context.drawImage(images.ExpanderSpikesHorizontal, 0, 12, 10, 10, x, this.bottom() - 10, 10, 10)
     }
@@ -423,14 +439,15 @@ export class Expander extends GameObject {
       canvas.context.translate(this.left() + 5, y + 5)
       canvas.context.rotate(270 * Math.PI / 180)
       canvas.context.translate(-(this.left() + 5), -(y + 5))
-      canvas.context.drawImage(images.ExpanderSpikeAnimation, 10 * this.animationFrames, 0, 10, images.ExpanderSpikeAnimation.height, this.left(), y - 2, 10, 22)
+      canvas.context.drawImage(expanderSpikeAnimation, 10 * this.animationFrames, 0, 10, expanderSpikeAnimation.height, this.left(), y - 2, 10, 22)
       canvas.context.restore()
 
       canvas.context.save()
       canvas.context.translate(this.right() - 5, y + 5)
       canvas.context.rotate(90 * Math.PI / 180)
+      canvas.context.scale(-1, 1)
       canvas.context.translate(-(this.right() - 5), -(y + 5))
-      canvas.context.drawImage(images.ExpanderSpikeAnimation, 10 * this.animationFrames, 0, 10, images.ExpanderSpikeAnimation.height, this.right() - 10, y - 2, 10, 22)
+      canvas.context.drawImage(expanderSpikeAnimation, 10 * this.animationFrames, 0, 10, expanderSpikeAnimation.height, this.right() - 10, y - 2, 10, 22)
       canvas.context.restore()
     }
   }

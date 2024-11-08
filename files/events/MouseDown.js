@@ -77,13 +77,13 @@ export function MouseDown (event) {
   // Check if a game mode is selected
   if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
     // Down "Level Selector"
-    if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 850 && event.offsetX > 690 && event.offsetY > 450 && event.offsetY < 600 && gameStates.mobile === true) { gameStates.currentLevelIndex = gameStates.currentLevelIndex + 1 }
+    if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 850 && event.offsetX > 690 && event.offsetY > 450 && event.offsetY < 600) { gameStates.currentLevelIndex = gameStates.currentLevelIndex + 1 }
 
     // Up "Level Selector"
-    if (gameStates.currentLevelIndex !== 0 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 160 && event.offsetX > 0 && event.offsetY > 450 && event.offsetY < 600 && gameStates.mobile === true) { gameStates.currentLevelIndex = gameStates.currentLevelIndex - 1 }
+    if (gameStates.currentLevelIndex !== 0 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 160 && event.offsetX > 0 && event.offsetY > 450 && event.offsetY < 600) { gameStates.currentLevelIndex = gameStates.currentLevelIndex - 1 }
 
     // Level Selector to Game
-    if (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetY > 500 && event.offsetY < 600 && event.offsetX < 610 && event.offsetX > 225) {
+    if (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetY > 500 && event.offsetY < 600 && event.offsetX < 610 && event.offsetX > 225 && gameStates.levelController.CheckLocked()) {
       gameStates.CurrentLevel().startLevelTime()
       gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
       return

@@ -112,16 +112,27 @@ export const draw = {
   DrawSelectLevel: function () {
     canvas.context.font = '125px Arial'
     canvas.context.fillStyle = 'rgba(255, 255, 132, 0.788)'
-    canvas.context.fillText('Level ' + (gameStates.currentLevelIndex + 1), 225, 575)
+
+    // Draw level number
+    canvas.context.textAlign = 'center'
+    canvas.context.fillText('Level ' + (gameStates.currentLevelIndex + 1), 425, 575)
+    canvas.context.textAlign = 'left'
+
+    // Draw Locked Screen if level isn't unlocked
     if (!gameStates.levelController.CheckLocked()) {
       canvas.context.font = '175px Arial'
       canvas.context.fillStyle = 'rgba(255, 255, 132)'
       canvas.context.fillText('Locked', 10, 275)
       draw.DrawImage(images.LockedIcon, 562.5, 10)
     }
-    if (gameStates.mobile === true) {
-      draw.DrawImage(images.UpArrow, 10, 450)
+
+    // Draw arrows to change level if applicable
+    if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1) {
       draw.DrawImage(images.DownArrow, 690, 450)
+    }
+
+    if (gameStates.currentLevelIndex > 0) {
+      draw.DrawImage(images.UpArrow, 10, 450)
     }
   },
   SettingsDraw: function () {

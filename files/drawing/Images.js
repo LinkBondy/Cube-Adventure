@@ -30,7 +30,9 @@ export const images = {
     images.RedCubePlastic = LoadImage('images/RedCubePlastic.png')
     ///
     images.ExpanderSpike = LoadImage('images/ExpanderSpike.png')
+    images.ExpanderSpikePlastic = LoadImage('images/ExpanderSpikePlastic.png')
     images.ExpanderSpikeAnimation = LoadImage('images/ExpanderSpikeAnimation.png')
+    images.ExpanderSpikePlasticAnimation = LoadImage('images/ExpanderSpikePlasticAnimation.png')
     images.Expander_200x200 = LoadImage('images/Expander_200x200.png')
     ///
     images.TeleporterTomato = LoadImage('images/TeleporterTomato.png')
