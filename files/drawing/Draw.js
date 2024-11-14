@@ -6,7 +6,7 @@ export const draw = {
   DrawImage: function (image, x, y) {
     canvas.context.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height)
   },
-  ChangeShdow: function (offsetX, offsetY, offsetColour) {
+  ChangeShadow: function (offsetX, offsetY, offsetColour) {
     canvas.context.shadowOffsetX = offsetX
     canvas.context.shadowOffsetY = offsetY
     canvas.context.shadowColor = offsetColour
@@ -29,7 +29,7 @@ export const draw = {
 
       if (gameStates.arrayChartController.findCurrentArrayChart() !== false) { this.DrawCharts() }
     } else {
-      if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) { this.StartingSreenDraw() }
+      if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) { gameStates.titleScreen.Draw(this) }
       if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { gameStates.menuController.MainMenu.Draw() }
     }
   },
@@ -82,32 +82,6 @@ export const draw = {
   },
   ShopDraw: function () {
     if (gameStates.currentShopMode === ShopMode.ShopMenu) { gameStates.menuController.ShopMenu.Draw() }
-  },
-  StartingSreenDraw: function () {
-    this.ChangeShdow(8, 8, 'rgb(50, 50, 50)')
-    canvas.context.font = '275px Arial'
-    canvas.context.fillStyle = 'black'
-    canvas.context.fillText('CUB', 0, 250)
-    canvas.context.font = '125px Arial'
-    canvas.context.shadowColor = 'rgba(127, 0, 0)'
-    canvas.context.shadowOffsetX = 0
-    canvas.context.shadowOffsetY = 0
-    canvas.context.fillStyle = 'red'
-    canvas.context.fillText('Adventure', 120, 400)
-    canvas.context.font = '60px Arial'
-    canvas.context.fillStyle = 'darkred'
-    canvas.context.shadowColor = 'rgba(67, 0, 0)'
-    canvas.context.fillText('Press Enter to Begin', 120, 550)
-    ///
-    this.ChangeShdow(8, 8, 'rgb(50, 50, 50)')
-    canvas.context.fillStyle = 'black'
-    canvas.context.fillRect(600, 50, 200, 200)
-    this.ChangeShdow(0, 0, 'rgb(0, 0, 0)')
-    ///
-    canvas.context.fillStyle = gameStates.currentThemeColour
-    canvas.context.fillRect(620, 90, 40, 40)
-    canvas.context.fillRect(740, 90, 40, 40)
-    canvas.context.fillRect(620, 180, 160, 40)
   },
   DrawSelectLevel: function () {
     canvas.context.font = '125px Arial'
@@ -193,23 +167,23 @@ export const draw = {
     canvas.context.fillText('to replace:', 410, 220)
     canvas.context.fillStyle = gameStates.currentThemeColour
     canvas.context.font = '80px Arial'
-    this.ChangeShdow(4, 4, 'black')
+    this.ChangeShadow(4, 4, 'black')
     switch (gameStates.keybindController.currentType) {
       case 'A':
         canvas.context.fillStyle = gameStates.currentThemeColour
         canvas.context.fillText(gameStates.keybindController.currentKeybind.displayNameA, 410, 320)
-        this.ChangeShdow(0, 0, 'black')
+        this.ChangeShadow(0, 0, 'black')
         canvas.context.strokeText(gameStates.keybindController.currentKeybind.displayNameA, 410, 320)
         break
 
       case 'B':
 
         canvas.context.fillText(gameStates.keybindController.currentKeybind.displayNameB, 410, 320)
-        this.ChangeShdow(0, 0, 'black')
+        this.ChangeShadow(0, 0, 'black')
         canvas.context.strokeText(gameStates.keybindController.currentKeybind.displayNameB, 410, 320)
         break
     }
-    this.ChangeShdow(0, 0, 'black')
+    this.ChangeShadow(0, 0, 'black')
     canvas.context.fillStyle = 'rgb(97, 97, 117)'
     if (gameStates.keybindController.triedRebinding) { canvas.context.fillText('Try Again', 410, 420) }
     canvas.context.font = '60px Arial'

@@ -1,6 +1,52 @@
 'use strict'
-const { gameStates, storyModeStates, drawUpdate } = require('../data/GameData')
+const { gameStates, storyModeStates, startingMenusStates, drawUpdate } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
+
+export class TitleScreen {
+  Draw (self) {
+    self.ChangeShadow(8, 8, 'rgb(50, 50, 50)')
+    canvas.context.font = '210px Arial'
+    canvas.context.fillStyle = 'black'
+    canvas.context.fillText('CUBE', 0, 225)
+    canvas.context.font = '125px Arial'
+    canvas.context.shadowColor = 'rgba(127, 0, 0)'
+    canvas.context.shadowOffsetX = 0
+    canvas.context.shadowOffsetY = 0
+
+    const gradient = canvas.context.createLinearGradient(0, 0, 750, 0)
+    gradient.addColorStop(0, 'rgb(255, 5, 5)')
+    gradient.addColorStop(1, 'rgb(145, 4, 12)')
+
+    canvas.context.fillStyle = gradient
+    canvas.context.fillText('Adventure', 120, 400)
+    canvas.context.font = '60px Arial'
+    canvas.context.fillStyle = 'darkred'
+    canvas.context.shadowColor = 'rgba(67, 0, 0)'
+    canvas.context.fillText('Press Enter to Begin', 120, 550)
+    ///
+    self.ChangeShadow(8, 8, 'rgb(50, 50, 50)')
+    canvas.context.fillStyle = 'black'
+    canvas.context.fillRect(600, 50, 200, 200)
+    self.ChangeShadow(0, 0, 'rgb(0, 0, 0)')
+    ///
+    canvas.context.fillStyle = gameStates.currentThemeColour
+    canvas.context.fillRect(620, 90, 40, 40)
+    canvas.context.fillRect(740, 90, 40, 40)
+    canvas.context.fillRect(620, 180, 160, 40)
+  }
+
+  KeyDown (event, keybindArray) {
+    if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key)) {
+      gameStates.SetGameState(startingMenusStates.Menu, 'Starting')
+    }
+  }
+
+  MouseDown (event, isTouching) {
+    if (isTouching(0, 500, 850, 100, event.offsetX, event.offsetY)) {
+      gameStates.SetGameState(startingMenusStates.Menu, 'Starting')
+    }
+  }
+}
 
 export class LossScreen {
   constructor () {

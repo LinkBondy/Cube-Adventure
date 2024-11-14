@@ -16,8 +16,8 @@ export function MouseDown (event) {
   }
 
   // Start Game "Menu"
-  if (isTouching(0, 500, 850, 100, event.offsetX, event.offsetY) && gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
-    gameStates.SetGameState(startingMenusStates.Menu, 'Starting')
+  if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
+    gameStates.titleScreen.MouseDown(event, isTouching)
     return
   }
 

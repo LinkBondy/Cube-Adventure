@@ -4,8 +4,8 @@ export function Keydown (event) {
   // console.log(event)
   const keybindArray = gameStates.keybindController.keybinds
   // Start Game "Menu"
-  if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
-    gameStates.SetGameState(startingMenusStates.Menu, 'Starting')
+  if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
+    gameStates.titleScreen.KeyDown(event, keybindArray)
     return
   }
 

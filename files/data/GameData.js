@@ -13,12 +13,13 @@ export const gameMode = {
 }
 
 export const storyModeStates = {
-  Selecting: 1,
-  Playing: 2,
-  Tutorials: 3,
-  Lost: 4,
-  WonStage: 5,
-  Paused: 6
+  WorldSelecting: 1,
+  Selecting: 2,
+  Playing: 3,
+  Tutorials: 4,
+  Lost: 5,
+  WonStage: 6,
+  Paused: 7
 }
 
 export const ShopMode/* shopStates */ = {
