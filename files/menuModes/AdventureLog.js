@@ -3,28 +3,30 @@ const { images } = require('../drawing/Images')
 const { draw } = require('../drawing/Draw')
 const { canvas } = require('../drawing/Canvas')
 const { gameStates } = require('../data/GameData')
+const { Requirement } = require('../levels/Levels')
 
 const LockedFeature = {
-  infoCuber: 0,
-  infoCuber2: 9,
-  infoExpander: 11,
-  infoCuber3: 12,
-  infoRollphant1: 20,
+  infoCuber: false,
+  infoCuber2: new Requirement(0, 9 - 1),
+  infoExpander: new Requirement(0, 10 - 1),
+  // infoCuber3: [new Requirement(1, 1 - 1)],
+  // infoRollphant1: [new Requirement(2, 1 - 1)],
   ///
-  infoWall: 1,
-  infoInvisibleWall: 4,
-  infoWater: 7,
+  infoWall: false,
+  infoInvisibleWall: new Requirement(0, 4 - 1),
+  infoWater: new Requirement(0, 7 - 1),
   ///
-  infoSwitch: 3,
-  infoTeleporter: 5,
+  infoSwitch: new Requirement(0, 3 - 1),
+  infoTeleporter: new Requirement(0, 5 - 1),
   ///
-  infoRock: 3,
+  infoRock: new Requirement(0, 3 - 1),
   ///
-  infoLifeJacket: 7,
-  infoFinishItems: 11,
-  infoPryoShard: 12,
+  infoLifeJacket: new Requirement(0, 7 - 1),
+  // infoFinishItems: [new Requirement(1, 1 - 1)],
+  // infoPryoShard: [new Requirement(1, 3 - 1)],
   ///
-  infoHole: 8
+  infoHole: new Requirement(0, 8 - 1)
+  // infoCactus: [new Requirement(0, 11 - 1)]
 }
 
 export class InfoController {
@@ -40,7 +42,6 @@ export class InfoController {
     ]
     this.itemIndex = 0
     this.slideIndex = 0
-    this.unlockedLevel = 0
   }
 
   Keydown (event, keybindArray) {
@@ -135,8 +136,16 @@ class ItemSlide {
     this.neededFeature = neededFeature
   }
 
-  ShouldShowSlide (unlockedLevel) {
-    return unlockedLevel >= this.neededFeature
+  ShouldShowSlide () {
+    if (this.neededFeature === false) {
+      return true
+    } else {
+      const levelRequired = gameStates.gameController.worlds[this.neededFeature.worldRequired].levels[this.neededFeature.levelRequired]
+      if ((levelRequired.completed)) {
+        return true
+      }
+    }
+    return false
   }
 
   Draw () {
@@ -144,23 +153,27 @@ class ItemSlide {
     canvas.context.fillStyle = 'black'
     canvas.context.fillText(gameStates.infoController.slideIndex + ' / ' + (gameStates.infoController.items[gameStates.infoController.itemIndex].slides.length - 1), 790, 590)
     ///
-    if (this.ShouldShowSlide(gameStates.infoController.unlockedLevel)) {
+    if (this.ShouldShowSlide()) {
       this.items.forEach(function (itemInfo) {
         itemInfo.Draw()
       })
     } else {
+      canvas.context.textAlign = 'center'
       canvas.context.font = '125px Arial'
-      canvas.context.fillStyle = 'lightcoral'
-      canvas.context.fillText('Item ' + gameStates.infoController.slideIndex, 200, 200)
+      const gradientA = canvas.context.createLinearGradient(350, 0, 500, 0)
+      gradientA.addColorStop(0, 'rgb(235, 110, 160)')
+      gradientA.addColorStop(1, 'rgb(245, 130, 180)')
+      canvas.context.fillStyle = gradientA
+      canvas.context.fillText('Item ' + gameStates.infoController.slideIndex, 425, 200)
       ///
-      canvas.context.fillStyle = 'lime'
-      if (this.neededFeature >= 10) {
-        canvas.context.font = '125px Arial'
-        canvas.context.fillText('Beat Level ' + this.neededFeature, 35, 550)
-      } else {
-        canvas.context.font = '150px Arial'
-        canvas.context.fillText('Beat Level ' + this.neededFeature, 10, 550)
-      }
+      canvas.context.font = '55px Arial'
+      const gradientB = canvas.context.createLinearGradient(125, 0, 600, 0)
+      gradientB.addColorStop(0, 'rgb(0, 205, 0)')
+      gradientB.addColorStop(1, 'rgb(0, 195, 150)')
+      canvas.context.fillStyle = gradientB
+      canvas.context.fillText('Beat ' + gameStates.gameController.worlds[this.neededFeature.worldRequired].title + ',', 425, 450)
+      canvas.context.fillText(gameStates.gameController.worlds[this.neededFeature.worldRequired].levels[this.neededFeature.levelRequired].title, 425, 550)
+      canvas.context.textAlign = 'left'
     }
   }
 };
@@ -169,7 +182,7 @@ class Tutorials {
   constructor () {
     const titleSlide = new ItemSlide([
       new ItemText('Tutorials', '200px Arial', 'purple', 10, 400)
-    ], 0)
+    ], false)
 
     const slide1 = new ItemSlide([
       new ItemText('Basics', '125px Arial', 'purple', 200, 125),
@@ -179,7 +192,7 @@ class Tutorials {
       new ItemText('Use A, W, S, D or Arrow Keys to move.', '48px Arial', 'rgb(2, 0, 139)', 10, 415),
       new ItemText('Tap above, below, to the left or to the', '48px Arial', 'rgb(2, 0, 139)', 10, 515),
       new ItemText('right of the player to move.', '48px Arial', 'rgb(2, 0, 139)', 10, 575)
-    ], 0)
+    ], false)
 
     this.slides = [titleSlide, slide1]
   }
@@ -189,7 +202,7 @@ class EnemyInfo {
   constructor () {
     const titleSlide = new ItemSlide([
       new ItemText('Enemies', '200px Arial', 'purple', 10, 400)
-    ], 0)
+    ], false)
 
     const slide1 = new ItemSlide([
       new ItemImage(false, images.RedCube_200x200, 562.5, 10),
@@ -247,13 +260,13 @@ class BarrierInfo {
   constructor () {
     const titleSlide = new ItemSlide([
       new ItemText('Barriers', '200px Arial', 'purple', 10, 400)
-    ], 0)
+    ], false)
 
     const cuberSlide1 = new ItemSlide([
       new ItemImage(false, images.WallGrassClassicA_200x200, 550, 10),
       ///
       new ItemText('Walls', '200px Arial', 'purple', 10, 160),
-      new ItemText('Walls stop players movement.', '60px Arial', 'rgb(2, 0, 139)', 10, 300),
+      new ItemText("Walls stop players' movement.", '60px Arial', 'rgb(2, 0, 139)', 10, 300),
       new ItemText('Cubers turn the opposite way,', '60px Arial', 'rgb(2, 0, 139)', 10, 400),
       new ItemText('when they touch walls.', '60px Arial', 'rgb(2, 0, 139)', 15, 475),
       new ItemText('Walls can look different.', '60px Arial', 'rgb(2, 0, 139)', 10, 575)
@@ -287,7 +300,7 @@ class IntractableInfo {
   constructor () {
     const titleSlide = new ItemSlide([
       new ItemText('Intractables', '150px Arial', 'purple', 10, 400)
-    ], 0)
+    ], false)
 
     const switchSlide1 = new ItemSlide([
       new ItemImage(false, images.BlueSwitch_200x200, 550, 10),
@@ -307,7 +320,7 @@ class IntractableInfo {
       new ItemText('Reverse', '125px Arial', 'purple', 10, 100),
       new ItemText('Tiles', '125px Arial', 'purple', 75, 220),
       new ItemText('When a reverse tile is activated,', '55px Arial', 'rgb(2, 0, 139)', 10, 300),
-      new ItemText('rocks with the same, colour', '55px Arial', 'rgb(2, 0, 139)', 10, 375),
+      new ItemText('rocks with the same colour', '55px Arial', 'rgb(2, 0, 139)', 10, 375),
       new ItemText("break if they're altogether and", '55px Arial', 'rgb(2, 0, 139)', 10, 450),
       new ItemText("become altogether if they're apart.", '55px Arial', 'rgb(2, 0, 139)', 10, 525)
     ], LockedFeature.infoSwitch)
@@ -330,7 +343,7 @@ class UnlockableInfo {
   constructor () {
     const titleSlide = new ItemSlide([
       new ItemText('Unlockables', '150px Arial', 'purple', 10, 400)
-    ], 0)
+    ], false)
 
     const slide1 = new ItemSlide([
       new ItemImage(false, images.UnlockRockBlue_200x200, 625, 10),
@@ -351,16 +364,16 @@ class CollectableInfo {
   constructor () {
     const titleSlide = new ItemSlide([
       new ItemText('Collectables', '150px Arial', 'purple', 10, 400)
-    ], 0)
+    ], false)
 
     const slide1 = new ItemSlide([
       new ItemImage(false, images.LifeJacket_200x200, 625, 10),
       //
       new ItemText('Life Jackets', '115px Arial', 'purple', 10, 150),
-      new ItemText('When players pick up life jackets they', '50px Arial', 'rgb(2, 0, 139)', 10, 262.5),
-      new ItemText('can go in water.', '50px Arial', 'rgb(2, 0, 139)', 10, 337.5),
-      new ItemText('When cubers pick up life jackets', '50px Arial', 'rgb(2, 0, 139)', 10, 425),
-      new ItemText('they can move at nomral speed in', '50px Arial', 'rgb(2, 0, 139)', 10, 500),
+      new ItemText('When players pick up life jackets,', '50px Arial', 'rgb(2, 0, 139)', 10, 262.5),
+      new ItemText('they can go in water.', '50px Arial', 'rgb(2, 0, 139)', 10, 337.5),
+      new ItemText('When cubers pick up life jackets,', '50px Arial', 'rgb(2, 0, 139)', 10, 425),
+      new ItemText('they can move at a nomral speed in', '50px Arial', 'rgb(2, 0, 139)', 10, 500),
       new ItemText('water.', '50px Arial', 'rgb(2, 0, 139)', 10, 575)
     ], LockedFeature.infoLifeJacket)
     /* const slide2 = new ItemSlide([
@@ -381,7 +394,7 @@ class TrapInfo {
   constructor () {
     const titleSlide = new ItemSlide([
       new ItemText('Traps', '300px Arial', 'purple', 10, 400)
-    ], 0)
+    ], false)
 
     const slide1 = new ItemSlide([
       new ItemImage(true, images.Hole_200x200, 550, 10, 200, 200, 0, 0, 200, 200),
@@ -391,17 +404,17 @@ class TrapInfo {
       new ItemText('its cover starts to fall.', '45px Arial', 'rgb(2, 0, 139)', 10, 325),
       new ItemText('Different holes have different amounts of', '45px Arial', 'rgb(2, 0, 139)', 10, 400),
       new ItemText('times a player can go over it.', '45px Arial', 'rgb(2, 0, 139)', 10, 450),
-      new ItemText('When a player goes over a uncovered', '45px Arial', 'rgb(2, 0, 139)', 10, 525),
-      new ItemText('hole you lose.', '45px Arial', 'rgb(2, 0, 139)', 10, 575)
+      new ItemText('When a player goes over an uncovered', '45px Arial', 'rgb(2, 0, 139)', 10, 525),
+      new ItemText('hole, you lose.', '45px Arial', 'rgb(2, 0, 139)', 10, 575)
     ], LockedFeature.infoHole)
 
     const slide2 = new ItemSlide([
       new ItemImage(true, images.Hole_200x200, 550, 10, 200, 200, 200, 0, 200, 200),
       ///
       new ItemText('Holes', '200px Arial', 'purple', 10, 160),
-      new ItemText('When a enemy goes over a', '60px Arial', 'rgb(2, 0, 139)', 10, 300),
-      new ItemText('uncovered hole they go the', '60px Arial', 'rgb(2, 0, 139)', 10, 375),
-      new ItemText('opposite way.', '60px Arial', 'rgb(2, 0, 139)', 10, 450)
+      new ItemText('When an enemy approaches', '60px Arial', 'rgb(2, 0, 139)', 10, 300),
+      new ItemText('an uncovered hole, they turn', '60px Arial', 'rgb(2, 0, 139)', 10, 375),
+      new ItemText('back the other way.', '60px Arial', 'rgb(2, 0, 139)', 10, 450)
     ], LockedFeature.infoHole)
     this.slides = [titleSlide, slide1, slide2]
   }

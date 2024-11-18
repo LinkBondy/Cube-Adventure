@@ -6,6 +6,7 @@ export const startingMenusStates = {
 }
 
 export const gameMode = {
+  Unselected: 0,
   StoryMode: 1,
   Shop: 2,
   ItemsInfo: 3,
@@ -50,9 +51,9 @@ export const settingStates = {
 
 export const gameStates = {
   currentStartingMenusState: startingMenusStates.NotStarted,
-  currentStoryModeState: storyModeStates.Selecting,
+  currentStoryModeState: storyModeStates.WorldSelecting,
   currentSettingState: settingStates.Selecting,
-  currentGameMode: gameMode.StoryMode,
+  currentGameMode: gameMode.Unselected,
   currentShopMode: ShopMode.ShopMenu,
   currentBackgroundStyle: BackgroundStyles.Classic,
   currentCubeStyle: cubeStyle.BlueCube,
@@ -65,7 +66,7 @@ export const gameStates = {
   loading: true,
   stopTime: false,
   CurrentLevel: function () {
-    return gameStates.levelController.levels[gameStates.currentLevelIndex]
+    return gameStates.worldSelector.currentWorld.levels[gameStates.currentLevelIndex]
   },
 
   SetGameState: function (gameState, type) {
@@ -78,6 +79,11 @@ export const gameStates = {
     if (type === 'Settings') {
       gameStates.currentSettingState = gameState
     }
+  },
+
+  ReturnToMainMenu: function () {
+    gameStates.SetGameState(startingMenusStates.Menu, 'Starting')
+    gameStates.currentGameMode = gameMode.Unselected
   }
 }
 
@@ -92,11 +98,18 @@ export const dataManagement = {
   Save: function (override) {
     window.localStorage.setItem('autoSave', this.autoSave)
     if (this.autoSave || override) {
-      window.localStorage.setItem('level', gameStates.infoController.unlockedLevel)
+      const world1LevelsCompleted = []
+      const specialLevelsCompleted = []
+      for (let l = 0; l < gameStates.gameController.worlds[0].levels.length; l++) {
+        world1LevelsCompleted.push(gameStates.gameController.worlds[0].levels[l].completed)
+      }
+
+      for (let l = 0; l < gameStates.gameController.worlds[1].levels.length; l++) {
+        specialLevelsCompleted.push(gameStates.gameController.worlds[1].levels[l].completed)
+      }
+      window.localStorage.setItem('world1Levels', JSON.stringify(world1LevelsCompleted))
+      window.localStorage.setItem('specialLevels', JSON.stringify(specialLevelsCompleted))
       window.localStorage.setItem('newUpdate', false)
-      if (gameStates.infoController.unlockedLevel !== gameStates.levelController.levels.length && gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex - 1) {
-        window.localStorage.setItem('stateGame', gameStates.currentStoryModeState)
-      } else { window.localStorage.setItem('stateGame', -1) }
       window.localStorage.setItem('PlayerAlienLock', drawUpdate.blueCubeAlienLock)
       window.localStorage.setItem('PlayerSadLock', drawUpdate.blueCubeSadLock)
       window.localStorage.setItem('highestLevelLock', drawUpdate.highestLevelLock)
@@ -112,15 +125,19 @@ export const dataManagement = {
       this.autoSave = JSON.parse(window.localStorage.getItem('autoSave'))
     }
 
-    const newUpdate = window.localStorage.getItem('newUpdate')
-    if (newUpdate !== null) {
-      const level = Number(window.localStorage.getItem('level'))
-      const stateGame = Number(window.localStorage.getItem('stateGame'))
-      if (level !== null) {
-        gameStates.infoController.unlockedLevel = level
-        if (stateGame === storyModeStates.WonStage) {
-          gameStates.infoController.unlockedLevel++
-        }
+    if (window.localStorage.getItem('world1Levels') !== null) {
+      const completedLevelsW1 = JSON.parse(window.localStorage.getItem('world1Levels'))
+
+      for (let l = 0; l < gameStates.gameController.worlds[0].levels.length; l++) {
+        gameStates.gameController.worlds[0].levels[l].completed = completedLevelsW1[l]
+      }
+    }
+
+    if (window.localStorage.getItem('specialLevels') !== null) {
+      const completedLevelsSpecial = JSON.parse(window.localStorage.getItem('specialLevels'))
+
+      for (let l = 0; l < gameStates.gameController.worlds[1].levels.length; l++) {
+        gameStates.gameController.worlds[1].levels[l].completed = completedLevelsSpecial[l]
       }
     }
 
@@ -138,7 +155,7 @@ export const dataManagement = {
       const AlienLock = JSON.parse(window.localStorage.getItem('PlayerAlienLock'))
       drawUpdate.blueCubeAlienLock = AlienLock
       if (!drawUpdate.blueCubeAlienLock) {
-        gameStates.levelController.levels[8].items.splice(1, 1)
+        gameStates.gameController.world1[8].items.splice(1, 1)
       }
     }
 

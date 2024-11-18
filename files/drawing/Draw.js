@@ -18,7 +18,7 @@ export const draw = {
     this.MainDrawToolBar()
   },
   MainDrawGame: function () {
-    if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
+    if (gameStates.currentStartingMenusState === startingMenusStates.Selected && gameStates.currentGameMode !== gameMode.Unselected) {
       if (gameStates.currentGameMode === gameMode.StoryMode) { this.StoryModeDraw() }
 
       if (gameStates.currentGameMode === gameMode.Shop) { this.ShopDraw() }
@@ -29,24 +29,44 @@ export const draw = {
 
       if (gameStates.arrayChartController.findCurrentArrayChart() !== false) { this.DrawCharts() }
     } else {
-      if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) { gameStates.titleScreen.Draw(this) }
-      if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { gameStates.menuController.MainMenu.Draw() }
+      this.StartingDraw()
     }
   },
   MainDrawToolBar: function () {
     if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
       switch (gameStates.currentStoryModeState) {
-        case storyModeStates.Lost:
-          gameStates.lossScreen.DrawSideBar()
+        case storyModeStates.WorldSelecting:
           break
-        case storyModeStates.WonStage:
-          break
-        default:
+        case storyModeStates.Selecting:
+          this.DrawSideBarLines(1, 2)
+          this.DrawTimer()
           this.DrawCollectedItems(2, 2)
           this.DrawSlotFrame(2, 2)
           break
+        case storyModeStates.Tutorials:
+          break
+        case storyModeStates.Playing :
+          this.DrawSideBarLines(1, 2)
+          this.DrawTimer()
+          this.DrawCollectedItems(2, 2)
+          this.DrawSlotFrame(2, 2)
+          break
+        case storyModeStates.Paused:
+          this.DrawSideBarLines(1, 2)
+          this.DrawTimer()
+          this.DrawCollectedItems(2, 2)
+          this.DrawSlotFrame(2, 2)
+          break
+        case storyModeStates.Lost:
+          this.DrawSideBarLines(1, 1)
+          this.DrawTimer()
+          gameStates.lossScreen.DrawSideBar()
+          break
+        case storyModeStates.WonStage:
+          this.DrawSideBarLines(1, 0)
+          this.DrawTimer()
+          break
       }
-      this.DrawTimer()
     }
 
     if (gameStates.currentGameMode === gameMode.Settings && gameStates.currentSettingState === settingStates.Saving) {
@@ -54,12 +74,18 @@ export const draw = {
     }
     this.DrawToolBarButtons()
   },
+  StartingDraw: function () {
+    if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) { gameStates.titleScreen.Draw(this) }
+    if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { gameStates.menuController.MainMenu.Draw() }
+  },
   StoryModeDraw: function () {
-    if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelController.CheckLocked())) {
+    if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelSelector.CheckLocked())) {
       gameStates.CurrentLevel().draw()
     }
 
-    if (gameStates.currentStoryModeState === storyModeStates.Selecting) { this.DrawSelectLevel() }
+    if (gameStates.currentStoryModeState === storyModeStates.WorldSelecting) { gameStates.worldSelector.Draw() }
+
+    if (gameStates.currentStoryModeState === storyModeStates.Selecting) { gameStates.levelSelector.Draw() }
 
     // if (gameStates.currentStoryModeState === storyModeStates.Tutorials) { gameStates.infoController.DrawTutorials() }
 
@@ -82,32 +108,6 @@ export const draw = {
   },
   ShopDraw: function () {
     if (gameStates.currentShopMode === ShopMode.ShopMenu) { gameStates.menuController.ShopMenu.Draw() }
-  },
-  DrawSelectLevel: function () {
-    canvas.context.font = '125px Arial'
-    canvas.context.fillStyle = 'rgba(255, 255, 132, 0.788)'
-
-    // Draw level number
-    canvas.context.textAlign = 'center'
-    canvas.context.fillText('Level ' + (gameStates.currentLevelIndex + 1), 425, 575)
-    canvas.context.textAlign = 'left'
-
-    // Draw Locked Screen if level isn't unlocked
-    if (!gameStates.levelController.CheckLocked()) {
-      canvas.context.font = '175px Arial'
-      canvas.context.fillStyle = 'rgba(255, 255, 132)'
-      canvas.context.fillText('Locked', 10, 275)
-      draw.DrawImage(images.LockedIcon, 562.5, 10)
-    }
-
-    // Draw arrows to change level if applicable
-    if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1) {
-      draw.DrawImage(images.DownArrow, 690, 450)
-    }
-
-    if (gameStates.currentLevelIndex > 0) {
-      draw.DrawImage(images.UpArrow, 10, 450)
-    }
   },
   SettingsDraw: function () {
     if (gameStates.currentSettingState === settingStates.Selecting) { gameStates.menuController.SettingsMenu.Draw() }
@@ -191,6 +191,19 @@ export const draw = {
     // Reset Alignment
     canvas.context.textAlign = 'left'
   },
+  DrawSideBarLines: function (lineA, lineB) {
+    if (lineA === 1) {
+      canvas.context.fillRect(850, 175, canvas.width - 850, 4)
+    }
+
+    if (lineB === 1) {
+      canvas.context.fillRect(850, 390, canvas.width - 850, 4)
+    }
+
+    if (lineB === 2) {
+      canvas.context.fillRect(850, 450, canvas.width - 850, 4)
+    }
+  },
   DrawToolBarButtons: function () {
     switch (gameStates.currentStoryModeState) {
       case storyModeStates.Playing:
@@ -256,7 +269,7 @@ export const draw = {
   DrawTimer: function () {
     canvas.context.font = '75px Arial'
     canvas.context.fillStyle = 'black'
-    if (gameStates.levelController.CheckLocked()) {
+    if (gameStates.levelSelector.CheckLocked()) {
       canvas.context.fillText(gameStates.CurrentLevel().timeLimit, 965, 110)
     } else {
       canvas.context.fillText('???', 965, 105)

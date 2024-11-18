@@ -175,6 +175,8 @@ export class Background {
           this.color1 = 'rgb(80, 80, 80)'
           break
       }
+    } else if (gameStates.currentStoryModeState === storyModeStates.WorldSelecting && gameStates.currentGameMode === gameMode.StoryMode) {
+      this.color1 = gameStates.worldSelector.currentSelectedWorld.backgroundColour
     } else {
       this.color1 = 'lightgray'
     }
@@ -190,13 +192,5 @@ export class Background {
     canvas.context.fillRect(850, 0, canvas.width - 850, canvas.height)
     canvas.context.fillStyle = 'black'
     canvas.context.fillRect(850, 0, 2, canvas.height)
-    if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
-      canvas.context.fillRect(850, 175, canvas.width - 850, 4)
-      if (gameStates.currentStoryModeState === storyModeStates.Lost) {
-        canvas.context.fillRect(850, 390, canvas.width - 850, 4)
-      } else if (gameStates.currentStoryModeState !== storyModeStates.WonStage) {
-        canvas.context.fillRect(850, 450, canvas.width - 850, 4)
-      }
-    }
   }
 };

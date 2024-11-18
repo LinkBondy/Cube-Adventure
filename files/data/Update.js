@@ -6,10 +6,13 @@ export const update = {
     // if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { gameStates.menuController.MainMenu.Update() }
 
     if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
-      if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
-        gameStates.CurrentLevel().update()
-        gameStates.lossScreen.CheckLose()
-        gameStates.winScreen.CheckWin()
+      if (gameStates.currentGameMode === gameMode.StoryMode) {
+        gameStates.gameController.CheckUnlocked()
+        if (gameStates.currentStoryModeState === storyModeStates.Playing) {
+          gameStates.CurrentLevel().update()
+          gameStates.lossScreen.CheckLose()
+          gameStates.winScreen.CheckWin()
+        }
       }
 
       if (gameStates.arrayChartController.findCurrentArrayChart() !== false) { this.chartUpdate() }

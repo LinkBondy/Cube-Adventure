@@ -142,10 +142,12 @@ export class MenuController {
       new MenuItem('Story Mode', 1, 1, 'rgb(0, 166, 255)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.StoryMode
+        gameStates.currentStoryModeState = storyModeStates.WorldSelecting
       }),
       new MenuItem('Customize', 1, 2, 'rgb(0, 122, 216)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.Shop
+        gameStates.currentShopMode = ShopMode.ShopMenu
       }),
       new MenuItem('Adventure Log', 1, 3, 'rgb(0, 67, 190)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
@@ -154,6 +156,7 @@ export class MenuController {
       new MenuItem('Settings', 1, 4, 'rgb(0, 0, 139)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.Settings
+        gameStates.currentSettingState = settingStates.Selecting
       }),
       new MenuItem('Comming Soon', 1, 5, 'rgb(55, 0, 110)', function () {
       })
@@ -241,18 +244,23 @@ export class MenuController {
       }),
       new MenuItem('Main Menu', 1, 3, 'rgb(60, 0, 225)', function () {
         gameStates.CurrentLevel().restart()
-        gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
+        gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
+        gameStates.currentLevelIndex = 0
         gameStates.lossScreen.loseLevel = false
       })
     ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */175, /* width */850, /* height */425, /* fontSize */90))
 
     this.menus.push(this.WinMenu = new Menu([
       new MenuItem('Continue', 1, 1, 'rgb(255, 0, 75)', function () {
-        if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1) {
-          gameStates.CurrentLevel().startLevelTime()
+        if (gameStates.currentLevelIndex + 1 >= gameStates.worldSelector.currentWorld.levels.length || !gameStates.worldSelector.currentWorld.levels[gameStates.currentLevelIndex + 1].unlocked) {
+          gameStates.CurrentLevel().restart()
+          gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
+          gameStates.winScreen.winLevel = false
+        } else {
           gameStates.CurrentLevel().restart()
           gameStates.currentLevelIndex++
+          gameStates.CurrentLevel().startLevelTime()
           gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
           gameStates.winScreen.winLevel = false
         }
@@ -264,8 +272,9 @@ export class MenuController {
       }),
       new MenuItem('Main Menu', 1, 3, 'rgb(255, 10, 150)', function () {
         gameStates.CurrentLevel().restart()
-        gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
+        gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
+        gameStates.currentLevelIndex = 0
         gameStates.winScreen.winLevel = false
       })
     ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */150, /* width */850, /* height */450, /* fontSize */100))
@@ -289,8 +298,9 @@ export class MenuController {
       }),
       new MenuItem('Main Menu', 1, 4, 'rgb(255, 170, 0)', function () {
         gameStates.CurrentLevel().restart()
-        gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
+        gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
+        gameStates.currentLevelIndex = 0
       })
     ], /* itemWidth */1, /* itemHeight */4, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */90))
   }

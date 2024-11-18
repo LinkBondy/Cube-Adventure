@@ -2,9 +2,10 @@
 const { KeybindController } = require('../events/KeyBinds')
 const { ArrayChartController } = require('../menuModes/ArrayChart')
 const { MenuController } = require('../menuModes/Menu')
-const { LevelController } = require('../levels/Levels')
+const { GameController } = require('../levels/Levels')
 const { Background } = require('../levels/Class')
 const { InfoController } = require('../menuModes/AdventureLog')
+const { WorldSelector, LevelSelector } = require('../levels/GameSelectors')
 const { LossScreen, WinScreen, TitleScreen } = require('../drawing/GameScreens')
 const { images } = require('../drawing/Images')
 const { draw } = require('../drawing/Draw')
@@ -63,7 +64,9 @@ function ImageLoadingLoop () {
 function StartGame () {
   canvas.createCanvasContext()
   gameStates.loading = true
-  gameStates.levelController = new LevelController()
+  gameStates.gameController = new GameController()
+  gameStates.worldSelector = new WorldSelector()
+  gameStates.levelSelector = new LevelSelector()
   gameStates.background = new Background()
   gameStates.infoController = new InfoController()
   gameStates.menuController = new MenuController()
@@ -72,14 +75,14 @@ function StartGame () {
   gameStates.lossScreen = new LossScreen()
   gameStates.winScreen = new WinScreen()
   gameStates.titleScreen = new TitleScreen()
-  gameStates.levelController.createLevels()
+  gameStates.gameController.CreateLevels()
+  gameStates.gameController.CreateWorlds()
   dataManagement.Load()
   game.mainLoop()
   gameStates.loading = false
 }
 
 function LoadGame () {
-  ///
   if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/Windows Phone/i)) { gameStates.mobile = true } else { gameStates.mobile = false }
   images.LoadImages()
   // audio.MusicW1.src = "musicName";

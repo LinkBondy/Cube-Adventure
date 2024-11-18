@@ -21,41 +21,68 @@ export function MouseDown (event) {
     return
   }
 
+  // Back-Button / Pause-Button / Resume-Button
   if (isTouching(925, 475, 100, 100, event.offsetX, event.offsetY)) {
-    if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStoryModeState === storyModeStates.Playing) {
-      gameStates.SetGameState(storyModeStates.Paused, 'StoryMode')
-      gameStates.CurrentLevel().cubers.forEach(function (cuber) {
-        window.clearTimeout(cuber.timeoutID)
-        cuber.pausedDate = new Date()
-      })
-      gameStates.CurrentLevel().pauseLevelTime()
+    console.log(gameStates.currentGameMode)
+    if (gameStates.currentGameMode === gameMode.Unselected && gameStates.currentStartingMenusState > 1) {
+      gameStates.SetGameState(gameStates.currentStartingMenusState - 1, 'Starting')
       return
     }
 
-    if (gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStoryModeState === storyModeStates.Paused) {
-      gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
-      gameStates.CurrentLevel().resumeLevelTime()
-      gameStates.CurrentLevel().cubers.forEach(function (cuber) {
-        cuber.setTimer()
-      })
-      return
-    } else if (gameStates.currentShopMode > 1) {
-      gameStates.currentShopMode = ShopMode.ShopMenu
-      return
-    } else if (gameStates.currentSettingState > 1) {
-      switch (gameStates.keybindController.seletingKeybind) {
-        case true:
-          gameStates.keybindController.finishRebinding()
-          break
-
-        case false:
-          gameStates.currentSettingState = settingStates.Selecting
-          break
+    if (gameStates.currentGameMode === gameMode.StoryMode) {
+      if (gameStates.currentStoryModeState === 1) {
+        gameStates.ReturnToMainMenu()
+      } else if (gameStates.currentStoryModeState === storyModeStates.Playing) {
+        // Pause Game
+        gameStates.SetGameState(storyModeStates.Paused, 'StoryMode')
+        gameStates.CurrentLevel().cubers.forEach(function (cuber) {
+          window.clearTimeout(cuber.timeoutID)
+          cuber.pausedDate = new Date()
+        })
+        gameStates.CurrentLevel().pauseLevelTime()
+      } else if (gameStates.currentStoryModeState === storyModeStates.Paused) {
+        // Resume Game
+        gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
+        gameStates.CurrentLevel().resumeLevelTime()
+        gameStates.CurrentLevel().cubers.forEach(function (cuber) {
+          cuber.setTimer()
+        })
+      } else if (gameStates.currentStoryModeState === storyModeStates.Selecting) {
+        gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
+        gameStates.currentLevelIndex = 0
       }
       return
-    } else if (gameStates.currentStartingMenusState >= startingMenusStates.Menu && gameStates.currentStoryModeState === storyModeStates.Selecting) {
-      gameStates.SetGameState(gameStates.currentStartingMenusState - 1, 'Starting')
+    }
+
+    if (gameStates.currentGameMode === gameMode.Shop) {
+      if (gameStates.currentShopMode === 1) {
+        gameStates.ReturnToMainMenu()
+      } else {
+        gameStates.currentShopMode = ShopMode.ShopMenu
+      }
       return
+    }
+
+    if (gameStates.currentGameMode === gameMode.ItemsInfo) {
+      gameStates.ReturnToMainMenu()
+      return
+    }
+
+    if (gameStates.currentGameMode === gameMode.Settings) {
+      if (gameStates.currentSettingState === 1) {
+        gameStates.ReturnToMainMenu()
+      } else {
+        switch (gameStates.keybindController.seletingKeybind) {
+          case true:
+            gameStates.keybindController.finishRebinding()
+            break
+
+          case false:
+            gameStates.currentSettingState = settingStates.Selecting
+            break
+        }
+        return
+      }
     }
   }
 
@@ -76,16 +103,13 @@ export function MouseDown (event) {
 
   // Check if a game mode is selected
   if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
-    // Down "Level Selector"
-    if (gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 850 && event.offsetX > 690 && event.offsetY > 450 && event.offsetY < 600) { gameStates.currentLevelIndex = gameStates.currentLevelIndex + 1 }
+    if (gameStates.currentStoryModeState === storyModeStates.WorldSelecting) {
+      gameStates.worldSelector.MouseDown(event, isTouching)
+      return
+    }
 
-    // Up "Level Selector"
-    if (gameStates.currentLevelIndex !== 0 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetX < 160 && event.offsetX > 0 && event.offsetY > 450 && event.offsetY < 600) { gameStates.currentLevelIndex = gameStates.currentLevelIndex - 1 }
-
-    // Level Selector to Game
-    if (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && event.offsetY > 500 && event.offsetY < 600 && event.offsetX < 610 && event.offsetX > 225 && gameStates.levelController.CheckLocked()) {
-      gameStates.CurrentLevel().startLevelTime()
-      gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
+    if (gameStates.currentStoryModeState === storyModeStates.Selecting) {
+      gameStates.levelSelector.MouseDown(event, isTouching)
       return
     }
 

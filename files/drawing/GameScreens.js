@@ -13,22 +13,24 @@ export class TitleScreen {
     canvas.context.shadowOffsetX = 0
     canvas.context.shadowOffsetY = 0
 
+    canvas.context.textAlign = 'center'
     const gradient = canvas.context.createLinearGradient(0, 0, 750, 0)
     gradient.addColorStop(0, 'rgb(255, 5, 5)')
     gradient.addColorStop(1, 'rgb(145, 4, 12)')
-
     canvas.context.fillStyle = gradient
-    canvas.context.fillText('Adventure', 120, 400)
+    canvas.context.fillText('Adventure', 425, 400)
     canvas.context.font = '60px Arial'
+
     canvas.context.fillStyle = 'darkred'
     canvas.context.shadowColor = 'rgba(67, 0, 0)'
-    canvas.context.fillText('Press Enter to Begin', 120, 550)
-    ///
+    canvas.context.fillText('Press Enter to Begin', 425, 550)
+    canvas.context.textAlign = 'left'
+
     self.ChangeShadow(8, 8, 'rgb(50, 50, 50)')
     canvas.context.fillStyle = 'black'
     canvas.context.fillRect(600, 50, 200, 200)
     self.ChangeShadow(0, 0, 'rgb(0, 0, 0)')
-    ///
+
     canvas.context.fillStyle = gameStates.currentThemeColour
     canvas.context.fillRect(620, 90, 40, 40)
     canvas.context.fillRect(740, 90, 40, 40)
@@ -133,7 +135,9 @@ export class WinScreen {
   DrawScreen () {
     canvas.context.font = '88px Arial'
     canvas.context.fillStyle = 'red'
-    canvas.context.fillText('Level ' + (gameStates.currentLevelIndex + 1) + ' Complete!', 60, 100)
+    canvas.context.textAlign = 'center'
+    canvas.context.fillText(gameStates.CurrentLevel().title + ' Complete!', 425, 100)
+    canvas.context.textAlign = 'left'
   }
 
   CheckWin () {
@@ -154,8 +158,8 @@ export class WinScreen {
     setTimeout(function () {
       window.clearTimeout(gameStates.CurrentLevel().currentTimeout)
       gameStates.SetGameState(storyModeStates.WonStage, 'StoryMode')
-      if (gameStates.infoController.unlockedLevel === gameStates.currentLevelIndex) { gameStates.infoController.unlockedLevel++ }
-      if (gameStates.infoController.unlockedLevel === gameStates.levelController.levels.length) { drawUpdate.highestLevelLock = false }
+      gameStates.CurrentLevel().completed = true
+      if (gameStates.infoController.unlockedLevel === gameStates.worldSelector.currentWorld.levels.length) { drawUpdate.highestLevelLock = false }
     }, 300)
   }
 }

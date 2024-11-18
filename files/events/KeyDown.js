@@ -9,37 +9,72 @@ export function Keydown (event) {
     return
   }
 
+  // Back Action
   if ((keybindArray[5/* back */].keybindA === event.key || keybindArray[5/* back */].keybindB === event.key) && (gameStates.currentStartingMenusState === startingMenusStates.Menu || gameStates.currentStartingMenusState === startingMenusStates.Selected) && !gameStates.keybindController.seletingKeybind) {
-    if (gameStates.currentShopMode > 1) {
-      gameStates.currentShopMode = ShopMode.ShopMenu
-      return
-    }
-
-    if (gameStates.currentSettingState > 1) {
-      gameStates.SetGameState(settingStates.Selecting, 'Settings')
-      return
-    } else if (gameStates.currentStartingMenusState >= startingMenusStates.Menu && gameStates.currentStoryModeState === storyModeStates.Selecting) {
+    if (gameStates.currentGameMode === gameMode.Unselected && gameStates.currentStartingMenusState > 1) {
       gameStates.SetGameState(gameStates.currentStartingMenusState - 1, 'Starting')
       return
     }
+
+    if (gameStates.currentGameMode === gameMode.StoryMode) {
+      if (gameStates.currentStoryModeState === 1) {
+        gameStates.ReturnToMainMenu()
+      } else if (gameStates.currentStoryModeState === storyModeStates.Selecting) {
+        gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
+        gameStates.currentLevelIndex = 0
+      }
+      return
+    }
+
+    if (gameStates.currentGameMode === gameMode.Shop) {
+      if (gameStates.currentShopMode === 1) {
+        gameStates.ReturnToMainMenu()
+      } else {
+        gameStates.currentShopMode = ShopMode.ShopMenu
+      }
+      return
+    }
+
+    if (gameStates.currentGameMode === gameMode.ItemsInfo) {
+      gameStates.ReturnToMainMenu()
+      return
+    }
+
+    if (gameStates.currentGameMode === gameMode.Settings) {
+      if (gameStates.currentSettingState === 1) {
+        gameStates.ReturnToMainMenu()
+      } else {
+        switch (gameStates.keybindController.seletingKeybind) {
+          case true:
+            gameStates.keybindController.finishRebinding()
+            break
+
+          case false:
+            gameStates.currentSettingState = settingStates.Selecting
+            break
+        }
+        return
+      }
+    }
   }
+
   if (gameStates.menuController.CheckMenu() !== undefined) {
     gameStates.menuController.menus[gameStates.menuController.CheckMenu()].Keydown(event, keybindArray, stopEvents)
     return
   }
 
   if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
-    // Down "Level Selector"
-    if ((keybindArray[3/* down */].keybindA === event.key || keybindArray[3/* down */].keybindB === event.key) && gameStates.currentLevelIndex < gameStates.levelController.levels.length - 1 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode) { gameStates.currentLevelIndex = gameStates.currentLevelIndex + 1 }
+    // Select World
+    if (gameStates.currentGameMode === gameMode.StoryMode) {
+      if (gameStates.currentStoryModeState === storyModeStates.WorldSelecting) {
+        gameStates.worldSelector.KeyDown(event, keybindArray)
+        return
+      }
 
-    // Up "Level Selector"
-    if ((keybindArray[2/* up */].keybindA === event.key || keybindArray[2/* up */].keybindB === event.key) && gameStates.currentLevelIndex !== 0 && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode) { gameStates.currentLevelIndex = gameStates.currentLevelIndex - 1 }
-
-    // Level Selector to Game
-    if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.currentGameMode === gameMode.StoryMode && gameStates.levelController.CheckLocked()) {
-      gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
-      gameStates.CurrentLevel().startLevelTime()
-      return
+      if (gameStates.currentStoryModeState === storyModeStates.Selecting) {
+        gameStates.levelSelector.KeyDown(event, keybindArray)
+        return
+      }
     }
     ///
     if (gameStates.currentGameMode === gameMode.ItemsInfo) {

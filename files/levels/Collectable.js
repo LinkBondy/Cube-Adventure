@@ -64,7 +64,7 @@ export class ThreeBead extends Item {
     this.y = this.original_y
     if (this.collected === true && gameStates.currentStoryModeState === storyModeStates.WonStage) {
       drawUpdate.blueCubeAlienLock = false
-      gameStates.levelController.levels[8].items.splice(1, 1)
+      gameStates.gameController.levels[8].items.splice(1, 1)
     }
     this.collected = false
   }
