@@ -23,10 +23,11 @@ export const storyModeStates = {
   Paused: 7
 }
 
-export const ShopMode/* shopStates */ = {
-  ShopMenu: 1,
-  Backround: 2,
-  Player: 3
+export const shopStates = {
+  Menu: 1,
+  Player: 2,
+  ThemeColour: 3,
+  Background: 4
 }
 
 export const BackgroundStyles = {
@@ -44,7 +45,7 @@ export const cubeStyle = {
 export const settingStates = {
   Selecting: 1,
   Keybinds: 2,
-  ThemeColourSelection: 3,
+  Mobile: 3,
   Saving: 4,
   Sound: 5
 }
@@ -54,7 +55,7 @@ export const gameStates = {
   currentStoryModeState: storyModeStates.WorldSelecting,
   currentSettingState: settingStates.Selecting,
   currentGameMode: gameMode.Unselected,
-  currentShopMode: ShopMode.ShopMenu,
+  currentShopState: shopStates.Menu,
   currentBackgroundStyle: BackgroundStyles.Classic,
   currentCubeStyle: cubeStyle.BlueCube,
   currentThemeColour: 'lightgray',
@@ -115,7 +116,7 @@ export const dataManagement = {
       window.localStorage.setItem('highestLevelLock', drawUpdate.highestLevelLock)
       window.localStorage.setItem('StyleCube', gameStates.currentCubeStyle)
       window.localStorage.setItem('backgroundStyle', gameStates.currentBackgroundStyle)
-      window.localStorage.setItem('currentThemeColourSelection', gameStates.arrayChartController.arrayCharts[0].currentSelection)
+      window.localStorage.setItem('currentThemeColourSelection', gameStates.arrayChartController.arrayCharts[1].currentSelection)
       window.localStorage.setItem('keybindArray', JSON.stringify(gameStates.keybindController.keybinds))
     }
   },
@@ -162,22 +163,86 @@ export const dataManagement = {
     const BackgroundStyle = Number(window.localStorage.getItem('backgroundStyle'))
     if (BackgroundStyle !== null) {
       gameStates.currentBackgroundStyle = BackgroundStyle
-      gameStates.arrayChartController.arrayCharts[1].currentSelection = BackgroundStyle
+      gameStates.arrayChartController.arrayCharts[2].currentSelection = BackgroundStyle
     }
 
     const StyleCube = Number(window.localStorage.getItem('StyleCube'))
     if (StyleCube !== null) {
       gameStates.currentCubeStyle = StyleCube
-      gameStates.arrayChartController.arrayCharts[2].currentSelection = StyleCube
+      gameStates.arrayChartController.arrayCharts[0].currentSelection = StyleCube
     }
 
     const currentThemeColourSelection = window.localStorage.getItem('currentThemeColourSelection')
     if (currentThemeColourSelection !== null) {
-      gameStates.currentThemeColour = gameStates.arrayChartController.arrayCharts[0].items[currentThemeColourSelection].value
-      gameStates.arrayChartController.arrayCharts[0].currentSelection = currentThemeColourSelection
+      gameStates.currentThemeColour = gameStates.arrayChartController.arrayCharts[1].items[Number(currentThemeColourSelection)].value
+      gameStates.arrayChartController.arrayCharts[1].currentSelection = currentThemeColourSelection
     }
 
     const loadArrayKeybind = JSON.parse(window.localStorage.getItem('keybindArray'))
     if (loadArrayKeybind !== null) { gameStates.keybindController.load(loadArrayKeybind) }
+  }
+}
+
+export const eventFunctions = {
+  isTouching: function (x, y, width, height, event) {
+    const boxLeft = x
+    const boxRight = x + width
+    const boxTop = y
+    const boxBottom = y + height
+    const mouseX = event.offsetX
+    const mouseY = event.offsetY
+    ///
+    if (mouseX >= boxLeft && mouseX <= boxRight &&
+            mouseY >= boxTop && mouseY <= boxBottom) {
+      return true
+    }
+    return false
+  },
+
+  backButtonAction: function () {
+    if (gameStates.currentGameMode === gameMode.Unselected && gameStates.currentStartingMenusState > 1) {
+      gameStates.SetGameState(gameStates.currentStartingMenusState - 1, 'Starting')
+      return
+    }
+
+    if (gameStates.currentGameMode === gameMode.StoryMode) {
+      if (gameStates.currentStoryModeState === 1) {
+        gameStates.ReturnToMainMenu()
+      } else if (gameStates.currentStoryModeState === storyModeStates.Selecting) {
+        gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
+        gameStates.currentLevelIndex = 0
+      }
+      return
+    }
+
+    if (gameStates.currentGameMode === gameMode.Shop) {
+      if (gameStates.currentShopState === shopStates.Menu) {
+        gameStates.ReturnToMainMenu()
+      } else {
+        gameStates.currentShopState = shopStates.Menu
+      }
+      return
+    }
+
+    if (gameStates.currentGameMode === gameMode.ItemsInfo) {
+      gameStates.ReturnToMainMenu()
+      return
+    }
+
+    if (gameStates.currentGameMode === gameMode.Settings) {
+      if (gameStates.currentSettingState === 1) {
+        gameStates.ReturnToMainMenu()
+      } else {
+        switch (gameStates.keybindController.seletingKeybind) {
+          case true:
+            gameStates.keybindController.finishRebinding()
+            break
+
+          case false:
+            gameStates.currentSettingState = settingStates.Selecting
+            break
+        }
+      }
+    }
   }
 }

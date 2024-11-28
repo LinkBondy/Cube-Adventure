@@ -2,7 +2,7 @@
 const { images } = require('../drawing/Images')
 const { draw } = require('../drawing/Draw')
 const { canvas } = require('../drawing/Canvas')
-const { gameStates } = require('../data/GameData')
+const { gameStates, eventFunctions } = require('../data/GameData')
 const { Requirement } = require('../levels/Levels')
 
 const LockedFeature = {
@@ -66,19 +66,19 @@ export class InfoController {
 
   Mousedown (event) {
     // Forward
-    if (event.offsetY > 150 && event.offsetY < 450) {
+    if (eventFunctions.isTouching(0, 150, 850, 300, event)) {
       if ((this.items[this.itemIndex].slides.length - 1) === this.slideIndex) { this.slideIndex = 0 } else { this.slideIndex++ }
       return
     }
 
     // Down
-    if (event.offsetY > 450 && event.offsetY < 600 && event.offsetX < 850 && this.itemIndex < (this.items.length - 1)) {
+    if (eventFunctions.isTouching(0, 450, 850, 150, event) && this.itemIndex < (this.items.length - 1)) {
       this.itemIndex = this.itemIndex + 1
       this.slideIndex = 0
     }
 
     // Up
-    if (event.offsetY > 0 && event.offsetY < 150 && event.offsetX < 850 && this.itemIndex !== 0) {
+    if (eventFunctions.isTouching(0, 0, 850, 150, event) && this.itemIndex !== 0) {
       this.itemIndex = this.itemIndex - 1
       this.slideIndex = 0
     }

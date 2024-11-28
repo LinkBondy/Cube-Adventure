@@ -1,5 +1,5 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, BackgroundStyles, gameStates, settingStates, dataManagement } = require('../data/GameData')
+const { gameMode, startingMenusStates, storyModeStates, shopStates, BackgroundStyles, gameStates, settingStates, dataManagement } = require('../data/GameData')
 const { canvas } = require('./Canvas')
 const { images } = require('./Images')
 export const draw = {
@@ -107,7 +107,7 @@ export const draw = {
     }
   },
   ShopDraw: function () {
-    if (gameStates.currentShopMode === ShopMode.ShopMenu) { gameStates.menuController.ShopMenu.Draw() }
+    if (gameStates.currentShopState === shopStates.Menu) { gameStates.menuController.ShopMenu.Draw() }
   },
   SettingsDraw: function () {
     if (gameStates.currentSettingState === settingStates.Selecting) { gameStates.menuController.SettingsMenu.Draw() }
@@ -210,12 +210,8 @@ export const draw = {
         draw.DrawImage(images.PauseButton, 925, 475)
         break
 
-      case storyModeStates.Paused:
-        draw.DrawImage(images.PlayButton, 925, 475)
-        break
-
       default:
-        if (gameStates.currentStoryModeState !== storyModeStates.Lost && gameStates.currentStoryModeState !== storyModeStates.WonStage && gameStates.currentStartingMenusState !== startingMenusStates.NotStarted) {
+        if (gameStates.currentStoryModeState !== storyModeStates.Lost && gameStates.currentStoryModeState !== storyModeStates.Paused && gameStates.currentStoryModeState !== storyModeStates.WonStage && gameStates.currentStartingMenusState !== startingMenusStates.NotStarted) {
           draw.DrawImage(images.BackButton, 925, 475)
         }
         break

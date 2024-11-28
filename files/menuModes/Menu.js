@@ -1,5 +1,5 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, ShopMode, gameStates, settingStates, dataManagement } = require('../data/GameData')
+const { gameMode, startingMenusStates, storyModeStates, shopStates, gameStates, settingStates, dataManagement, eventFunctions } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 
 class MenuItem {
@@ -76,13 +76,13 @@ class Menu {
     }
   }
 
-  MouseDown (event, isTouching) {
+  MouseDown (event) {
     const self = this
     const heightPerItem = this.height / this.itemHeight
     const widthPerItem = this.width / this.itemWidth
     this.menuItems.forEach(function (menuItem) {
       // Selected "Menus"
-      if (isTouching(self.x + widthPerItem * (menuItem.valueX - 1), self.y + heightPerItem * (menuItem.valueY - 1), widthPerItem, heightPerItem, event.offsetX, event.offsetY) && gameStates.menuController.CheckMenu() !== undefined) {
+      if (eventFunctions.isTouching(self.x + widthPerItem * (menuItem.valueX - 1), self.y + heightPerItem * (menuItem.valueY - 1), widthPerItem, heightPerItem, event) && gameStates.menuController.CheckMenu() !== undefined) {
         if ((menuItem.valueX - 1) === self.selectedIndexX && (menuItem.valueY - 1) === self.selectedIndexY) {
           gameStates.menuController.menus[gameStates.menuController.CheckMenu()].selected()
         } else {
@@ -147,7 +147,7 @@ export class MenuController {
       new MenuItem('Customize', 1, 2, 'rgb(0, 122, 216)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.Shop
-        gameStates.currentShopMode = ShopMode.ShopMenu
+        gameStates.currentShopState = shopStates.Menu
       }),
       new MenuItem('Adventure Log', 1, 3, 'rgb(0, 67, 190)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
@@ -157,19 +157,22 @@ export class MenuController {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
         gameStates.currentGameMode = gameMode.Settings
         gameStates.currentSettingState = settingStates.Selecting
-      }),
-      new MenuItem('Comming Soon', 1, 5, 'rgb(55, 0, 110)', function () {
       })
-    ], /* itemWidth */1, /* itemHeight */5, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */80))
+      /* new MenuItem('Comming Soon', 1, 5, 'rgb(55, 0, 110)', function () {
+      }) */
+    ], /* itemWidth */1, /* itemHeight */4, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */85))
 
     this.menus.push(this.ShopMenu = new Menu([
       new MenuItem('Player', 1, 1, 'lightcoral', function () {
-        gameStates.currentShopMode = ShopMode.Player
+        gameStates.currentShopState = shopStates.Player
       }),
-      new MenuItem('Background', 1, 2, 'gold', function () {
-        gameStates.currentShopMode = ShopMode.Backround
+      new MenuItem('Theme Colour', 1, 2, 'rgb(240, 160, 40)', function () {
+        gameStates.currentShopState = shopStates.ThemeColour
+      }),
+      new MenuItem('Background', 1, 3, 'gold', function () {
+        gameStates.currentShopState = shopStates.Background
       })
-    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */105))
 
     this.menus.push(this.KeybindsSelector = new Menu([
       new MenuItem('ArrowLeft', 1, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.startRebind('A', 1, this) }),
@@ -198,16 +201,16 @@ export class MenuController {
       new MenuItem('Keybinds', 1, 1, 'rgb(230, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Keybinds, 'Settings')
       }),
-      new MenuItem('Theme Colour', 1, 2, 'rgb(182, 200, 0)', function () {
+      /* new MenuItem('Theme Colour', 1, 2, 'rgb(182, 200, 0)', function () {
         gameStates.SetGameState(settingStates.ThemeColourSelection, 'Settings')
-      }),
-      new MenuItem('Saving', 1, 3, 'rgb(135, 200, 0)', function () {
+      }), */
+      new MenuItem('Saving', 1, 2, 'rgb(135, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Saving, 'Settings')
       })
       /* new MenuItem('Sound', 1, 4, 'rgb(0, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Sound, 'Settings')
       }) */
-    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */95))
+    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */95))
 
     this.menus.push(this.SavingMenu = new Menu([
       new MenuItem('Auto Save', 1, 1, 'limeGreen', function () {
@@ -246,6 +249,7 @@ export class MenuController {
         gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
+        gameStates.currentGameMode = gameMode.Unselected
         gameStates.currentLevelIndex = 0
         gameStates.lossScreen.loseLevel = false
       })
@@ -274,6 +278,7 @@ export class MenuController {
         gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
+        gameStates.currentGameMode = gameMode.Unselected
         gameStates.currentLevelIndex = 0
         gameStates.winScreen.winLevel = false
       })
@@ -299,6 +304,7 @@ export class MenuController {
       new MenuItem('Main Menu', 1, 4, 'rgb(255, 170, 0)', function () {
         gameStates.CurrentLevel().restart()
         gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
+        gameStates.currentGameMode = gameMode.Unselected
         gameStates.currentStartingMenusState = startingMenusStates.Menu
         gameStates.currentLevelIndex = 0
       })
@@ -310,7 +316,7 @@ export class MenuController {
     if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { return 0 }
     ///
     if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
-      if (gameStates.currentShopMode === ShopMode.ShopMenu && gameStates.currentGameMode === gameMode.Shop) { return 1 }
+      if (gameStates.currentShopState === shopStates.Menu && gameStates.currentGameMode === gameMode.Shop) { return 1 }
       ///
       if (gameStates.currentGameMode === gameMode.Settings) {
         if (gameStates.currentSettingState === settingStates.Keybinds && !gameStates.keybindController.seletingKeybind) { return 2 }

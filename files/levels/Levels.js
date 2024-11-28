@@ -3,7 +3,7 @@ const { Player, Cuber, Expander, ChangeDirectionSquare } = require('./Moveable')
 const { TallGrass, FakeTallGrass, Rock, Water } = require('./Barriers')
 const { ReverseTile, Teleporter, Hole, FinishArea } = require('./Interactable')
 const { LifeJacket, ThreeBead } = require('./Collectable')
-const { gameStates } = require('../data/GameData')
+const { gameStates, storyModeStates } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 
 class Level {
@@ -175,9 +175,13 @@ class Level {
   }
 
   pauseLevelTime () {
-    gameStates.pausedDate = new Date()
     const self = this
+    gameStates.pausedDate = new Date()
+    gameStates.SetGameState(storyModeStates.Paused, 'StoryMode')
     window.clearTimeout(self.currentTimeout)
+    this.cubers.forEach(function (cuber) {
+      cuber.stopTimer()
+    })
   }
 
   resumeLevelTime () {

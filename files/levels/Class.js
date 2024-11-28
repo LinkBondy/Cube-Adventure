@@ -175,7 +175,7 @@ export class Background {
           this.color1 = 'rgb(80, 80, 80)'
           break
       }
-    } else if (gameStates.currentStoryModeState === storyModeStates.WorldSelecting && gameStates.currentGameMode === gameMode.StoryMode) {
+    } else if (gameStates.currentStoryModeState === storyModeStates.WorldSelecting && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
       this.color1 = gameStates.worldSelector.currentSelectedWorld.backgroundColour
     } else {
       this.color1 = 'lightgray'

@@ -1,5 +1,5 @@
 'use strict'
-const { gameStates, storyModeStates } = require('../data/GameData')
+const { gameStates, storyModeStates, eventFunctions } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 const { images } = require('../drawing/Images')
 const { draw } = require('../drawing/Draw')
@@ -36,9 +36,9 @@ export class WorldSelector {
     console.log(this.currentSelectedWorld)
   }
 
-  MouseDown (event, isTouching) {
+  MouseDown (event) {
     // Left "World Selector"
-    if (isTouching(690, 450, 160, 150, event.offsetX, event.offsetY)) {
+    if (eventFunctions.isTouching(690, 450, 160, 150, event)) {
       if (this.worldIndex > 0) {
         this.worldIndex -= 1
       } else if (this.worldIndex === 0) {
@@ -47,7 +47,7 @@ export class WorldSelector {
     }
 
     // Right "World Selector"
-    if (isTouching(0, 450, 160, 150, event.offsetX, event.offsetY)) {
+    if (eventFunctions.isTouching(0, 450, 160, 150, event)) {
       if (this.worldIndex < gameStates.gameController.worlds.length - 1) {
         this.worldIndex += 1
       } else if (this.worldIndex === gameStates.gameController.worlds.length - 1) {
@@ -56,7 +56,7 @@ export class WorldSelector {
     }
 
     // World Selector to Level Selector
-    if (isTouching(0, 120, 850, 200, event.offsetX, event.offsetY) && this.CheckLocked()) {
+    if (eventFunctions.isTouching(0, 120, 850, 200, event) && this.CheckLocked()) {
       gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
       this.currentWorld = gameStates.gameController.worlds[this.worldIndex]
     }
@@ -149,15 +149,15 @@ export class LevelSelector {
     }
   }
 
-  MouseDown (event, isTouching) {
+  MouseDown (event) {
     // Down "Level Selector"
-    if (isTouching(690, 450, 160, 150, event.offsetX, event.offsetY) && gameStates.currentLevelIndex < gameStates.worldSelector.currentWorld.levels.length - 1) { gameStates.currentLevelIndex += 1 }
+    if (eventFunctions.isTouching(690, 450, 160, 150, event) && gameStates.currentLevelIndex < gameStates.worldSelector.currentWorld.levels.length - 1) { gameStates.currentLevelIndex += 1 }
 
     // Up "Level Selector"
-    if (isTouching(0, 450, 160, 150, event.offsetX, event.offsetY) && gameStates.currentLevelIndex !== 0) { gameStates.currentLevelIndex -= 1 }
+    if (eventFunctions.isTouching(0, 450, 160, 150, event) && gameStates.currentLevelIndex !== 0) { gameStates.currentLevelIndex -= 1 }
 
     // Level Selector to Game
-    if (isTouching(225, 500, 385, 100, event.offsetX, event.offsetY) && this.CheckLocked()) {
+    if (eventFunctions.isTouching(225, 500, 385, 100, event) && this.CheckLocked()) {
       this.SelectLevel()
     }
   }

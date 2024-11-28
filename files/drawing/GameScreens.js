@@ -1,5 +1,5 @@
 'use strict'
-const { gameStates, storyModeStates, startingMenusStates, drawUpdate } = require('../data/GameData')
+const { gameStates, storyModeStates, startingMenusStates, drawUpdate, eventFunctions } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 
 export class TitleScreen {
@@ -43,8 +43,8 @@ export class TitleScreen {
     }
   }
 
-  MouseDown (event, isTouching) {
-    if (isTouching(0, 500, 850, 100, event.offsetX, event.offsetY)) {
+  MouseDown (event) {
+    if (eventFunctions.isTouching(0, 500, 850, 100, event)) {
       gameStates.SetGameState(startingMenusStates.Menu, 'Starting')
     }
   }

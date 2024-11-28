@@ -1,40 +1,10 @@
 'use strict'
 const { images } = require('../drawing/Images')
-const { gameMode, ShopMode, gameStates, settingStates, cubeStyle, BackgroundStyles, drawUpdate } = require('../data/GameData')
+const { gameMode, shopStates, gameStates, cubeStyle, BackgroundStyles, drawUpdate } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 export class ArrayChartController {
   constructor () {
     this.arrayCharts = []
-    this.arrayCharts.push(this.colours = new ArrayChart(/* title */'Theme Colour', /* currentSelection */10, /* offsetX */0, /* offsetY */300, /* sectionWidth */135.75, /* sectionHeight */135.75, /* loopWidth */6, /* loopHeight */2, [
-      new ArrayChartBox(/* displayName */'Red', /* locked */false, /* value */'rgb(255, 179, 179)', /* colour */'rgb(255, 179, 179)', /* boarder */'rgb(0, 0, 0)'),
-      new ArrayChartBox('Orange', false, 'rgb(255, 211, 179)', 'rgb(255, 211, 179)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Yellow', false, 'rgb(255, 243, 179)', 'rgb(255, 243, 179)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Lime', false, 'rgb(179, 255, 179)', 'rgb(179, 255, 179)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Aqua', false, 'rgb(178, 255, 210)', 'rgb(178, 255, 210)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Light Blue', false, 'rgb(179, 249, 255)', 'rgb(179, 249, 255)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Blue', false, 'rgb(179, 186, 255)', 'rgb(179, 186, 255)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Purple', false, 'rgb(211, 179, 255)', 'rgb(211, 179, 255)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Magenta', false, 'rgb(255, 179, 255)', 'rgb(255, 179, 255)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Pink', false, 'rgb(255, 179, 217)', 'rgb(255, 179, 217)', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Light Gray', false, 'lightgray', 'lightgray', 'rgb(0, 0, 0)'),
-      new ArrayChartBox('Dark Gray', false, 'rgb(137, 137, 137)', 'rgb(137, 137, 137)', 'rgb(0, 0, 0)')
-    ], function (arrayChart, currentSelectionCheck) {
-      if (!arrayChart.items[currentSelectionCheck].locked) {
-        arrayChart.currentSelection = currentSelectionCheck
-        gameStates.currentThemeColour = arrayChart.items[arrayChart.currentSelection].value
-      }
-    }))
-
-    this.arrayCharts.push(this.backroundStyles = new ArrayChart(/* title */'Background Style', /* currentSelection */0, /* offsetX */220, /* offsetY */300, /* sectionWidth */200, /* sectionHeight */200, /* loopWidth */2, /* loopHeight */1, [
-      new ArrayChartImage(/* displayName */'Classic', /* locked */false, /* value */BackgroundStyles.Classic, /* image */images.WallGrassClassicA_400x400, /* imageStartX */-4, /* imageStartY */0, /* imageStartWidth */images.WallGrassClassicA_400x400.width, /* imageStartHeight */images.WallGrassClassicA_400x400.height),
-      new ArrayChartBox(/* displayName */'Plastic', drawUpdate.highestLevelLock, /* value */BackgroundStyles.Plastic, /* colour */'rgb(127, 127, 127)', /* boarder */'rgb(0, 0, 0)', /* checkLocked */function () { this.locked = drawUpdate.highestLevelLock })
-    ], function (arrayChart, currentSelectionCheck) {
-      if (!arrayChart.items[currentSelectionCheck].locked) {
-        arrayChart.currentSelection = currentSelectionCheck
-        gameStates.currentBackgroundStyle = arrayChart.items[arrayChart.currentSelection].value
-      }
-    }))
-
     this.arrayCharts.push(this.playerStyles = new ArrayChart(/* title */'Player Style', /* currentSelection */0, /* offsetX */12.5, /* offsetY */300, /* sectionWidth */200, /* sectionHeight */200, /* loopWidth */4, /* loopHeight */1, [
       new ArrayChartImage(/* displayName */'Classic', /* locked */false, /* value */cubeStyle.Classic, /* image */images.BlueCube_400x400, /* imageStartX */0, /* imageStartY */0, /* imageStartWidth */200, /* imageStartHeight */images.BlueCube_400x400.height),
       new ArrayChartImage('Alien', drawUpdate.blueCubeAlienLock, cubeStyle.Alien, images.BlueCube_400x400, 200, 0, 200, images.BlueCube_400x400.height, /* checkLocked */function () { this.locked = drawUpdate.blueCubeAlienLock }),
@@ -46,13 +16,43 @@ export class ArrayChartController {
         gameStates.currentCubeStyle = arrayChart.items[arrayChart.currentSelection].value
       }
     }))
+
+    this.arrayCharts.push(this.colours = new ArrayChart(/* title */'Theme Colour', /* currentSelection */10, /* offsetX */0, /* offsetY */300, /* sectionWidth */135.75, /* sectionHeight */135.75, /* loopWidth */6, /* loopHeight */2, [
+      new ArrayChartBox(/* displayName */'Red', /* locked */false, /* value */'rgb(255, 159, 159)', /* colour */'rgb(255, 159, 159)', /* border */'rgb(0, 0, 0)'),
+      new ArrayChartBox('Orange', false, 'rgb(255, 190, 134)', 'rgb(255, 190, 134)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Yellow', false, 'rgb(252, 242, 169)', 'rgb(252, 242, 169)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Lime', false, 'rgb(179, 255, 179)', 'rgb(179, 255, 179)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Aqua', false, 'rgb(178, 255, 215)', 'rgb(178, 255, 215)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Light Blue', false, 'rgb(179, 249, 255)', 'rgb(179, 249, 255)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Blue', false, 'rgb(169, 186, 255)', 'rgb(169, 186, 255)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Purple', false, 'rgb(209, 161, 249)', 'rgb(216, 179, 255)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Magenta', false, 'rgb(235, 159, 230)', 'rgb(235, 169, 245)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Pink', false, 'rgb(255, 179, 217)', 'rgb(255, 179, 217)', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Light Gray', false, 'lightgray', 'lightgray', 'rgb(0, 0, 0)'),
+      new ArrayChartBox('Dark Gray', false, 'rgb(145, 145, 145)', 'rgb(145, 145, 145)', 'rgb(0, 0, 0)')
+    ], function (arrayChart, currentSelectionCheck) {
+      if (!arrayChart.items[currentSelectionCheck].locked) {
+        arrayChart.currentSelection = currentSelectionCheck
+        gameStates.currentThemeColour = arrayChart.items[arrayChart.currentSelection].value
+      }
+    }))
+
+    this.arrayCharts.push(this.backroundStyles = new ArrayChart(/* title */'Background Style', /* currentSelection */0, /* offsetX */220, /* offsetY */300, /* sectionWidth */200, /* sectionHeight */200, /* loopWidth */2, /* loopHeight */1, [
+      new ArrayChartImage(/* displayName */'Classic', /* locked */false, /* value */BackgroundStyles.Classic, /* image */images.WallGrassClassicA_400x400, /* imageStartX */-4, /* imageStartY */0, /* imageStartWidth */images.WallGrassClassicA_400x400.width, /* imageStartHeight */images.WallGrassClassicA_400x400.height),
+      new ArrayChartBox(/* displayName */'Plastic', drawUpdate.highestLevelLock, /* value */BackgroundStyles.Plastic, /* colour */'rgb(127, 127, 127)', /* border */'rgb(0, 0, 0)', /* checkLocked */function () { this.locked = drawUpdate.highestLevelLock })
+    ], function (arrayChart, currentSelectionCheck) {
+      if (!arrayChart.items[currentSelectionCheck].locked) {
+        arrayChart.currentSelection = currentSelectionCheck
+        gameStates.currentBackgroundStyle = arrayChart.items[arrayChart.currentSelection].value
+      }
+    }))
   }
 
   findCurrentArrayChart () {
-    if (gameStates.currentSettingState === settingStates.ThemeColourSelection && gameStates.currentGameMode === gameMode.Settings) { return 0 }
     if (gameStates.currentGameMode === gameMode.Shop) {
-      if (gameStates.currentShopMode === ShopMode.Backround) { return 1 }
-      if (gameStates.currentShopMode === ShopMode.Player) { return 2 }
+      if (gameStates.currentShopState === shopStates.Player) { return 0 }
+      if (gameStates.currentShopState === shopStates.ThemeColour) { return 1 }
+      if (gameStates.currentShopState === shopStates.Background) { return 2 }
     }
     return false
   }
@@ -114,19 +114,19 @@ class ArrayChart {
 };
 
 class ArrayChartBox {
-  constructor (displayName, locked, value, colour, boarder, checkedLocked) {
+  constructor (displayName, locked, value, colour, border, checkedLocked) {
     this.displayName = displayName
     this.locked = locked
     this.value = value
     this.colour = colour
-    this.boarder = boarder
+    this.border = border
     this.checkedLocked = checkedLocked
     this.currentSelected = false
   }
 
   Draw (row, col) {
     if (!this.locked) {
-      if (this.currentArrayChart.currentX === row && this.currentArrayChart.currentY === col) { canvas.context.fillStyle = 'white' } else { canvas.context.fillStyle = this.boarder }
+      if (this.currentArrayChart.currentX === row && this.currentArrayChart.currentY === col) { canvas.context.fillStyle = 'white' } else { canvas.context.fillStyle = this.border }
       canvas.context.fillRect(this.x, this.y, this.currentArrayChart.sectionWidth, this.currentArrayChart.sectionHeight)
       // darwBoxStart
       canvas.context.fillStyle = this.colour
