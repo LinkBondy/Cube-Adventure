@@ -1,5 +1,5 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, shopStates, BackgroundStyles, gameStates, settingStates, dataManagement } = require('../data/GameData')
+const { gameMode, startingMenusStates, storyModeStates, shopStates, gameStates, settingStates, dataManagement } = require('../data/GameData')
 const { canvas } = require('./Canvas')
 const { images } = require('./Images')
 export const draw = {
@@ -40,22 +40,19 @@ export const draw = {
         case storyModeStates.Selecting:
           this.DrawSideBarLines(1, 2)
           this.DrawTimer()
-          this.DrawCollectedItems(2, 2)
-          this.DrawSlotFrame(2, 2)
+          gameStates.CurrentLevel().storage.Draw(2, 2)
           break
         case storyModeStates.Tutorials:
           break
         case storyModeStates.Playing :
           this.DrawSideBarLines(1, 2)
           this.DrawTimer()
-          this.DrawCollectedItems(2, 2)
-          this.DrawSlotFrame(2, 2)
+          gameStates.CurrentLevel().storage.Draw(2, 2)
           break
         case storyModeStates.Paused:
           this.DrawSideBarLines(1, 2)
           this.DrawTimer()
-          this.DrawCollectedItems(2, 2)
-          this.DrawSlotFrame(2, 2)
+          gameStates.CurrentLevel().storage.Draw(2, 2)
           break
         case storyModeStates.Lost:
           this.DrawSideBarLines(1, 1)
@@ -79,7 +76,7 @@ export const draw = {
     if (gameStates.currentStartingMenusState === startingMenusStates.Menu) { gameStates.menuController.MainMenu.Draw() }
   },
   StoryModeDraw: function () {
-    if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.levelSelector.CheckLocked())) {
+    if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || (gameStates.currentStoryModeState === storyModeStates.Selecting && gameStates.CurrentLevel().checkLocked())) {
       gameStates.CurrentLevel().draw()
     }
 
@@ -217,55 +214,10 @@ export const draw = {
         break
     }
   },
-  DrawCollectedItems: function (slotRow, slotCol) {
-    const startCol = 850 + 25
-    const startRow = 200 + 10
-    const items = gameStates.CurrentLevel().collectedItems
-    let totalItemsDrawn = 0
-    for (let row = 0; row < slotRow; row++) {
-      for (let col = 0; col < slotCol; col++) {
-        let image = images.BlueCube
-        if (totalItemsDrawn === items.length) {
-          return
-        } else {
-          switch (items[totalItemsDrawn]) {
-            case 'lifeJacket':
-              if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-                image = images.LifeJacket_80x80
-              }
-              if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-                image = images.LifeJacketPlastic_80x80
-              }
-              break
-
-            case 'threeBead':
-              if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-                image = images.ThreeBead_80x80
-              }
-              if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-                image = images.ThreeBeadPlastic_80x80
-              }
-              break
-          }
-          draw.DrawImage(image, 120 * col + startCol, 125 * row + startRow)
-          totalItemsDrawn += 1
-        }
-      }
-    }
-  },
-  DrawSlotFrame: function (slotRow, slotCol) {
-    const startCol = 850 + 16
-    const startRow = 200
-    for (let row = 0; row < slotRow; row++) {
-      for (let col = 0; col < slotCol; col++) {
-        draw.DrawImage(images.Frame, 120 * col + startCol, 125 * row + startRow)
-      }
-    }
-  },
   DrawTimer: function () {
     canvas.context.font = '75px Arial'
     canvas.context.fillStyle = 'black'
-    if (gameStates.levelSelector.CheckLocked()) {
+    if (gameStates.CurrentLevel().checkLocked()) {
       canvas.context.fillText(gameStates.CurrentLevel().timeLimit, 965, 110)
     } else {
       canvas.context.fillText('???', 965, 105)

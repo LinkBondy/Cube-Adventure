@@ -2,12 +2,13 @@
 const { gameMode, startingMenusStates, storyModeStates, gameStates, BackgroundStyles } = require('../data/GameData')
 const { canvas } = require('../drawing/Canvas')
 export class GameObject {
-  constructor (x, y, width, height, color1) {
+  constructor (x, y, width, height, color1, debugColor) {
     this.x = x
     this.y = y
     this.width = width
     this.height = height
     this.color1 = color1
+    this.debugColor = debugColor
   }
 
   intersects (otherBox) {
@@ -103,6 +104,13 @@ export class GameObject {
     return this.y + this.height
   }
 
+  debugDraw () {
+    canvas.context.fillStyle = 'black'
+    canvas.context.fillRect(this.x, this.y, this.width, this.height)
+    canvas.context.fillStyle = this.debugColor
+    canvas.context.fillRect(this.x + 3, this.y + 3, this.width - 6, this.height - 6)
+  }
+
   /* above(typeArray, itemX, itemY) {
         typeArray.forEach(function(type) {
             for (var x = type.left(); x < type.right(); x = x + 50) {
@@ -163,17 +171,28 @@ export class Background {
   }
 
   DrawBackround () {
-    if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected && gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-      switch (gameStates.CurrentLevel().currentArea) {
-        case 1:
-          this.color1 = 'rgb(100, 200, 100)'
-          break
-        case 2 :
-          this.color1 = 'rgb(153, 63, 33)'
-          break
-        case 3 :
-          this.color1 = 'rgb(80, 80, 80)'
-          break
+    if ((gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused || gameStates.currentStoryModeState === storyModeStates.Selecting) && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
+      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
+        switch (gameStates.CurrentLevel().currentArea) {
+          case 1:
+            this.color1 = 'rgb(100, 200, 100)'
+            break
+          case 2 :
+            this.color1 = 'rgb(80, 80, 80)'
+            break
+          case 3 :
+            this.color1 = 'rgb(153, 63, 33)'
+            break
+        }
+      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
+        switch (gameStates.CurrentLevel().currentArea) {
+          case 1:
+            this.color1 = 'lightgray'
+            break
+          case 2 :
+            this.color1 = 'rgb(155, 155, 155)'
+            break
+        }
       }
     } else if (gameStates.currentStoryModeState === storyModeStates.WorldSelecting && gameStates.currentGameMode === gameMode.StoryMode && gameStates.currentStartingMenusState === startingMenusStates.Selected) {
       this.color1 = gameStates.worldSelector.currentSelectedWorld.backgroundColour

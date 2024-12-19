@@ -50,27 +50,37 @@ export function MouseDown (event) {
         // Pause Game
         gameStates.CurrentLevel().pauseLevelTime()
       } else {
-        gameStates.CurrentLevel().players.forEach(function (player) {
-          const leftOffset = player.x + player.width / 2 - 850 * (gameStates.CurrentLevel().currentX - 1) - event.offsetX
-          const rightOffset = event.offsetX - (player.x + player.width / 2 - 850 * (gameStates.CurrentLevel().currentX - 1))
-          const topOffset = player.y + player.height / 2 - 600 * (gameStates.CurrentLevel().currentY - 1) - event.offsetY
-          const bottomOffset = event.offsetY - (player.y + player.height / 2 - 600 * (gameStates.CurrentLevel().currentY - 1))
-          if (leftOffset > rightOffset && leftOffset > topOffset && leftOffset > bottomOffset) {
-            player.moveLeft()
-            return
+        for (let i = 0; i < gameStates.CurrentLevel().storage.items.length; i++) {
+          if (gameStates.CurrentLevel().storage.items[i].availableFunctions[2]) {
+            gameStates.CurrentLevel().storage.items[i].Mousedown(event)
           }
-          if (rightOffset > leftOffset && rightOffset > topOffset && rightOffset > bottomOffset) {
-            player.moveRight()
-            return
-          }
-          if (topOffset > bottomOffset && topOffset > leftOffset && topOffset > rightOffset) {
-            player.moveUp()
-            return
-          }
-          if (bottomOffset > topOffset && bottomOffset > leftOffset && bottomOffset > rightOffset) {
-            player.moveDown()
-          }
-        })
+        }
+
+        if (eventFunctions.stopMovement) {
+          eventFunctions.stopMovement = false
+        } else {
+          gameStates.CurrentLevel().players.forEach(function (player) {
+            const leftOffset = player.x + player.width / 2 - 850 * (gameStates.CurrentLevel().currentX - 1) - event.offsetX
+            const rightOffset = event.offsetX - (player.x + player.width / 2 - 850 * (gameStates.CurrentLevel().currentX - 1))
+            const topOffset = player.y + player.height / 2 - 600 * (gameStates.CurrentLevel().currentY - 1) - event.offsetY
+            const bottomOffset = event.offsetY - (player.y + player.height / 2 - 600 * (gameStates.CurrentLevel().currentY - 1))
+            if (leftOffset > rightOffset && leftOffset > topOffset && leftOffset > bottomOffset) {
+              player.moveLeft()
+              return
+            }
+            if (rightOffset > leftOffset && rightOffset > topOffset && rightOffset > bottomOffset) {
+              player.moveRight()
+              return
+            }
+            if (topOffset > bottomOffset && topOffset > leftOffset && topOffset > rightOffset) {
+              player.moveUp()
+              return
+            }
+            if (bottomOffset > topOffset && bottomOffset > leftOffset && bottomOffset > rightOffset) {
+              player.moveDown()
+            }
+          })
+        }
       }
     }
   }

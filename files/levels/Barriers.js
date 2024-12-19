@@ -6,8 +6,8 @@ const { canvas } = require('../drawing/Canvas')
 const { GameObject } = require('./Class')
 
 export class Wall extends GameObject {
-  constructor (x, y, width, height, color1, type) {
-    super(x, y, width, height, color1)
+  constructor (x, y, width, height, color1, debugColour, type) {
+    super(x, y, width, height, color1, debugColour)
     this.type = type
   }
 
@@ -48,7 +48,7 @@ export class Wall extends GameObject {
 
 export class TallGrass extends Wall {
   constructor (x, y, width, height) {
-    super(x, y, width, height, 'rgb(190, 190, 190)', 'tallGrass')
+    super(x, y, width, height, 'rgb(190, 190, 190)', /* Debug */'rgba(50, 210, 75, 0.8)', 'tallGrass')
     this.color2 = 'rgb(120, 120, 120)'
     this.original_x = this.x
     this.original_y = this.y
@@ -81,17 +81,19 @@ export class TallGrass extends Wall {
               }
               break
             case 2 :
+              if (this.randomList[i] % 7 === 0) {
+                draw.DrawImage(images.UndergroundWallCrystalA, 0, 0)
+              } else if (this.randomList[i] % 20 === 0) {
+                draw.DrawImage(images.UndergroundWallCrystalB, 0, 0)
+              } else {
+                draw.DrawImage(images.UndergroundWallA, 0, 0)
+              }
+              break
+            case 3 :
               if (this.randomList[i] % 9 === 0) {
                 canvas.context.drawImage(images.WorldTwoLedges, 104, 10, 54, 54, 0, 0, 54, 54)
               } else {
                 canvas.context.drawImage(images.WorldTwoLedges, 100, 6, 54, 54, 0, 0, 54, 54)
-              }
-              break
-            case 3 :
-              if (this.randomList[i] % 7 === 0) {
-                draw.DrawImage(images.UndergroundWallCrystalA, 0, 0)
-              } else {
-                draw.DrawImage(images.UndergroundWallA, 0, 0)
               }
               break
           }
@@ -104,7 +106,7 @@ export class TallGrass extends Wall {
           canvas.context.fillStyle = this.color1
           break
 
-        case 3:
+        case 2:
           canvas.context.fillStyle = this.color2
           break
       }
@@ -127,7 +129,7 @@ export class TallGrass extends Wall {
 
 export class FakeTallGrass extends Wall {
   constructor (x, y, width, height) {
-    super(x, y, width, height, 'rgba(190, 190, 190, 0.9)', 'fakeTallGrass')
+    super(x, y, width, height, 'rgba(190, 190, 190, 0.9)', /* Debug */'rgba(30, 140, 30, 0.8)', 'fakeTallGrass')
     this.original_x = this.x
     this.original_y = this.y
     this.randomList = Array(100)
@@ -163,7 +165,7 @@ export class FakeTallGrass extends Wall {
 
 export class SelectiveWall extends Wall {
   constructor (x, y, width, height, selectionType) {
-    super(x, y, width, height, 'rgb(255, 120, 120)', 'selectiveWall')
+    super(x, y, width, height, 'rgb(255, 120, 120)', /* Debug */'rgba(30, 140, 30, 0.8)', 'selectiveWall')
     this.original_x = this.x
     this.original_y = this.y
     this.color2 = 'rgb(120, 120, 255)'
@@ -194,8 +196,7 @@ export class SelectiveWall extends Wall {
 
 export class Water extends GameObject {
   constructor (x, y, width, height) {
-    super(x, y, width, height)
-    this.color1 = 'rgb(0, 175, 235)'
+    super(x, y, width, height, 'rgb(0, 175, 235)', /* Debug */'rgb(0, 175, 235, 0.8)')
     this.original_x = this.x
     this.original_y = this.y
     this.spriteX = 0
@@ -309,3 +310,40 @@ export class Rock extends GameObject {
     this.allowMovement = this.originalAllowMovement
   }
 };
+
+export class CrackedRock extends GameObject {
+  constructor (x, y, width, height, cracks) {
+    super(x, y, width, height)
+    this.originalX = this.x
+    this.originalY = this.y
+    this.cracks = cracks
+    this.originalCracks = this.cracks
+    if (this.cracks >= 4) {
+      this.allowMovement = true
+    } else {
+      this.allowMovement = false
+    }
+    this.originalAllowMovement = this.allowMovement
+  }
+
+  Draw () {
+    const drawingX = this.cracks * 50
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      switch (gameStates.currentBackgroundStyle) {
+        case BackgroundStyles.Classic:
+          canvas.context.drawImage(images.CrackedRock, drawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+          break
+        case BackgroundStyles.Plastic:
+          canvas.context.drawImage(images.CrackedRockPlastic, drawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
+          break
+      }
+    }
+  }
+
+  reset () {
+    this.x = this.originalX
+    this.y = this.originalY
+    this.cracks = this.originalCracks
+    this.allowMovement = this.originalAllowMovement
+  }
+}

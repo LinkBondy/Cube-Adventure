@@ -61,6 +61,7 @@ export const gameStates = {
   currentThemeColour: 'lightgray',
   currentLevelIndex: 0,
   delta: 1,
+  debug: false,
   pausedDate: undefined,
   isRunning: true,
   mobile: false,
@@ -68,6 +69,10 @@ export const gameStates = {
   stopTime: false,
   CurrentLevel: function () {
     return gameStates.worldSelector.currentWorld.levels[gameStates.currentLevelIndex]
+  },
+
+  FindLevel: function (world, level) {
+    return gameStates.gameController.worlds[world].levels[level]
   },
 
   SetGameState: function (gameState, type) {
@@ -99,17 +104,18 @@ export const dataManagement = {
   Save: function (override) {
     window.localStorage.setItem('autoSave', this.autoSave)
     if (this.autoSave || override) {
-      const world1LevelsCompleted = []
-      const specialLevelsCompleted = []
-      for (let l = 0; l < gameStates.gameController.worlds[0].levels.length; l++) {
-        world1LevelsCompleted.push(gameStates.gameController.worlds[0].levels[l].completed)
+      const levelsCompleted = []
+      for (let w = 0; w < gameStates.gameController.worlds.length; w++) {
+        levelsCompleted.push([])
+        for (let l = 0; l < gameStates.gameController.worlds[w].levels.length; l++) {
+          const currentLevelSaving = gameStates.gameController.worlds[w].levels[l]
+          levelsCompleted[w].push([])
+          for (let e = 0; e < currentLevelSaving.exitsCompleted.length; e++) {
+            levelsCompleted[w][l].push(currentLevelSaving.exitsCompleted[e])
+          }
+        }
       }
-
-      for (let l = 0; l < gameStates.gameController.worlds[1].levels.length; l++) {
-        specialLevelsCompleted.push(gameStates.gameController.worlds[1].levels[l].completed)
-      }
-      window.localStorage.setItem('world1Levels', JSON.stringify(world1LevelsCompleted))
-      window.localStorage.setItem('specialLevels', JSON.stringify(specialLevelsCompleted))
+      window.localStorage.setItem('levelsCompleted', JSON.stringify(levelsCompleted))
       window.localStorage.setItem('newUpdate', false)
       window.localStorage.setItem('PlayerAlienLock', drawUpdate.blueCubeAlienLock)
       window.localStorage.setItem('PlayerSadLock', drawUpdate.blueCubeSadLock)
@@ -126,19 +132,16 @@ export const dataManagement = {
       this.autoSave = JSON.parse(window.localStorage.getItem('autoSave'))
     }
 
-    if (window.localStorage.getItem('world1Levels') !== null) {
-      const completedLevelsW1 = JSON.parse(window.localStorage.getItem('world1Levels'))
+    if (window.localStorage.getItem('levelsCompleted') !== null) {
+      const completedLevels = JSON.parse(window.localStorage.getItem('levelsCompleted'))
 
-      for (let l = 0; l < gameStates.gameController.worlds[0].levels.length; l++) {
-        gameStates.gameController.worlds[0].levels[l].completed = completedLevelsW1[l]
-      }
-    }
-
-    if (window.localStorage.getItem('specialLevels') !== null) {
-      const completedLevelsSpecial = JSON.parse(window.localStorage.getItem('specialLevels'))
-
-      for (let l = 0; l < gameStates.gameController.worlds[1].levels.length; l++) {
-        gameStates.gameController.worlds[1].levels[l].completed = completedLevelsSpecial[l]
+      for (let w = 0; w < gameStates.gameController.worlds.length; w++) {
+        for (let l = 0; l < gameStates.gameController.worlds[w].levels.length; l++) {
+          const currentLevelLoading = gameStates.gameController.worlds[w].levels[l]
+          for (let e = 0; e < currentLevelLoading.exitsCompleted.length; e++) {
+            currentLevelLoading.exitsCompleted[e] = completedLevels[w][l][e]
+          }
+        }
       }
     }
 
@@ -184,6 +187,8 @@ export const dataManagement = {
 }
 
 export const eventFunctions = {
+  stopMovement: false,
+
   isTouching: function (x, y, width, height, event) {
     const boxLeft = x
     const boxRight = x + width

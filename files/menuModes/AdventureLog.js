@@ -6,27 +6,29 @@ const { gameStates, eventFunctions } = require('../data/GameData')
 const { Requirement } = require('../levels/Levels')
 
 const LockedFeature = {
-  infoCuber: false,
-  infoCuber2: new Requirement(0, 9 - 1),
-  infoExpander: new Requirement(0, 10 - 1),
-  // infoCuber3: [new Requirement(1, 1 - 1)],
-  // infoRollphant1: [new Requirement(2, 1 - 1)],
+  infoCuber: [],
+  infoCuber2: [new Requirement(0, 9 - 1, 0)],
+  infoExpander: [new Requirement(0, 10 - 1, 0)],
+  // infoHollowFollows: [new Requirement(1, 4 - 1)],
+  // infoRollphant: [new Requirement(1, 2 - 1)],
+  // infoHayBundle: [new Requirement(1, 2 - 1)],
   ///
-  infoWall: false,
-  infoInvisibleWall: new Requirement(0, 4 - 1),
-  infoWater: new Requirement(0, 7 - 1),
+  infoWall: [],
+  infoInvisibleWall: [new Requirement(0, 4 - 1, 0)],
+  infoWater: [new Requirement(0, 7 - 1, 0)],
   ///
-  infoSwitch: new Requirement(0, 3 - 1),
-  infoTeleporter: new Requirement(0, 5 - 1),
+  infoSwitch: [new Requirement(0, 3 - 1, 0)],
+  infoTeleporter: [new Requirement(0, 5 - 1, 0)],
   ///
-  infoRock: new Requirement(0, 3 - 1),
+  infoRock: [new Requirement(0, 3 - 1, 0)],
+  infoCrackedRock: [new Requirement(0, 11 - 1, 0)],
   ///
-  infoLifeJacket: new Requirement(0, 7 - 1),
-  // infoFinishItems: [new Requirement(1, 1 - 1)],
+  infoLifeJacket: [new Requirement(0, 7 - 1, 0)],
+  infoPickaxe: [new Requirement(0, 11 - 1, 0)],
   // infoPryoShard: [new Requirement(1, 3 - 1)],
   ///
-  infoHole: new Requirement(0, 8 - 1)
-  // infoCactus: [new Requirement(0, 11 - 1)]
+  infoHole: [new Requirement(0, 8 - 1, 0)]
+  // infoGrappleWeed: [new Requirement(0, 11 - 1)]
 }
 
 export class InfoController {
@@ -37,8 +39,8 @@ export class InfoController {
       new BarrierInfo(),
       new IntractableInfo(),
       new UnlockableInfo(),
-      new CollectableInfo(),
-      new TrapInfo()
+      new ItemsInfo(),
+      new HazardInfo()
     ]
     this.itemIndex = 0
     this.slideIndex = 0
@@ -137,15 +139,12 @@ class ItemSlide {
   }
 
   ShouldShowSlide () {
-    if (this.neededFeature === false) {
-      return true
-    } else {
-      const levelRequired = gameStates.gameController.worlds[this.neededFeature.worldRequired].levels[this.neededFeature.levelRequired]
-      if ((levelRequired.completed)) {
-        return true
+    for (let f = 0; f < this.neededFeature.length; f++) {
+      if (!gameStates.FindLevel(this.neededFeature[f].worldRequired, this.neededFeature[f].levelRequired).exitsCompleted[this.neededFeature[f].exitRequired]) {
+        return false
       }
     }
-    return false
+    return true
   }
 
   Draw () {
@@ -171,8 +170,8 @@ class ItemSlide {
       gradientB.addColorStop(0, 'rgb(0, 205, 0)')
       gradientB.addColorStop(1, 'rgb(0, 195, 150)')
       canvas.context.fillStyle = gradientB
-      canvas.context.fillText('Beat ' + gameStates.gameController.worlds[this.neededFeature.worldRequired].title + ',', 425, 450)
-      canvas.context.fillText(gameStates.gameController.worlds[this.neededFeature.worldRequired].levels[this.neededFeature.levelRequired].title, 425, 550)
+      canvas.context.fillText('Beat ' + gameStates.gameController.worlds[this.neededFeature[0].worldRequired].title + ',', 425, 450)
+      canvas.context.fillText(gameStates.gameController.worlds[this.neededFeature[0].worldRequired].levels[this.neededFeature[0].levelRequired].title, 425, 550)
       canvas.context.textAlign = 'left'
     }
   }
@@ -356,26 +355,47 @@ class UnlockableInfo {
       new ItemText('colours.', '50px Arial', 'rgb(2, 0, 139)', 10, 575)
 
     ], LockedFeature.infoRock)
-    this.slides = [titleSlide, slide1]
+    const slide2 = new ItemSlide([
+      new ItemImage(false, images.CrackedRock_200x200, 655, 5),
+      ///
+      new ItemText('Cracked Rocks', '95px Arial', 'purple', 10, 125),
+      new ItemText('Cracked rocks act as barriers.', '50px Arial', 'rgb(2, 0, 139)', 10, 240),
+      new ItemText('You can mine cracked rocks, by', '50px Arial', 'rgb(2, 0, 139)', 10, 340),
+      new ItemText('using a pickaxe.', '50px Arial', 'rgb(2, 0, 139)', 10, 405),
+      new ItemText('Once the cracked rocks are mined,', '50px Arial', 'rgb(2, 0, 139)', 10, 505),
+      new ItemText('anything can go through them.', '50px Arial', 'rgb(2, 0, 139)', 10, 575)
+    ], LockedFeature.infoCrackedRock)
+    this.slides = [titleSlide, slide1, slide2]
   }
 };
 
-class CollectableInfo {
+class ItemsInfo {
   constructor () {
     const titleSlide = new ItemSlide([
-      new ItemText('Collectables', '150px Arial', 'purple', 10, 400)
+      new ItemText('Items', '275px Arial', 'purple', 10, 400)
     ], false)
 
     const slide1 = new ItemSlide([
       new ItemImage(false, images.LifeJacket_200x200, 625, 10),
       //
-      new ItemText('Life Jackets', '115px Arial', 'purple', 10, 150),
+      new ItemText('Life Jacket', '115px Arial', 'purple', 10, 150),
       new ItemText('When players pick up life jackets,', '50px Arial', 'rgb(2, 0, 139)', 10, 262.5),
       new ItemText('they can go in water.', '50px Arial', 'rgb(2, 0, 139)', 10, 337.5),
       new ItemText('When cubers pick up life jackets,', '50px Arial', 'rgb(2, 0, 139)', 10, 425),
       new ItemText('they can move at a nomral speed in', '50px Arial', 'rgb(2, 0, 139)', 10, 500),
       new ItemText('water.', '50px Arial', 'rgb(2, 0, 139)', 10, 575)
     ], LockedFeature.infoLifeJacket)
+
+    const slide2 = new ItemSlide([
+      new ItemImage(false, images.Pickaxe_200x200, 565, 10),
+      //
+      new ItemText('Pickaxe', '150px Arial', 'purple', 10, 150),
+      new ItemText('When players pick up pickaxes,', '50px Arial', 'rgb(2, 0, 139)', 10, 262.5),
+      new ItemText('they can mine cracked rocks.', '50px Arial', 'rgb(2, 0, 139)', 10, 337.5),
+      new ItemText("Press 'p' to activate the pickaxe,", '50px Arial', 'rgb(2, 0, 139)', 10, 425),
+      new ItemText('then press the direction you want', '50px Arial', 'rgb(2, 0, 139)', 10, 500),
+      new ItemText('to mine.', '50px Arial', 'rgb(2, 0, 139)', 10, 575)
+    ], LockedFeature.infoPickaxe)
     /* const slide2 = new ItemSlide([
       new ItemImage(false, images.YellowKey_200x200, 625, 10),
       //
@@ -386,14 +406,14 @@ class CollectableInfo {
       //
       new ItemText('', '120px Arial', 'purple', 10, 150)
     ], LockedFeature.infoPryoShard) */
-    this.slides = [titleSlide, slide1/*, slide2, slide3 */]
+    this.slides = [titleSlide, slide1, slide2]
   }
 };
 
-class TrapInfo {
+class HazardInfo {
   constructor () {
     const titleSlide = new ItemSlide([
-      new ItemText('Traps', '300px Arial', 'purple', 10, 400)
+      new ItemText('Hazards', '200px Arial', 'purple', 10, 400)
     ], false)
 
     const slide1 = new ItemSlide([

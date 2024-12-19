@@ -11,6 +11,7 @@ export const images = {
     images.WallGrassTreeV2 = LoadImage('images/WallGrassTreeV2.png')
     //
     images.UndergroundWallCrystalA = LoadImage('images/UndergroundWallCrystalA.png')
+    images.UndergroundWallCrystalB = LoadImage('images/UndergroundWallCrystalB.png')
     images.UndergroundWallA = LoadImage('images/UndergroundWallA.png')
     ///
     images.BlueCube = LoadImage('images/BlueCube.png')
@@ -51,7 +52,8 @@ export const images = {
     images.InvisibleWall = LoadImage('images/InvisibleWall.png')
     images.InvisibleWallV2 = LoadImage('images/InvisibleWallV2.png')
     images.InvisibleWall_200x200 = LoadImage('images/InvisibleWall_200x200.png')
-    ///
+
+    /// Items
     images.LifeJacket = LoadImage('images/LifeJacket.png')
     images.LifeJacket_80x80 = LoadImage('images/LifeJacket_80x80.png')
     images.LifeJacket_200x200 = LoadImage('images/LifeJacket_200x200.png')
@@ -63,9 +65,17 @@ export const images = {
     images.ThreeBeadPlastic = LoadImage('images/ThreeBeadPlastic.png')
     images.ThreeBeadPlastic_80x80 = LoadImage('images/ThreeBeadPlastic_80x80.png')
     ///
+    images.Pickaxe = LoadImage('images/Pickaxe.png')
+    images.Pickaxe_80x80 = LoadImage('images/Pickaxe_80x80.png')
+    images.Pickaxe_200x200 = LoadImage('images/Pickaxe_200x200.png')
+    images.PickaxePlastic = LoadImage('images/PickaxePlastic.png')
+    images.PickaxePlastic_80x80 = LoadImage('images/PickaxePlastic_80x80.png')
+
+    /// Water
     images.Water_Medium2 = LoadImage('images/Water_Medium2.png')
     images.Water_Medium_200x200 = LoadImage('images/Water_Medium_200x200.png')
-    ///
+
+    /// Rocks
     images.UnlockRockPurple = LoadImage('images/UnlockRockPurple.png')
     images.UnlockRockPurple_200x200 = LoadImage('images/UnlockRockPurple_200x200.png')
     images.UnlockedRockPurple = LoadImage('images/UnlockedRockPurple.png')
@@ -73,11 +83,21 @@ export const images = {
     images.UnlockRockBlue_200x200 = LoadImage('images/UnlockRockBlue_200x200.png')
     images.UnlockedRockBlue = LoadImage('images/UnlockedRockBlue.png')
     ///
+    images.CrackedRock = LoadImage('images/CrackedRock.png')
+    images.CrackedRock_200x200 = LoadImage('images/CrackedRock_200x200.png')
+    images.CrackedRockPlastic = LoadImage('images/CrackedRockPlastic.png')
+
+    /// Traps
     images.Hole = LoadImage('images/Hole.png')
     images.UndergroundHole = LoadImage('images/UndergroundHole.png')
     images.Hole_200x200 = LoadImage('images/Hole_200x200.png')
     images.HolePlastic = LoadImage('images/HolePlastic.png')
-    ///
+
+    // Finish Lines
+    images.finishLine = LoadImage('images/finishLine.png')
+    images.finishLineB = LoadImage('images/finishLineB.png')
+
+    /// Game Icons
     images.UpArrow = LoadImage('images/UpArrow.png')
     images.DownArrow = LoadImage('images/DownArrow.png')
     images.LockedIcon = LoadImage('images/LockedIcon.png')
@@ -87,12 +107,11 @@ export const images = {
     images.PlayButton = LoadImage('images/PlayButton.png')
     images.Frame = LoadImage('images/Frame.png')
     images.Clock = LoadImage('images/Clock.png')
-    images.WorldTwoLedges = LoadImage('images/WorldTwoLedges.png')
-    ///
-    images.finishLine = LoadImage('images/finishLine.png')
-    ///
     images.activated = LoadImage('images/Activated.png')
     images.notActivated = LoadImage('images/Not-Activated.png')
+
+    // Other
+    images.WorldTwoLedges = LoadImage('images/WorldTwoLedges.png')
   }
 }
 

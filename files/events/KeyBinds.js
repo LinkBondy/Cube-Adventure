@@ -10,8 +10,7 @@ export class KeybindController {
       new Keybind('Up', 3, 'ArrowUp', 'w'),
       new Keybind('Down', 4, 'ArrowDown', 's'),
       new Keybind('Select', 5, ' ', 'Enter', 'Space'),
-      new Keybind('Back', 6, 'Backspace', 'b'),
-      new Keybind('Use', 7, 'Shift', 'u')
+      new Keybind('Back', 6, 'Backspace', 'b')
     ]
 
     this.originalKeybinds = [
@@ -20,8 +19,7 @@ export class KeybindController {
       new Keybind('Up', 3, 'ArrowUp', 'w'),
       new Keybind('Down', 4, 'ArrowDown', 's'),
       new Keybind('Select', 5, ' ', 'Enter', 'Space'),
-      new Keybind('Back', 6, 'Backspace', 'b'),
-      new Keybind('Use', 7, 'Shift', 'u')
+      new Keybind('Back', 6, 'Backspace', 'b')
     ]
     this.seletingKeybind = false
     this.triedRebinding = false
@@ -122,7 +120,7 @@ export class KeybindController {
 
   load (savedArray) {
     this.keybinds = []
-    for (let keybindsLoaded = 0; keybindsLoaded < 7; keybindsLoaded++) {
+    for (let keybindsLoaded = 0; keybindsLoaded < this.originalKeybinds.length; keybindsLoaded++) {
       this.keybinds.push(new Keybind(savedArray[keybindsLoaded].name, savedArray[keybindsLoaded].value, savedArray[keybindsLoaded].keybindA, savedArray[keybindsLoaded].keybindB, savedArray[keybindsLoaded].displayNameA, savedArray[keybindsLoaded].displayNameB))
     }
   }
@@ -141,7 +139,7 @@ export class Keybind {
     this.keybindA = keybindA
     this.keybindB = keybindB
     this.x = 10
-    this.y = value * 75 - 15
+    this.y = (value - 1) * (600 / 7) + 55
     this.value = value
   }
 
@@ -150,12 +148,12 @@ export class Keybind {
     canvas.context.fillStyle = 'darkgray'
     // canvas.context.textBaseline = 'middle'
     canvas.context.fillText(this.name, this.x, this.y)
-    canvas.context.fillText('Reset', this.x, 8 * 75 - 15)
+    canvas.context.fillText('Reset', this.x, (7 - 1) * (600 / 7) + 55)
     canvas.context.textBaseline = 'alphabetic'
   }
 
   Update () {
     gameStates.menuController.menus[2].menuItems[this.value - 1].title = this.displayNameA
-    gameStates.menuController.menus[2].menuItems[this.value + 7].title = this.displayNameB
+    gameStates.menuController.menus[2].menuItems[this.value + gameStates.keybindController.keybinds.length].title = this.displayNameB
   }
 }

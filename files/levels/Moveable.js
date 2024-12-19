@@ -183,6 +183,13 @@ export class Cuber extends GameObject {
       }
     })
 
+    gameStates.CurrentLevel().crackedRocks.forEach(function (crakedRock) {
+      if (!crakedRock.allowMovement && crakedRock.intersects(self)) {
+        intersectsBarrier = true
+        currentBarrierIntersected = crakedRock
+      }
+    })
+
     // Check if touching holes
     gameStates.CurrentLevel().holes.forEach(function (hole) {
       if (!hole.fullHole && hole.intersectsAll(0, self)) {
@@ -312,7 +319,7 @@ export class Cuber extends GameObject {
 };
 
 export class Expander extends GameObject {
-  constructor (x, y, startWidth, startHeight, endWidth, endHeight, widthSpeed, heightSpeed, waitTime) {
+  constructor (x, y, startWidth, startHeight, endWidth, endHeight, direction, widthSpeed, heightSpeed, waitTime) {
     super(x, y, startWidth, startHeight)
     this.hitboxes = []
     this.originalX = this.x
@@ -325,7 +332,17 @@ export class Expander extends GameObject {
     this.heightSpeed = heightSpeed
     this.waitTime = waitTime
     this.steps = waitTime - 350
-    this.direction = 'expanding'
+    this.direction = direction
+    this.originalDirection = this.direction
+    if (this.direction === 'expanding') {
+      this.width = this.startWidth
+      this.height = this.startHeight
+    }
+
+    if (this.direction === 'shrinking') {
+      this.width = this.endWidth
+      this.height = this.endHeight
+    }
     this.waiting = true
     this.animationFrames = 0
     this.animating = false
@@ -467,9 +484,9 @@ export class Expander extends GameObject {
       if (this.width === this.endWidth) {
         this.waiting = true
         this.animating = true
-        this.direction = 'srinking'
+        this.direction = 'shrinking'
       }
-    } else if (this.direction === 'srinking') {
+    } else if (this.direction === 'shrinking') {
       this.x += this.widthSpeed / 2 * gameStates.delta
       this.y += this.heightSpeed / 2 * gameStates.delta
       this.width -= this.widthSpeed * gameStates.delta
@@ -581,11 +598,17 @@ export class Expander extends GameObject {
   reset () {
     this.x = this.originalX
     this.y = this.originalY
-    this.width = this.startWidth
-    this.height = this.startHeight
+    this.direction = this.originalDirection
+    if (this.direction === 'expanding') {
+      this.width = this.startWidth
+      this.height = this.startHeight
+    }
+    if (this.direction === 'shrinking') {
+      this.width = this.endWidth
+      this.height = this.endHeight
+    }
     this.steps = this.waitTime - 350
     this.waiting = true
-    this.direction = 'expanding'
     this.animationFrames = 0
     this.animating = false
     this.animatingDirection = 'backwards'
@@ -601,6 +624,7 @@ export class Player extends GameObject {
     // Other
     this.speed = 50
     this.previousIntersectsHole = false
+    this.waterMovement = false
   }
 
   moveLeft () {
@@ -667,8 +691,14 @@ export class Player extends GameObject {
       }
     })
 
+    gameStates.CurrentLevel().crackedRocks.forEach(function (crackedRock) {
+      if (!crackedRock.allowMovement && crackedRock.intersects(self)) {
+        stop = true
+      }
+    })
+
     gameStates.CurrentLevel().waters.forEach(function (water) {
-      if (!gameStates.CurrentLevel().haveItem('lifeJacket') && water.intersects(self)) {
+      if (!self.waterMovement && water.intersects(self)) {
         stop = true
       }
     })
@@ -695,7 +725,7 @@ export class Player extends GameObject {
 
     gameStates.CurrentLevel().items.forEach(function (item) {
       if (item.intersects(self) && !item.collected) {
-        gameStates.CurrentLevel().collectedItems.push(item.type)
+        gameStates.CurrentLevel().storage.AddItem(item.type)
         item.collected = true
       }
     })

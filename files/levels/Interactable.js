@@ -180,6 +180,7 @@ export class Hole extends GameObject {
     this.original_x = this.x
     this.original_y = this.y
     this.fullHole = fullHole
+    this.originallyFull = this.fullHole
     this.currentIntersects = currentIntersects
     this.originalCurrentIntersects = this.currentIntersects
     this.maxIntersects = maxIntersects
@@ -198,7 +199,7 @@ export class Hole extends GameObject {
           case 1:
             canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
             break
-          case 3 :
+          case 2:
             canvas.context.drawImage(images.UndergroundHole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
             break
         }
@@ -219,16 +220,17 @@ export class Hole extends GameObject {
   reset () {
     this.x = this.original_x
     this.y = this.original_y
-    this.fullHole = false
+    this.fullHole = this.originallyFull
     this.currentIntersects = this.originalCurrentIntersects
   }
 }
 
 export class FinishArea extends GameObject {
-  constructor (x, y, width, height) {
+  constructor (x, y, width, height, type) {
     super(x, y, width, height, 'rgb(255, 176, 231)')
     this.original_x = this.x
     this.original_y = this.y
+    this.type = type
   }
 
   Draw () {
@@ -236,7 +238,14 @@ export class FinishArea extends GameObject {
       if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
         for (let x = this.left(); x < this.right(); x += 50) {
           for (let y = this.top(); y < this.bottom(); y += 50) {
-            draw.DrawImage(images.finishLine, x, y)
+            switch (this.type) {
+              case 0:
+                draw.DrawImage(images.finishLine, x, y)
+                break
+              case 1:
+                draw.DrawImage(images.finishLineB, x, y)
+                break
+            }
           }
         }
       } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {

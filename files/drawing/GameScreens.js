@@ -74,6 +74,10 @@ export class LossScreen {
       canvas.context.fillText('You Were Captured', 425, 70)
       canvas.context.fillText('By an Enemy!', 425, 150)
     }
+    if (this.loseReason === 'water') {
+      canvas.context.font = '80px Arial'
+      canvas.context.fillText('You Drowned in Water!', 425, 110)
+    }
     canvas.context.textAlign = 'start'
   }
 
@@ -105,6 +109,11 @@ export class LossScreen {
             self.SetLoss(gameStates.CurrentLevel().timeLimit, 'hole')
           }
         })
+        gameStates.CurrentLevel().waters.forEach(function (water) {
+          if (player.intersects(water) && !gameStates.CurrentLevel().haveItem('lifeJacket')) {
+            self.SetLoss(gameStates.CurrentLevel().timeLimit, 'water')
+          }
+        })
         if (gameStates.CurrentLevel().timeLimit <= 0) {
           self.SetLoss(0, 'time')
         }
@@ -130,6 +139,7 @@ export class WinScreen {
   constructor () {
     this.timeLeft = 0
     this.winLevel = false
+    this.exitCompleted = 0
   }
 
   DrawScreen () {
@@ -146,20 +156,77 @@ export class WinScreen {
       gameStates.CurrentLevel().players.forEach(function (player) {
         gameStates.CurrentLevel().finishAreas.forEach(function (finishArea) {
           if (finishArea.intersects(player)) {
-            self.SetWin()
+            self.SetWin(finishArea.type)
           }
         })
       })
     }
   }
 
-  SetWin () {
+  SetWin (type) {
     this.winLevel = true
+    const self = this
     setTimeout(function () {
+      // Clear the level time
       window.clearTimeout(gameStates.CurrentLevel().currentTimeout)
+
+      // Set the state to Story Mode
       gameStates.SetGameState(storyModeStates.WonStage, 'StoryMode')
-      gameStates.CurrentLevel().completed = true
-      if (gameStates.infoController.unlockedLevel === gameStates.worldSelector.currentWorld.levels.length) { drawUpdate.highestLevelLock = false }
+
+      // Save the current exit
+      self.exitCompleted = type
+
+      // Set the current exit to complete
+      gameStates.CurrentLevel().exitsCompleted[self.exitCompleted] = true
+
+      // Set the current exit to complete
+      if (gameStates.FindLevel(0, 11 - 1).exitsCompleted[0]) { drawUpdate.highestLevelLock = false }
+
+      // Call all of the OnExit Items
+      for (let i = 0; i < gameStates.CurrentLevel().storage.items.length; i++) {
+        if (gameStates.CurrentLevel().storage.items[i].availableFunctions[1]) {
+          gameStates.CurrentLevel().storage.items[i].OnExit()
+        }
+      }
     }, 300)
+  }
+
+  NextLevel () {
+    if (gameStates.CurrentLevel().nextLevels.length === 0) {
+      gameStates.CurrentLevel().restart()
+      gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
+    } else {
+      // Save the original level and world
+      const originalLevel = gameStates.currentLevelIndex
+      const originalWorld = gameStates.worldSelector.currentSelectedWorld
+      const originalWorldIndex = gameStates.worldSelector.worldIndex
+
+      // Restart the level
+      gameStates.CurrentLevel().restart()
+
+      // Set the next level and world
+      const nextLevel = gameStates.CurrentLevel().nextLevels[this.exitCompleted].level
+      gameStates.worldSelector.worldIndex = gameStates.CurrentLevel().nextLevels[this.exitCompleted].world
+      gameStates.worldSelector.currentSelectedWorld = gameStates.gameController.worlds[gameStates.worldSelector.worldIndex]
+      gameStates.worldSelector.currentWorld = gameStates.worldSelector.currentSelectedWorld
+      gameStates.currentLevelIndex = nextLevel
+
+      // Check if the next level is locked or if there are no more levels to continue to
+      if (!gameStates.CurrentLevel().checkLocked()) {
+        // If it is, set the game state to selecting and reset the level and world back to the original and exit to the selection menu
+        gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
+        gameStates.currentLevelIndex = originalLevel
+        gameStates.worldSelector.currentSelectedWorld = originalWorld
+        gameStates.worldSelector.currentWorld = originalWorld
+        gameStates.worldSelector.worldIndex = originalWorldIndex
+      } else {
+        // Otherwise, start the next level
+        gameStates.CurrentLevel().startLevel()
+      }
+    }
+
+    // Reset other flags
+    gameStates.winScreen.winLevel = false
+    this.exitCompleted = 0
   }
 }

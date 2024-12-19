@@ -1,8 +1,13 @@
 'use strict'
 const { startingMenusStates, storyModeStates, gameMode, gameStates, eventFunctions } = require('../data/GameData')
 export function Keydown (event) {
-  // console.log(event)
+  console.log(event)
   const keybindArray = gameStates.keybindController.keybinds
+  // Debug Mode
+  /* if (event.key === '.') {
+    gameStates.debug = !gameStates.debug
+    console.log(gameStates.debug)
+  } */
   // Start Game "Menu"
   if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
     gameStates.titleScreen.KeyDown(event, keybindArray)
@@ -31,6 +36,22 @@ export function Keydown (event) {
         gameStates.levelSelector.KeyDown(event, keybindArray)
         return
       }
+
+      if (gameStates.currentStoryModeState === storyModeStates.Playing) {
+        for (let i = 0; i < gameStates.CurrentLevel().storage.items.length; i++) {
+          if (gameStates.CurrentLevel().storage.items[i].availableFunctions[2]) {
+            gameStates.CurrentLevel().storage.items[i].Keydown(event)
+          }
+        }
+        if (eventFunctions.stopMovement) {
+          eventFunctions.stopMovement = false
+        } else {
+          gameStates.CurrentLevel().players.forEach(function (player) {
+            player.Keydown(event, keybindArray)
+            player.changeSlideVariables()
+          })
+        }
+      }
     }
     ///
     if (gameStates.currentGameMode === gameMode.ItemsInfo) {
@@ -45,13 +66,6 @@ export function Keydown (event) {
 
     if (gameStates.arrayChartController.findCurrentArrayChart() !== false) {
       gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].Keydown(event, keybindArray)
-    }
-
-    if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
-      gameStates.CurrentLevel().players.forEach(function (player) {
-        player.Keydown(event, keybindArray)
-        player.changeSlideVariables()
-      })
     }
   }
 }

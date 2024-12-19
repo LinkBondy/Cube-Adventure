@@ -7,7 +7,6 @@ export const update = {
 
     if (gameStates.currentStartingMenusState === startingMenusStates.Selected) {
       if (gameStates.currentGameMode === gameMode.StoryMode) {
-        gameStates.gameController.CheckUnlocked()
         if (gameStates.currentStoryModeState === storyModeStates.Playing) {
           gameStates.CurrentLevel().update()
           gameStates.lossScreen.CheckLose()

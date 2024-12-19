@@ -1,13 +1,15 @@
 'use strict'
 const { Player, Cuber, Expander, ChangeDirectionSquare } = require('./Moveable')
-const { TallGrass, FakeTallGrass, Rock, Water } = require('./Barriers')
+const { TallGrass, FakeTallGrass, Rock, Water, CrackedRock } = require('./Barriers')
 const { ReverseTile, Teleporter, Hole, FinishArea } = require('./Interactable')
-const { LifeJacket, ThreeBead } = require('./Collectable')
+const { LifeJacket, ThreeBead, Pickaxe } = require('./Collectable')
 const { gameStates, storyModeStates } = require('../data/GameData')
+const { Storage, LifeJacketItem /* , ThreeBeadItem, PickaxeItem */ } = require('./Storage')
 const { canvas } = require('../drawing/Canvas')
 
 class Level {
-  constructor (levelData, title, requirements, currentX, currentY, width, height, collectedItems, currentArea, timeLimit) {
+  constructor (levelData, title, requirements, requiredOrder, nextLevels, currentX, currentY, width, height, storage, currentArea, timeLimit) {
+    // Level Items
     this.players = levelData.players ?? []
     this.cubers = levelData.cubers ?? []
     this.expanders = levelData.expanders ?? []
@@ -15,25 +17,46 @@ class Level {
     this.waters = levelData.waters ?? []
     this.items = levelData.items ?? []
     this.rocks = levelData.rocks ?? []
+    this.crackedRocks = levelData.crackedRocks ?? []
     this.holes = levelData.holes ?? []
     this.finishAreas = levelData.finishAreas ?? []
     this.changeDirectionSquares = levelData.changeDirectionSquares ?? []
     this.reverseTiles = levelData.reverseTiles ?? []
     this.teleporters = levelData.teleporters ?? []
+
+    // Level Data
     this.title = title
-    this.completed = false
-    this.unlocked = false
+
+    // Level States
+    if (requiredOrder === 'default') {
+      this.requiredOrder = function (req) { if (req[0]) { return true } else { return false } }
+    } else {
+      this.requiredOrder = requiredOrder
+    }
     this.requirements = requirements
+    this.nextLevels = nextLevels
+    this.exitsCompleted = []
+    for (let i = 0; i < nextLevels.length; i++) {
+      this.exitsCompleted.push(false)
+    }
+
+    // Screen Data
     this.currentX = currentX
     this.startingX = this.currentX
     this.currentY = currentY
     this.startingY = this.currentY
     this.width = width
     this.height = height
-    this.collectedItems = collectedItems
+
+    // Storage
+    this.storage = storage
+    this.originalStorage = []
+    this.originalStorage.push(...this.storage.items)
+
+    // Area
     this.currentArea = currentArea
-    this.originalCollectedItems = []
-    this.originalCollectedItems.push(...this.collectedItems)
+
+    // Time
     this.timeLimit = timeLimit
     this.originalTimeLimit = this.timeLimit
     this.clockFrame = 0
@@ -44,54 +67,109 @@ class Level {
   draw () {
     canvas.context.save()
     canvas.context.translate(0 - 850 * (this.currentX - 1), 0 - 600 * (this.currentY - 1))
-    this.waters.forEach(function (water) {
-      water.Draw()
-    })
+    if (gameStates.debug) {
+      this.waters.forEach(function (water) {
+        water.debugDraw()
+      })
 
-    this.finishAreas.forEach(function (finishArea) {
-      finishArea.Draw()
-    })
+      this.finishAreas.forEach(function (finishArea) {
+        finishArea.Draw()
+      })
 
-    this.holes.forEach(function (hole) {
-      hole.Draw()
-    })
+      this.holes.forEach(function (hole) {
+        hole.Draw()
+      })
 
-    this.reverseTiles.forEach(function (reverseTile) {
-      reverseTile.Draw()
-    })
+      this.reverseTiles.forEach(function (reverseTile) {
+        reverseTile.Draw()
+      })
 
-    this.teleporters.forEach(function (teleporter) {
-      teleporter.Draw()
-    })
+      this.teleporters.forEach(function (teleporter) {
+        teleporter.Draw()
+      })
 
-    this.items.forEach(function (item) {
-      item.Draw()
-    })
+      this.items.forEach(function (item) {
+        item.Draw()
+      })
 
-    this.rocks.forEach(function (rock) {
-      rock.Draw()
-    })
+      this.rocks.forEach(function (rock) {
+        rock.Draw()
+      })
 
-    /* this.changeDirectionSquares.forEach(function (changeDirectionSquare) {
-      changeDirectionSquare.Draw()
-    }) */
+      this.crackedRocks.forEach(function (crackedRock) {
+        crackedRock.Draw()
+      })
 
-    this.players.forEach(function (player) {
-      player.Draw()
-    })
+      this.changeDirectionSquares.forEach(function (changeDirectionSquare) {
+        changeDirectionSquare.Draw()
+      })
 
-    this.cubers.forEach(function (cuber) {
-      cuber.Draw()
-    })
+      this.players.forEach(function (player) {
+        player.Draw()
+      })
 
-    this.expanders.forEach(function (expander) {
-      expander.Draw()
-    })
+      this.cubers.forEach(function (cuber) {
+        cuber.Draw()
+      })
 
-    this.walls.forEach(function (wall) {
-      wall.Draw()
-    })
-    canvas.context.restore()
+      this.expanders.forEach(function (expander) {
+        expander.Draw()
+      })
+
+      this.walls.forEach(function (wall) {
+        wall.debugDraw()
+      })
+      canvas.context.restore()
+    } else {
+      this.waters.forEach(function (water) {
+        water.Draw()
+      })
+
+      this.finishAreas.forEach(function (finishArea) {
+        finishArea.Draw()
+      })
+
+      this.holes.forEach(function (hole) {
+        hole.Draw()
+      })
+
+      this.reverseTiles.forEach(function (reverseTile) {
+        reverseTile.Draw()
+      })
+
+      this.teleporters.forEach(function (teleporter) {
+        teleporter.Draw()
+      })
+
+      this.items.forEach(function (item) {
+        item.Draw()
+      })
+
+      this.rocks.forEach(function (rock) {
+        rock.Draw()
+      })
+
+      this.crackedRocks.forEach(function (crackedRock) {
+        crackedRock.Draw()
+      })
+
+      this.players.forEach(function (player) {
+        player.Draw()
+      })
+
+      this.cubers.forEach(function (cuber) {
+        cuber.Draw()
+      })
+
+      this.expanders.forEach(function (expander) {
+        expander.Draw()
+      })
+
+      this.walls.forEach(function (wall) {
+        wall.Draw()
+      })
+      canvas.context.restore()
+    }
   }
 
   update () {
@@ -159,6 +237,10 @@ class Level {
       rock.reset()
     })
 
+    this.crackedRocks.forEach(function (crackedRock) {
+      crackedRock.reset()
+    })
+
     this.changeDirectionSquares.forEach(function (changeDirectionSquare) {
       changeDirectionSquare.reset()
     })
@@ -166,6 +248,17 @@ class Level {
     this.walls.forEach(function (wall) {
       wall.reset()
     })
+  }
+
+  startLevel () {
+    gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
+    gameStates.CurrentLevel().storage.items.forEach(function (item) {
+      item.activated = true
+      if (item.availableFunctions[0]) {
+        item.OnPickUp()
+      }
+    })
+    gameStates.CurrentLevel().startLevelTime()
   }
 
   startLevelTime () {
@@ -210,19 +303,34 @@ class Level {
     this.currentX = this.startingX
     this.currentY = this.startingY
     this.timeLimit = this.originalTimeLimit
-    this.collectedItems = []
-    this.collectedItems.push(...this.originalCollectedItems)
+    this.storage.items = []
+    this.storage.items.push(...this.originalStorage)
     this.clockFrame = 0
     this.timeWaited = 0
   }
 
   haveItem (item) {
-    for (let i = 0; i < this.collectedItems.length; i++) {
-      if (item === this.collectedItems[i]) {
+    for (let i = 0; i < this.storage.items.length; i++) {
+      if (item === this.storage.items[i].tag) {
         return true
       }
     }
     return false
+  }
+
+  checkLocked () {
+    const requirementsCompleted = []
+    if (this.requirements.length === 0) {
+      return true
+    } else {
+      for (let r = 0; r < this.requirements.length; r++) {
+        const currentRequirement = this.requirements[r]
+        const levelRequired = gameStates.FindLevel(currentRequirement.worldRequired, currentRequirement.levelRequired)
+        const exitRequired = levelRequired.exitsCompleted[currentRequirement.exitRequired - 1]
+        requirementsCompleted.push(exitRequired)
+      }
+    }
+    return this.requiredOrder(requirementsCompleted)
   }
 }
 
@@ -247,6 +355,7 @@ export class GameController {
 
   CreateWorlds () {
     this.worlds.push(new World('Through the Grasslands', 'rgb(0, 150, 80)', 'rgb(150, 220, 150)', this.world1))
+    this.worlds.push(new World('Infiltrating the Castle', 'rgb(20, 20, 30)', 'rgb(150, 150, 150)', this.world2))
     this.worlds.push(new World('Special Levels', 'rgb(255, 10, 100)', 'rgb(255, 175, 200)', this.specialLevels))
     gameStates.worldSelector.currentWorld = this.worlds[0]
     gameStates.worldSelector.currentSelectedWorld = this.worlds[0]
@@ -295,9 +404,9 @@ export class GameController {
         new TallGrass(450, 500, 350, 50)
       ],
       finishAreas: [
-        new FinishArea(350, 550, 150, 50)
+        new FinishArea(350, 550, 150, 50, 0)
       ]
-    }, 'Level 1', /* Requirements */ [], /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 75))
+    }, 'Level 1', /* Requirements */ [], 'none', /* Next Level */ [new NextLevel(0, 2 - 1)], /* Level Borders */1, 1, 1, 1, new Storage([]), /* Area */ 1, /* Time Limit */ 75))
 
     // Level 2
     this.world1.push(new Level({
@@ -318,9 +427,9 @@ export class GameController {
         new TallGrass(450, 400, 50, 50)
       ],
       finishAreas: [
-        new FinishArea(350, 550, 150, 50)
+        new FinishArea(350, 550, 150, 50, 0)
       ]
-    }, 'Level 2', /* Requirements */ [new Requirement(0, 1 - 1)], /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 100))
+    }, 'Level 2', /* Requirements */ [new Requirement(0, 1 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 3 - 1)], /* Level Borders */ 1, 1, 1, 1, new Storage([]), /* Area */ 1, /* Time Limit */ 100))
 
     // Level 3
     this.world1.push(new Level({
@@ -356,7 +465,7 @@ export class GameController {
         new TallGrass(500, 500, 150, 50)
       ],
       finishAreas: [
-        new FinishArea(350, 550, 150, 50)
+        new FinishArea(350, 550, 150, 50, 0)
       ],
       changeDirectionSquares: [
         new ChangeDirectionSquare(300, 150, 50, 50, false, true, false, true, true),
@@ -367,7 +476,7 @@ export class GameController {
         ///
         new ChangeDirectionSquare(500, 350, 50, 50, false, true, true, false, true)
       ]
-    }, 'Level 3', /* Requirements */ [new Requirement(0, 2 - 1)], /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 100))
+    }, 'Level 3', /* Requirements */ [new Requirement(0, 2 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 4 - 1)], /* Level Borders */ 1, 1, 1, 1, new Storage([]), /* Area */ 1, /* Time Limit */ 100))
 
     // Level 4
     this.world1.push(new Level({
@@ -421,12 +530,12 @@ export class GameController {
         new Rock(600, 150, 50, 50, 'blue', false)
       ],
       finishAreas: [
-        new FinishArea(600, 500, 50, 50)
+        new FinishArea(600, 500, 50, 50, 0)
       ],
       reverseTiles: [
         new ReverseTile(200, 500, 50, 50, 'blue')
       ]
-    }, 'Level 4', /* Requirements */ [new Requirement(0, 3 - 1)], /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 150))
+    }, 'Level 4', /* Requirements */ [new Requirement(0, 3 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 5 - 1)], /* Level Borders */ 1, 1, 1, 1, new Storage([]), /* Area */ 1, /* Time Limit */ 150))
 
     // Level 5
     this.world1.push(new Level({
@@ -490,7 +599,7 @@ export class GameController {
         new Rock(50, 350, 50, 50, 'pink', false)
       ],
       finishAreas: [
-        new FinishArea(0, 250, 50, 100)
+        new FinishArea(0, 250, 50, 100, 0)
       ],
       changeDirectionSquares: [
         new ChangeDirectionSquare(100, 50, 50, 50, false, true, false, true, true),
@@ -513,7 +622,7 @@ export class GameController {
         new ReverseTile(250, 100, 50, 50, 'blue'),
         new ReverseTile(300 + 850, 275, 50, 50, 'pink')
       ]
-    }, 'Level 5', /* Requirements */ [new Requirement(0, 4 - 1)], /* Level Borders */1, 1, 2, 1, [], /* Area */ 1, /* Time Limit */ 200))
+    }, 'Level 5', /* Requirements */ [new Requirement(0, 4 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 6 - 1)], /* Level Borders */ 1, 1, 2, 1, new Storage([]), /* Area */ 1, /* Time Limit */ 200))
 
     // Level 6
     this.world1.push(new Level({
@@ -601,7 +710,7 @@ export class GameController {
         new Rock(650, 500, 50, 50, 'blue', false)
       ],
       finishAreas: [
-        new FinishArea(0, 250, 50, 100)
+        new FinishArea(0, 250, 50, 100, 0)
       ],
       changeDirectionSquares: [
         // new ChangeDirectionSquare(500, 200, 50, 50, false, true, true, true, true),
@@ -614,7 +723,7 @@ export class GameController {
         new Teleporter(550, 450, 50, 50, '6Teleporter', 2),
         new Teleporter(350, 200, 50, 50, '6Teleporter', 2)
       ]
-    }, 'Level 6', /* Requirements */ [new Requirement(0, 5 - 1)], /* Level Borders */1, 1, 1, 2, [], /* Area */ 1, /* Time Limit */ 200))
+    }, 'Level 6', /* Requirements */ [new Requirement(0, 5 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 7 - 1)], /* Level Borders */ 1, 1, 1, 2, new Storage([]), /* Area */ 1, /* Time Limit */ 200))
 
     // Level 7
     this.world1.push(new Level({
@@ -670,7 +779,7 @@ export class GameController {
         new Rock(700, 250, 50, 50, 'pink', false)
       ],
       finishAreas: [
-        new FinishArea(650, 150, 50, 300)
+        new FinishArea(650, 150, 50, 300, 0)
       ],
       changeDirectionSquares: [
         // Right Side
@@ -699,7 +808,7 @@ export class GameController {
         new Teleporter(750, 450, 50, 50, '7Teleporter', 1),
         new Teleporter(50, 300, 50, 50, '7Teleporter', 1)
       ]
-    }, 'Level 7', /* Requirements */ [new Requirement(0, 6 - 1)], /* Level Borders */1, 1, 1, 1, [], /* Area */ 1, /* Time Limit */ 200))
+    }, 'Level 7', /* Requirements */ [new Requirement(0, 6 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 8 - 1)], /* Level Borders */ 1, 1, 1, 1, new Storage([]), /* Area */ 1, /* Time Limit */ 200))
 
     // Level 8
     this.world1.push(new Level({
@@ -791,7 +900,7 @@ export class GameController {
         new Rock(300, 400 + 600, 50, 50, 'blue', false)
       ],
       finishAreas: [
-        new FinishArea(800, 200 + 600, 50, 150)
+        new FinishArea(800, 200 + 600, 50, 150, 0)
       ],
       reverseTiles: [
         new ReverseTile(350, 450 + 600, 50, 50, 'blue')
@@ -800,7 +909,7 @@ export class GameController {
         new Teleporter(150, 500 + 600, '8Teleporter', 50, 50, 2),
         new Teleporter(650, 50 + 600, '8Teleporter', 50, 50, 2)
       ]
-    }, 'Level 8', /* Requirements */ [new Requirement(0, 7 - 1)], /* Level Borders */1, 2, 1, 2, [], /* Area */ 1, /* Time Limit */ 200))
+    }, 'Level 8', /* Requirements */ [new Requirement(0, 7 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 9 - 1)], /* Level Borders */ 1, 2, 1, 2, new Storage([]), /* Area */ 1, /* Time Limit */ 200))
 
     // Level 9
     this.world1.push(new Level({
@@ -966,7 +1075,7 @@ export class GameController {
         new Hole(850 + 600, 200, 50, 50, true, 0, 0)
       ],
       finishAreas: [
-        new FinishArea(400, 0, 50, 50)
+        new FinishArea(400, 0, 50, 50, 0)
       ],
       changeDirectionSquares: [
         new ChangeDirectionSquare(600, 250, 50, 50, true, false, false, true, true),
@@ -990,7 +1099,7 @@ export class GameController {
       reverseTiles: [
         new ReverseTile(600, 450 + 600, 50, 50, 'pink')
       ]
-    }, 'Level 9', /* Requirements */ [new Requirement(0, 8 - 1)], /* Level Borders */1, 1, 2, 2, [], /* Area */ 1, /* Time Limit */ 300))
+    }, 'Level 9', /* Requirements */ [new Requirement(0, 8 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 10 - 1)], /* Level Borders */ 1, 1, 2, 2, new Storage([]), /* Area */ 1, /* Time Limit */ 300))
 
     // Level 10
     this.world1.push(new Level({
@@ -1102,7 +1211,7 @@ export class GameController {
 
       ],
       finishAreas: [
-        new FinishArea(0, 400, 50, 150)
+        new FinishArea(0, 400, 50, 150, 0)
       ],
       reverseTiles: [
         new ReverseTile(350, 500, 50, 50, 'blue'),
@@ -1112,7 +1221,7 @@ export class GameController {
         new Teleporter(100, 300, '10Teleporter', 50, 50, 1),
         new Teleporter(550 + 850, 100, '10Teleporter', 50, 50, 1)
       ]
-    }, 'Level 10', /* Requirements */ [new Requirement(0, 9 - 1)], /* Level Borders */1, 1, 2, 1, [], /* Area */ 1, /* Time Limit */ 200))
+    }, 'Level 10', /* Requirements */ [new Requirement(0, 9 - 1, 1)], 'default', /* Next Level */ [new NextLevel(0, 11 - 1)], /* Level Borders */ 1, 1, 2, 1, new Storage([]), /* Area */ 1, /* Time Limit */ 200))
 
     // Level 11
     this.world1.push(new Level({
@@ -1120,9 +1229,9 @@ export class GameController {
         new Player(800 + 850, 450 + 600, 50, 50)
       ],
       expanders: [
-        new Expander(205 + 850, 255 + 600, /* startLength */40, 40, /* endLength */140, 140, /* speed */ 1, 1, /* waitTime */1000),
-        new Expander(505, 405 + 600, /* startLength */90, 40, /* endLength */180, 140, /* speed */ 1, 1, /* waitTime */1000),
-        new Expander(305, 55 + 600, /* startLength */40, 40, /* endLength */140, 140, /* speed */ 2, 2, /* waitTime */1250)
+        new Expander(205 + 850, 255 + 600, /* startLength */40, 40, /* endLength */140, 140, /* direction */'expanding', /* speed */ 1, 1, /* waitTime */1000),
+        new Expander(505, 405 + 600, /* startLength */90, 40, /* endLength */180, 140, /* direction */'expanding', /* speed */ 1, 1, /* waitTime */1000),
+        new Expander(305, 55 + 600, /* startLength */40, 40, /* endLength */140, 140, /* direction */'expanding', /* speed */ 2, 2, /* waitTime */1250)
       ],
       walls: [
         // First Screen
@@ -1213,11 +1322,202 @@ export class GameController {
         new Water(300, 500, 150, 50)
       ],
       finishAreas: [
-        new FinishArea(400, 200, 50, 50),
-        new FinishArea(350, 250, 150, 50),
-        new FinishArea(400, 300, 50, 50)
+        new FinishArea(400, 200, 50, 50, 0),
+        new FinishArea(350, 250, 150, 50, 0),
+        new FinishArea(400, 300, 50, 50, 0)
       ]
-    }, 'Level 11', /* Requirements */ [new Requirement(0, 10 - 1)], /* Level Borders */2, 2, 2, 2, ['lifeJacket'], /* Area */ 1, /* Time Limit */ 50))
+    }, 'Level 11', /* Requirements */ [new Requirement(0, 10 - 1, 1)], 'default', /* Next Level */ [new NextLevel(1, 1 - 1)], /* Level Borders */ 2, 2, 2, 2, new Storage([new LifeJacketItem()]), /* Area */ 1, /* Time Limit */ 50))
+
+    // World 2 Level 1
+    this.world2.push(new Level({
+      players: [
+        new Player(250, 300 + 600, 50, 50)
+      ],
+      cubers: [
+        // Slide X=1 Y=2
+        new Cuber(250 + 850, 150, 50, 50, [false, false, true, false], 4),
+        new Cuber(550 + 850, 350, 50, 50, [false, false, false, true], 4),
+        //
+        new Cuber(400 + 850, 500 + 600, 50, 50, [true, false, false, false], 6)
+      ],
+      expanders: [
+        new Expander(455, 55 + 600, /* startLength */40, 40, /* endLength */140, 140, /* direction */ 'shrinking', /* speed */ 1, 1, /* waitTime */750),
+        new Expander(705, 105 + 600, /* startLength */40, 40, /* endLength */140, 140, /* direction */ 'expanding', /* speed */ 1, 1, /* waitTime */750)
+      ],
+      walls: [
+        // Slide X=1, Y=2
+        // Left Border
+        new TallGrass(0, 0 + 600, 50, 600),
+
+        // Bottom Border
+        new TallGrass(50, 550 + 600, 600, 50),
+
+        // Top Border
+        new TallGrass(50, 0 + 600, 150, 50),
+        new TallGrass(350, 0 + 600, 500, 50),
+
+        // Center
+        new TallGrass(350, 200 + 600, 500, 50),
+        new TallGrass(350, 350 + 600, 500, 50),
+
+        // Start
+        new TallGrass(150, 150 + 600, 50, 300),
+        new TallGrass(200, 150 + 600, 200, 50),
+        new TallGrass(200, 400 + 600, 200, 50),
+
+        // Bottom-Right Exit
+        new TallGrass(700, 400 + 600, 150, 50),
+        new TallGrass(750, 450 + 600, 100, 100),
+        new TallGrass(800, 550 + 600, 50, 50),
+        //
+        new TallGrass(500, 500 + 600, 100, 50),
+
+        // Slide X=2, Y=2
+        // Top Border
+        new TallGrass(0 + 850, 0 + 600, 200, 50),
+        new TallGrass(450 + 850, 0 + 600, 400, 50),
+
+        // Top Center (Right Water Cut-Off)
+        new TallGrass(200 + 850, 0 + 600, 50, 100),
+        new TallGrass(250 + 850, 0 + 600, 50, 150),
+        new TallGrass(300 + 850, 100 + 600, 50, 100),
+        new TallGrass(350 + 850, 150 + 600, 50, 100),
+
+        // Top Right
+        new TallGrass(500 + 850, 50 + 600, 350, 100),
+        new TallGrass(550 + 850, 150 + 600, 300, 150),
+        new TallGrass(500 + 850, 300 + 600, 350, 50),
+        new TallGrass(450 + 850, 350 + 600, 400, 50),
+
+        // Top Walkway Wall
+        new TallGrass(0 + 850, 200 + 600, 150, 50),
+
+        // Bottom Start
+        new TallGrass(0 + 850, 350 + 600, 400, 50),
+        new TallGrass(0 + 850, 400 + 600, 350, 200),
+
+        // Teleporter Puzzle End
+        new TallGrass(350 + 850, 550 + 600, 150, 50),
+        new TallGrass(500 + 850, 400 + 600, 350, 200),
+
+        // Slide X=2, Y=1
+        // Left-Right Borders
+        new TallGrass(0 + 850, 0, 50, 600),
+        new TallGrass(800 + 850, 0, 50, 600),
+
+        // Top Border
+        new TallGrass(50 + 850, 0, 750, 50),
+
+        // Bottom Border/Enterance
+        new TallGrass(50 + 850, 500, 250, 100),
+        new TallGrass(50 + 850, 450, 300, 50),
+        new TallGrass(450 + 850, 500, 350, 100),
+        new TallGrass(500 + 850, 450, 300, 50),
+
+        // Left Teleporter Enterance
+        new TallGrass(200 + 850, 50, 50, 200),
+        new TallGrass(200 + 850, 300, 50, 150),
+        new TallGrass(50 + 850, 50, 150, 150),
+        new TallGrass(50 + 850, 350, 150, 100),
+
+        // Top
+        new TallGrass(250 + 850, 50, 150, 50),
+        new TallGrass(450 + 850, 50, 150, 50),
+
+        // Center
+        new TallGrass(300 + 850, 150, 250, 250),
+        //
+        new TallGrass(600 + 850, 50, 50, 200),
+        new TallGrass(600 + 850, 300, 50, 150),
+        new TallGrass(650 + 850, 50, 150, 150),
+        new TallGrass(650 + 850, 350, 150, 100)
+      ],
+      waters: [
+        // Slide X=1, Y=2
+        // Top Side Water
+        new Water(400, 50 + 600, 450, 150),
+
+        // Bottom Side Waters
+        new Water(50, 450 + 600, 450, 100),
+        new Water(400, 400 + 600, 300, 100),
+        new Water(600, 450 + 600, 150, 100),
+
+        // Side Waters
+        new Water(50, 50 + 600, 350, 100),
+
+        // Back Water
+        new Water(50, 150 + 600, 100, 300),
+
+        // Exit Waters (Top + Bottom)
+        new Water(200, 0 + 600, 150, 50),
+        new Water(600, 550 + 600, 200, 50),
+
+        // Slide X=2, Y=2
+        new Water(0 + 850, 50 + 600, 150, 150),
+        new Water(150 + 850, 50 + 600, 50, 200),
+        new Water(200 + 850, 100 + 600, 50, 150),
+        new Water(250 + 850, 150 + 600, 50, 100),
+        new Water(300 + 850, 200 + 600, 50, 50)
+      ],
+      changeDirectionSquares: [
+        // X=2, Y=1
+        new ChangeDirectionSquare(250 + 850, 100, 50, 50, true, false, true, false, true),
+        new ChangeDirectionSquare(250 + 850, 400, 50, 50, false, true, true, false, true),
+        new ChangeDirectionSquare(550 + 850, 400, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(550 + 850, 100, 50, 50, true, false, false, true, true),
+
+        // X=2, Y=2
+        new ChangeDirectionSquare(350 + 850, 400 + 600, 50, 50, true, false, true, false, true),
+        new ChangeDirectionSquare(350 + 850, 500 + 600, 50, 50, false, true, true, false, true),
+        new ChangeDirectionSquare(450 + 850, 500 + 600, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(450 + 850, 400 + 600, 50, 50, true, false, false, true, true)
+      ],
+      items: [
+        new LifeJacket(700 + 850, 250, 50, 50),
+        new Pickaxe(400 + 850, 50, 50, 50)
+      ],
+      crackedRocks: [
+        // X=2, Y=2
+        new CrackedRock(400 + 850, 200 + 600, 50, 50, 1),
+        new CrackedRock(450 + 850, 200 + 600, 50, 50, 1),
+        new CrackedRock(500 + 850, 200 + 600, 50, 50, 1),
+
+        // X=2, Y=1
+        new CrackedRock(350 + 850, 450, 50, 50, 1),
+        new CrackedRock(400 + 850, 450, 50, 50, 1),
+        new CrackedRock(450 + 850, 450, 50, 50, 1)
+      ],
+      teleporters: [
+        new Teleporter(400 + 850, 450 + 600, 'W2L1Teleporter', 50, 50, 2),
+        new Teleporter(100 + 850, 250, 'W2L1Teleporter', 50, 50, 2)
+      ],
+      holes: [
+        // X=2, Y=2
+        new Hole(400 + 850, 350 + 600, 50, 50, false, 0, 1),
+
+        // X=2, Y=1
+        new Hole(200 + 850, 250, 50, 50, false, 0, 1)
+      ],
+      finishAreas: [
+        new FinishArea(200, 0 + 600, 150, 50, 0),
+        new FinishArea(650, 550 + 600, 150, 50, 1)
+      ]
+    }, 'Level 1', /* Requirements */ [new Requirement(0, 11 - 1, 1)], 'default', /* Next Level */ [], /* Level Borders */ 1, 2, 2, 2, new Storage([]), /* Area */ 2, /* Time Limit */ 200))
+
+    /* // World 2 Level 2A
+    this.world2.push(new Level({
+      players: [
+        new Player(250, 300 + 600, 50, 50)
+      ] */
+    // }, 'Level 2A', /* Requirements */ [new Requirement(1, 1 - 1, 1)], 'default', /* Next Level */ [], /* Level Borders */ 2, 1, 2, 2, new Storage([]), /* Area */ 2, /* Time Limit */ 250))
+
+    // World 2 Level 2B
+    // this.world2.push(new Level({
+    /* players: [
+        new Player(250, 300 + 600, 50, 50),
+        new Player(300, 300 + 600, 50, 50)
+      ] */
+    // }, 'Level 2B', /* Requirements */ [new Requirement(1, 1 - 1, 2)], 'default', /* Next Level */ [], /* Level Borders */ 2, 1, 2, 2, new Storage([]), /* Area */ 2, /* Time Limit */ 250))
 
     // Level 1 + 2 + 3
     this.specialLevels.push(new Level({
@@ -1302,7 +1602,7 @@ export class GameController {
         new TallGrass(500, 500 + 1200, 150, 50)
       ],
       finishAreas: [
-        new FinishArea(350, 550 + 1200, 150, 50)
+        new FinishArea(350, 550 + 1200, 150, 50, 0)
       ],
       changeDirectionSquares: [
         new ChangeDirectionSquare(300, 150 + 1200, 50, 50, false, true, false, true, true),
@@ -1313,7 +1613,7 @@ export class GameController {
         ///
         new ChangeDirectionSquare(500, 350 + 1200, 50, 50, false, true, true, false, true)
       ]
-    }, 'Special 1', /* Requirements */ [new Requirement(0, 3 - 1)], /* Level Borders */1, 1, 1, 3, [], /* Area */ 1, /* Time Limit */ 200))
+    }, 'Special 1', /* Requirements */ [new Requirement(0, 3 - 1, 1)], 'default', /* Next Level */ [new NextLevel(2, 2 - 1)], /* Level Borders */ 1, 1, 1, 3, new Storage([]), /* Area */ 1, /* Time Limit */ 200))
 
     // Level 10 + 11
     this.specialLevels.push(new Level({
@@ -1519,9 +1819,9 @@ export class GameController {
 
       ],
       finishAreas: [
-        new FinishArea(400, 200, 50, 50),
-        new FinishArea(350, 250, 150, 50),
-        new FinishArea(400, 300, 50, 50)
+        new FinishArea(400, 200, 50, 50, 0),
+        new FinishArea(350, 250, 150, 50, 0),
+        new FinishArea(400, 300, 50, 50, 0)
       ],
       reverseTiles: [
         new ReverseTile(350 + 1700, 500 + 600, 50, 50, 'blue'),
@@ -1531,31 +1831,21 @@ export class GameController {
         new Teleporter(100 + 1700, 300 + 600, 'Special2Teleporter', 50, 50, 1),
         new Teleporter(550 + 2550, 100 + 600, 'Special2Teleporter', 50, 50, 1)
       ]
-    }, 'Special 2', /* Requirements */ [new Requirement(0, 11 - 1)], /* Level Borders */3, 2, 4, 2, [], /* Area */ 1, /* Time Limit */ 250))
-  }
-
-  CheckUnlocked () {
-    // for (let r = 0; r < this.worlds[w].levels[l].requirements.length; r++) { }
-    for (let w = 0; w < this.worlds.length; w++) {
-      for (let l = 0; l < this.worlds[w].levels.length; l++) {
-        const currentLevel = this.worlds[w].levels[l]
-        if (currentLevel.requirements.length === 0) {
-          currentLevel.unlocked = true
-        } else {
-          const currentReqiurement = currentLevel.requirements[0]
-          const levelRequired = this.worlds[currentReqiurement.worldRequired].levels[currentReqiurement.levelRequired]
-          if ((currentLevel.requirements.length === 0 || levelRequired.completed)) {
-            currentLevel.unlocked = true
-          }
-        }
-      }
-    }
+    }, 'Special 2', /* Requirements */ [new Requirement(0, 11 - 1, 1), new Requirement(2, 1 - 1, 1)], function (req) { if (req[0] && req[1]) { return true } else { return false } }, /* Next Level */ [], /* Level Borders */ 3, 2, 4, 2, new Storage([]), /* Area */ 1, /* Time Limit */ 250))
   }
 }
 
 export class Requirement {
-  constructor (world, level) {
+  constructor (world, level, exit) {
     this.worldRequired = world
     this.levelRequired = level
+    this.exitRequired = exit
+  }
+}
+
+class NextLevel {
+  constructor (world, level) {
+    this.world = world
+    this.level = level
   }
 }

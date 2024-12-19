@@ -182,8 +182,7 @@ export class MenuController {
       ///
       new MenuItem('Space', 1, 5, 'rgb(219, 0, 116)', function () { gameStates.keybindController.startRebind('A', 5, this) }),
       new MenuItem('Backspace', 1, 6, 'rgb(231, 0, 102)', function () { gameStates.keybindController.startRebind('A', 6, this) }),
-      new MenuItem('Shift', 1, 7, 'rgb(243, 0, 88)', function () { gameStates.keybindController.startRebind('A', 7, this) }),
-      new MenuItem('Column 1', 1, 8, 'rgb(255, 0, 75)', function () { gameStates.keybindController.resetKeybinds('A') }),
+      new MenuItem('Column 1', 1, 7, 'rgb(255, 0, 75)', function () { gameStates.keybindController.resetKeybinds('A') }),
       ///
       ///
       new MenuItem('a', 2, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.startRebind('B', 1, this) }),
@@ -193,16 +192,15 @@ export class MenuController {
       ///
       new MenuItem('Enter', 2, 5, 'rgb(219, 0, 116)', function () { gameStates.keybindController.startRebind('B', 5, this) }),
       new MenuItem('b', 2, 6, 'rgb(231, 0, 102)', function () { gameStates.keybindController.startRebind('B', 6, this) }),
-      new MenuItem('u', 2, 7, 'rgb(243, 0, 88)', function () { gameStates.keybindController.startRebind('B', 7, this) }),
-      new MenuItem('Column 2', 2, 8, 'rgb(255, 0, 75)', function () { gameStates.keybindController.resetKeybinds('B') })
-    ], /* itemWidth */2, /* itemHeight */8, /* x */290, /* y */0, /* width */510, /* height */600, /* fontSize */40))
+      new MenuItem('Column 2', 2, 7, 'rgb(255, 0, 75)', function () { gameStates.keybindController.resetKeybinds('B') })
+    ], /* itemWidth */2, /* itemHeight */7, /* x */290, /* y */0, /* width */510, /* height */600, /* fontSize */40))
 
     this.menus.push(this.SettingsMenu = new Menu([
       new MenuItem('Keybinds', 1, 1, 'rgb(230, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Keybinds, 'Settings')
       }),
-      /* new MenuItem('Theme Colour', 1, 2, 'rgb(182, 200, 0)', function () {
-        gameStates.SetGameState(settingStates.ThemeColourSelection, 'Settings')
+      /* new MenuItem('Mobile', 1, 2, 'rgb(182, 200, 0)', function () {
+        gameStates.SetGameState(settingStates.Mobile, 'Settings')
       }), */
       new MenuItem('Saving', 1, 2, 'rgb(135, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Saving, 'Settings')
@@ -235,10 +233,9 @@ export class MenuController {
 
     this.menus.push(this.LoseMenu = new Menu([
       new MenuItem('Retry', 1, 1, 'rgb(120, 0, 225)', function () {
-        gameStates.CurrentLevel().startLevelTime()
-        gameStates.CurrentLevel().restart()
-        gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
         gameStates.lossScreen.loseLevel = false
+        gameStates.CurrentLevel().restart()
+        gameStates.CurrentLevel().startLevel()
       }),
       new MenuItem('Selection Menu', 1, 2, 'rgb(90, 0, 225)', function () {
         gameStates.CurrentLevel().restart()
@@ -257,17 +254,7 @@ export class MenuController {
 
     this.menus.push(this.WinMenu = new Menu([
       new MenuItem('Continue', 1, 1, 'rgb(255, 0, 75)', function () {
-        if (gameStates.currentLevelIndex + 1 >= gameStates.worldSelector.currentWorld.levels.length || !gameStates.worldSelector.currentWorld.levels[gameStates.currentLevelIndex + 1].unlocked) {
-          gameStates.CurrentLevel().restart()
-          gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
-          gameStates.winScreen.winLevel = false
-        } else {
-          gameStates.CurrentLevel().restart()
-          gameStates.currentLevelIndex++
-          gameStates.CurrentLevel().startLevelTime()
-          gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
-          gameStates.winScreen.winLevel = false
-        }
+        gameStates.winScreen.NextLevel()
       }),
       new MenuItem('Selection Menu', 1, 2, 'rgb(255, 5, 115)', function () {
         gameStates.CurrentLevel().restart()
@@ -293,9 +280,8 @@ export class MenuController {
         })
       }),
       new MenuItem('Retry', 1, 2, 'rgb(255, 85, 20)', function () {
-        gameStates.CurrentLevel().startLevelTime()
         gameStates.CurrentLevel().restart()
-        gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
+        gameStates.CurrentLevel().startLevel()
       }),
       new MenuItem('Selection Menu', 1, 3, 'rgb(255, 124, 0)', function () {
         gameStates.CurrentLevel().restart()

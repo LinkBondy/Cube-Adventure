@@ -73,14 +73,6 @@ export class WorldSelector {
     canvas.context.fillText(this.currentSelectedWorld.title, 425, 250)
     canvas.context.textAlign = 'left'
 
-    // Draw Locked Screen if level isn't unlocked
-    if (!this.CheckLocked()) {
-      canvas.context.font = '175px Arial'
-      canvas.context.fillStyle = 'rgba(25, 25, 25)'
-      canvas.context.fillText('Locked', 10, 275)
-      draw.DrawImage(images.LockedIcon, 562.5, 10)
-    }
-
     // Draw arrows to change worlds
     canvas.context.save()
     canvas.context.translate(767.5, 510)
@@ -97,10 +89,6 @@ export class WorldSelector {
     draw.DrawImage(images.UpArrow, 10, 432.5)
     // canvas.context.scale(-1, 1)
     canvas.context.restore()
-  }
-
-  CheckLocked () {
-    return true
   }
 }
 
@@ -119,7 +107,7 @@ export class LevelSelector {
     canvas.context.textAlign = 'left'
 
     // Draw Locked Screen if level isn't unlocked
-    if (!this.CheckLocked()) {
+    if (!gameStates.CurrentLevel().checkLocked()) {
       canvas.context.font = '175px Arial'
       canvas.context.fillStyle = 'rgba(255, 255, 132)'
       canvas.context.fillText('Locked', 10, 275)
@@ -144,8 +132,8 @@ export class LevelSelector {
     if ((keybindArray[2/* up */].keybindA === event.key || keybindArray[2/* up */].keybindB === event.key) && gameStates.currentLevelIndex !== 0) { gameStates.currentLevelIndex -= 1 }
 
     // Level Selector to Game
-    if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && this.CheckLocked()) {
-      this.SelectLevel()
+    if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && gameStates.CurrentLevel().checkLocked()) {
+      gameStates.CurrentLevel().startLevel()
     }
   }
 
@@ -157,14 +145,9 @@ export class LevelSelector {
     if (eventFunctions.isTouching(0, 450, 160, 150, event) && gameStates.currentLevelIndex !== 0) { gameStates.currentLevelIndex -= 1 }
 
     // Level Selector to Game
-    if (eventFunctions.isTouching(225, 500, 385, 100, event) && this.CheckLocked()) {
-      this.SelectLevel()
+    if (eventFunctions.isTouching(225, 500, 385, 100, event) && gameStates.CurrentLevel().checkLocked()) {
+      gameStates.CurrentLevel().startLevel()
     }
-  }
-
-  SelectLevel () {
-    gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
-    gameStates.CurrentLevel().startLevelTime()
   }
 
   CheckLocked () {
