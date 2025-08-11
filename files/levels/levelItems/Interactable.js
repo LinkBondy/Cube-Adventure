@@ -1,8 +1,8 @@
 'use strict'
-const { images } = require('../drawing/Images')
-const { draw } = require('../drawing/Draw')
-const { gameStates, BackgroundStyles } = require('../data/GameData')
-const { canvas } = require('../drawing/Canvas')
+const { images } = require('../../drawing/Images')
+const { draw } = require('../../drawing/Draw')
+const { gameStates, BackgroundStyles } = require('../../data/GameData')
+const { canvas } = require('../../drawing/Canvas')
 const { GameObject } = require('./Class')
 export class ReverseTile extends GameObject {
   constructor (x, y, width, height, colorType) {
@@ -20,26 +20,11 @@ export class ReverseTile extends GameObject {
 
   update () {
     const self = this
-    gameStates.CurrentLevel().players.forEach(function (player) {
-      if (self.intersects(/* 0, */ player)) {
-        gameStates.CurrentLevel().rocks.forEach(function (rock) {
-          if (self.colorType === rock.colorType && rock.allowMovement === rock.originalAllowMovement) {
-            rock.allowMovement = !rock.allowMovement
-          }
-        })
-        gameStates.CurrentLevel().changeDirectionSquares.forEach(function (changeDirectionSquare) {
-          if (self.colorType === changeDirectionSquare.colorType) {
-            changeDirectionSquare.allowDirectionChange = true
-          }
-        })
-        self.activated = true
-      }
-    })
 
     gameStates.CurrentLevel().cubers.forEach(function (cuber) {
       if (self.intersects(/* 1, */ cuber)) {
         gameStates.CurrentLevel().rocks.forEach(function (rock) {
-          if (self.colorType === rock.colorType && rock.allowMovement === rock.originalAllowMovement) {
+          if (self.colorType === rock.colorType && self.activated === false) {
             rock.allowMovement = !rock.allowMovement
           }
         })
@@ -174,60 +159,10 @@ export class Teleporter extends GameObject {
   }
 };
 
-export class Hole extends GameObject {
-  constructor (x, y, width, height, fullHole, currentIntersects, maxIntersects) {
-    super(x, y, width, height)
-    this.original_x = this.x
-    this.original_y = this.y
-    this.fullHole = fullHole
-    this.originallyFull = this.fullHole
-    this.currentIntersects = currentIntersects
-    this.originalCurrentIntersects = this.currentIntersects
-    this.maxIntersects = maxIntersects
-    this.previousIntersectsHole = false
-    this.stopPlayer = false
-    this.stopEnemy = false
-    this.DrawingX = undefined
-  }
-
-  Draw () {
-    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
-      if (this.fullHole) { this.DrawingX = 100 } else if (this.currentIntersects < this.maxIntersects && this.currentIntersects !== 0) { this.DrawingX = 50 } else { this.DrawingX = 0 }
-
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-        switch (gameStates.CurrentLevel().currentArea) {
-          case 1:
-            canvas.context.drawImage(images.Hole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
-            break
-          case 2:
-            canvas.context.drawImage(images.UndergroundHole, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
-            break
-        }
-      }
-
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-        canvas.context.drawImage(images.HolePlastic, this.DrawingX, 0, 50, 50, this.x, this.y, this.width, this.height)
-      }
-    }
-  }
-
-  update () {
-    if (this.currentIntersects >= this.maxIntersects) {
-      this.fullHole = true
-    }
-  }
-
-  reset () {
-    this.x = this.original_x
-    this.y = this.original_y
-    this.fullHole = this.originallyFull
-    this.currentIntersects = this.originalCurrentIntersects
-  }
-}
-
 export class FinishArea extends GameObject {
   constructor (x, y, width, height, type) {
     super(x, y, width, height, 'rgb(255, 176, 231)')
+    this.color2 = 'rgb(254, 201, 169)'
     this.original_x = this.x
     this.original_y = this.y
     this.type = type
@@ -249,7 +184,14 @@ export class FinishArea extends GameObject {
           }
         }
       } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-        canvas.context.fillStyle = this.color1
+        switch (this.type) {
+          case 0:
+            canvas.context.fillStyle = this.color1
+            break
+          case 1:
+            canvas.context.fillStyle = this.color2
+            break
+        }
         canvas.context.fillRect(this.x, this.y, this.width, this.height)
       }
     }

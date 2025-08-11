@@ -14,6 +14,13 @@ export const images = {
     images.UndergroundWallCrystalB = LoadImage('images/UndergroundWallCrystalB.png')
     images.UndergroundWallA = LoadImage('images/UndergroundWallA.png')
     ///
+    /// Player
+    images.PlayerBodies = LoadImage('images/PlayerBodies.png')
+    images.PlayerBodiesPlastic = LoadImage('images/PlayerBodiesPlastic.png')
+    ///
+    images.PlayerFaces = LoadImage('images/PlayerFaces.png')
+    images.PlayerFacesPlastic = LoadImage('images/PlayerFacesPlastic.png')
+    ///
     images.BlueCube = LoadImage('images/BlueCube.png')
     images.BlueCubePyro = LoadImage('images/BlueCubePyro.png')
     images.BlueCubeWooden = LoadImage('images/BlueCubeWooden.png')
@@ -88,10 +95,16 @@ export const images = {
     images.CrackedRockPlastic = LoadImage('images/CrackedRockPlastic.png')
 
     /// Traps
+    // Holes
     images.Hole = LoadImage('images/Hole.png')
     images.UndergroundHole = LoadImage('images/UndergroundHole.png')
     images.Hole_200x200 = LoadImage('images/Hole_200x200.png')
     images.HolePlastic = LoadImage('images/HolePlastic.png')
+
+    // Grapple Weed
+    images.GrappleWeed = LoadImage('images/GrappleWeed.png')
+    images.GrappleWeed_200x200 = LoadImage('images/GrappleWeed200x200.png')
+    images.GrappleWeedHolding = LoadImage('images/GrappleWeedHolding.png')
 
     // Finish Lines
     images.finishLine = LoadImage('images/finishLine.png')
@@ -107,6 +120,7 @@ export const images = {
     images.PlayButton = LoadImage('images/PlayButton.png')
     images.Frame = LoadImage('images/Frame.png')
     images.Clock = LoadImage('images/Clock.png')
+    images.DeathClock = LoadImage('images/DeathClock.png')
     images.activated = LoadImage('images/Activated.png')
     images.notActivated = LoadImage('images/Not-Activated.png')
 

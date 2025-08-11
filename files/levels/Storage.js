@@ -81,19 +81,20 @@ export class Storage {
   }
 
   DrawSlotAcessories (row, col, totalItemsDrawn) {
+    const currentlKeybind = gameStates.keybindController.keybindSelectors[1].keybinds[this.items[totalItemsDrawn].keybindNumber]
     const startCol = 850 + 80
     const startRow = 258 + 10
 
     // Draw Background
     canvas.context.fillStyle = 'rgba(255, 255, 255, 0.5)'
-    canvas.context.fillRect(120 * col + startCol - 20, 125 * row + startRow - 4, 50, 30)
+    canvas.context.fillRect(120 * col + startCol - 80 + 27, 125 * row + startRow - 4, 82, 30)
 
     // Draw Slot Number
     canvas.context.fillStyle = 'rgba(0, 0, 0, 0.5)'
     canvas.context.font = '23px Arial'
     canvas.context.textAlign = 'right'
     canvas.context.textBaseline = 'top'
-    canvas.context.fillText(this.items[totalItemsDrawn].startKey, 120 * col + startCol, 125 * row + startRow)
+    canvas.context.fillText(currentlKeybind.keybindA + ' | ' + currentlKeybind.keybindB, 120 * col + startCol, 125 * row + startRow)
 
     // Draw Activated Icon
     canvas.context.textAlign = 'left'
@@ -188,28 +189,30 @@ export class PickaxeItem {
     this.tag = 'pickaxe'
     this.activated = false
     this.availableFunctions = [false, false, true]
-    this.startKey = 'p'
+    this.keybindNumber = 0
   }
 
   Keydown (event) {
     const self = this
+    const basicKeybinds = gameStates.keybindController.keybindSelectors[0].keybinds
+    const specialKeybinds = gameStates.keybindController.keybindSelectors[1].keybinds
     if (this.activated) {
       gameStates.CurrentLevel().players.forEach(function (player) {
         gameStates.CurrentLevel().crackedRocks.forEach(function (crackedRock) {
           if (!crackedRock.allowMovement) {
-            if (gameStates.keybindController.keybinds[0/* left */].keybindA === event.key || gameStates.keybindController.keybinds[0/* left */].keybindB === event.key) {
+            if (basicKeybinds[0/* left */].keybindA === event.key || basicKeybinds[0/* left */].keybindB === event.key) {
               self.MineLeft(player, crackedRock)
             }
 
-            if (gameStates.keybindController.keybinds[1/* right */].keybindA === event.key || gameStates.keybindController.keybinds[1/* right */].keybindB === event.key) {
+            if (basicKeybinds[1/* right */].keybindA === event.key || basicKeybinds[1/* right */].keybindB === event.key) {
               self.MineRight(player, crackedRock)
             }
 
-            if (gameStates.keybindController.keybinds[2/* up */].keybindA === event.key || gameStates.keybindController.keybinds[2/* up */].keybindB === event.key) {
+            if (basicKeybinds[2/* up */].keybindA === event.key || basicKeybinds[2/* up */].keybindB === event.key) {
               self.MineUp(player, crackedRock)
             }
 
-            if (gameStates.keybindController.keybinds[3/* down */].keybindA === event.key || gameStates.keybindController.keybinds[3/* down */].keybindB === event.key) {
+            if (basicKeybinds[3/* down */].keybindA === event.key || basicKeybinds[3/* down */].keybindB === event.key) {
               self.MineDown(player, crackedRock)
             }
           }
@@ -218,7 +221,7 @@ export class PickaxeItem {
     }
 
     // Keydown 'p to select pickaxe, direction to use pickaxe"
-    if (event.key === this.startKey) {
+    if (specialKeybinds[0/* pickaxe */].keybindA === event.key || specialKeybinds[0/* pickaxe */].keybindB === event.key) {
       this.activated = !this.activated
     }
   }

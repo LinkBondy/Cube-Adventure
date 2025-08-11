@@ -16,7 +16,7 @@ export const update = {
 
       if (gameStates.arrayChartController.findCurrentArrayChart() !== false) { this.chartUpdate() }
 
-      if (gameStates.currentSettingState === settingStates.Keybinds && gameStates.currentGameMode === gameMode.Settings) { this.keybindUpdate() }
+      if ((gameStates.currentSettingState === settingStates.Keybinds || gameStates.currentSettingState === settingStates.SpecialKeybinds) && gameStates.currentGameMode === gameMode.Settings) { this.keybindUpdate() }
     }
   },
   chartUpdate: function () {
@@ -30,8 +30,11 @@ export const update = {
     gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].update()
   },
   keybindUpdate: function () {
-    gameStates.keybindController.keybinds.forEach(function (keybind) {
-      keybind.Update()
+    gameStates.CurrentKeybind().keybinds.forEach(function (keybind) {
+      if (!gameStates.CurrentKeybind().selectingKeybind) {
+        console.log(gameStates.CurrentKeybind().selectingKeybind)
+        keybind.Update()
+      }
     })
   }
 }

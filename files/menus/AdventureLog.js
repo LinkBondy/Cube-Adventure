@@ -27,11 +27,11 @@ const LockedFeature = {
   infoPickaxe: [new Requirement(0, 11 - 1, 0)],
   // infoPryoShard: [new Requirement(1, 3 - 1)],
   ///
-  infoHole: [new Requirement(0, 8 - 1, 0)]
-  // infoGrappleWeed: [new Requirement(0, 11 - 1)]
+  infoHole: [new Requirement(0, 8 - 1, 0)],
+  infoGrappleWeed: [new Requirement(0, 11 - 1, 0)]
 }
 
-export class InfoController {
+export class AdventureLogController {
   constructor () {
     this.items = [
       new Tutorials(),
@@ -150,7 +150,7 @@ class ItemSlide {
   Draw () {
     canvas.context.font = '25px Arial'
     canvas.context.fillStyle = 'black'
-    canvas.context.fillText(gameStates.infoController.slideIndex + ' / ' + (gameStates.infoController.items[gameStates.infoController.itemIndex].slides.length - 1), 790, 590)
+    canvas.context.fillText(gameStates.adventureLogController.slideIndex + ' / ' + (gameStates.adventureLogController.items[gameStates.adventureLogController.itemIndex].slides.length - 1), 790, 590)
     ///
     if (this.ShouldShowSlide()) {
       this.items.forEach(function (itemInfo) {
@@ -163,7 +163,7 @@ class ItemSlide {
       gradientA.addColorStop(0, 'rgb(235, 110, 160)')
       gradientA.addColorStop(1, 'rgb(245, 130, 180)')
       canvas.context.fillStyle = gradientA
-      canvas.context.fillText('Item ' + gameStates.infoController.slideIndex, 425, 200)
+      canvas.context.fillText('Item ' + gameStates.adventureLogController.slideIndex, 425, 200)
       ///
       canvas.context.font = '55px Arial'
       const gradientB = canvas.context.createLinearGradient(125, 0, 600, 0)
@@ -436,6 +436,27 @@ class HazardInfo {
       new ItemText('an uncovered hole, they turn', '60px Arial', 'rgb(2, 0, 139)', 10, 375),
       new ItemText('back the other way.', '60px Arial', 'rgb(2, 0, 139)', 10, 450)
     ], LockedFeature.infoHole)
-    this.slides = [titleSlide, slide1, slide2]
+
+    const slide3 = new ItemSlide([
+      new ItemImage(false, images.GrappleWeed_200x200, 625, 10),
+      ///
+      new ItemText('Grapple Weed', '90px Arial', 'purple', 10, 130),
+      new ItemText('When a player touches a grapple,', '50px Arial', 'rgb(2, 0, 139)', 10, 250),
+      new ItemText('weed, it grabs the player.', '50px Arial', 'rgb(2, 0, 139)', 10, 325),
+      new ItemText('Players can escape by pressing', '50px Arial', 'rgb(2, 0, 139)', 10, 425),
+      new ItemText('directions untill the grapple weed', '50px Arial', 'rgb(2, 0, 139)', 10, 500),
+      new ItemText('loses grip and releases the player.', '50px Arial', 'rgb(2, 0, 139)', 10, 575)
+    ], LockedFeature.infoGrappleWeed)
+
+    const slide4 = new ItemSlide([
+      new ItemImage(false, images.GrappleWeed_200x200, 625, 10),
+      ///
+      new ItemText('Grapple Weed', '90px Arial', 'purple', 10, 130),
+      new ItemText('If the player is not able to escape', '50px Arial', 'rgb(2, 0, 139)', 10, 260),
+      new ItemText('in time they will drown.', '50px Arial', 'rgb(2, 0, 139)', 10, 335),
+      new ItemText('Grapple weed can have different', '50px Arial', 'rgb(2, 0, 139)', 10, 460),
+      new ItemText('grip strengths depending on colour.', '50px Arial', 'rgb(2, 0, 139)', 10, 535)
+    ], LockedFeature.infoHole)
+    this.slides = [titleSlide, slide1, slide2, slide3, slide4]
   }
 };

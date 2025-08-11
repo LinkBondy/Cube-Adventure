@@ -1,6 +1,6 @@
 'use strict'
-const { gameMode, startingMenusStates, storyModeStates, gameStates, BackgroundStyles } = require('../data/GameData')
-const { canvas } = require('../drawing/Canvas')
+const { gameMode, startingMenusStates, storyModeStates, gameStates, BackgroundStyles } = require('../../data/GameData')
+const { canvas } = require('../../drawing/Canvas')
 export class GameObject {
   constructor (x, y, width, height, color1, debugColor) {
     this.x = x

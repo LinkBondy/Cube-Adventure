@@ -1,13 +1,14 @@
 'use strict'
-const { startingMenusStates, storyModeStates, gameMode, gameStates, eventFunctions } = require('../data/GameData')
+const { startingMenusStates, storyModeStates, gameMode, gameStates, eventFunctions, settingStates } = require('../data/GameData')
 export function Keydown (event) {
-  console.log(event)
-  const keybindArray = gameStates.keybindController.keybinds
+  // console.log(event)
+  const keybindArray = gameStates.keybindController.keybindSelectors[0].keybinds
+  // const specialKeybindArray = gameStates.keybindController.keybindSelectors[1].keybinds
   // Debug Mode
-  /* if (event.key === '.') {
+  if (event.key === '.') {
     gameStates.debug = !gameStates.debug
     console.log(gameStates.debug)
-  } */
+  }
   // Start Game "Menu"
   if (gameStates.currentStartingMenusState === startingMenusStates.NotStarted) {
     gameStates.titleScreen.KeyDown(event, keybindArray)
@@ -15,12 +16,12 @@ export function Keydown (event) {
   }
 
   // Back Action
-  if ((keybindArray[5/* back */].keybindA === event.key || keybindArray[5/* back */].keybindB === event.key) && (gameStates.currentStartingMenusState === startingMenusStates.Menu || gameStates.currentStartingMenusState === startingMenusStates.Selected) && !gameStates.keybindController.seletingKeybind) {
+  if ((keybindArray[5/* back */].keybindA === event.key || keybindArray[5/* back */].keybindB === event.key) && (gameStates.currentStartingMenusState === startingMenusStates.Menu || gameStates.currentStartingMenusState === startingMenusStates.Selected) && !gameStates.keybindController.selectingKeybind) {
     eventFunctions.backButtonAction()
   }
 
   if (gameStates.menuController.CheckMenu() !== undefined) {
-    gameStates.menuController.menus[gameStates.menuController.CheckMenu()].Keydown(event, keybindArray, stopEvents)
+    gameStates.menuController.menus[gameStates.menuController.CheckMenu()].Keydown(event, keybindArray)
     return
   }
 
@@ -54,13 +55,13 @@ export function Keydown (event) {
       }
     }
     ///
-    if (gameStates.currentGameMode === gameMode.ItemsInfo) {
-      gameStates.infoController.Keydown(event, keybindArray)
+    if (gameStates.currentGameMode === gameMode.AdventureLog) {
+      gameStates.adventureLogController.Keydown(event, keybindArray)
     }
     ///
     // Game to Pause Menu
     if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
-      gameStates.CurrentLevel().pauseLevelTime()
+      gameStates.CurrentLevel().pause()
       return
     }
 
@@ -70,16 +71,17 @@ export function Keydown (event) {
   }
 }
 
-const stopEvents = {
-  stopMouseUp: false
-}
 export function KeyUp (event) {
-  // console.log(event)
-  if (stopEvents.stopMouseUp === true) {
-    stopEvents.stopMouseUp = false
-    return
-  }
+  console.log(event)
   if (!gameStates.loading) {
-    if (gameStates.keybindController.seletingKeybind) { gameStates.keybindController.setKeybinds(event) }
+    if (gameStates.currentSettingState === settingStates.Keybinds || gameStates.currentSettingState === settingStates.SpecialKeybinds) {
+      if (gameStates.CurrentKeybind().selectingKeybind) {
+        if (!eventFunctions.stopMouseUp) {
+          gameStates.CurrentKeybind().setKeybinds(event)
+        } else {
+          eventFunctions.stopMouseUp = false
+        }
+      }
+    }
   }
 }

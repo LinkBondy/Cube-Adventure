@@ -1,42 +1,101 @@
 'use strict'
 const { canvas } = require('../drawing/Canvas')
-const { gameStates } = require('../data/GameData')
+const { gameStates, eventFunctions } = require('../data/GameData')
 
 export class KeybindController {
   constructor () {
-    this.keybinds = [
-      new Keybind('Left', 1, 'ArrowLeft', 'a'),
-      new Keybind('Right', 2, 'ArrowRight', 'd'),
-      new Keybind('Up', 3, 'ArrowUp', 'w'),
-      new Keybind('Down', 4, 'ArrowDown', 's'),
-      new Keybind('Select', 5, ' ', 'Enter', 'Space'),
-      new Keybind('Back', 6, 'Backspace', 'b')
-    ]
+    this.keybindSelectors = []
+  }
 
-    this.originalKeybinds = [
+  start () {
+    for (let selector = 0; selector < this.keybindSelectors.length; selector++) {
+      this.keybindSelectors[selector].start()
+    }
+  }
+
+  setupKeybinds () {
+    this.keybindSelectors.push(new KeybindSelector([
       new Keybind('Left', 1, 'ArrowLeft', 'a'),
       new Keybind('Right', 2, 'ArrowRight', 'd'),
       new Keybind('Up', 3, 'ArrowUp', 'w'),
       new Keybind('Down', 4, 'ArrowDown', 's'),
       new Keybind('Select', 5, ' ', 'Enter', 'Space'),
       new Keybind('Back', 6, 'Backspace', 'b')
-    ]
-    this.seletingKeybind = false
+    ], 'basicKeybinds', 0, 0, 600, 15))
+
+    this.keybindSelectors.push(new KeybindSelector([
+      new Keybind('Pickaxe Activate', 1, 'p', 'P')
+    ], 'specialKeybinds', 0, 0, 300, 35))
+  }
+
+  checkKeybinds (keybind) {
+    for (let s = 0; s < this.keybindSelectors.length; s++) {
+      for (let keybindNumber = 0; keybindNumber < this.keybindSelectors[s].keybinds.length; keybindNumber++) {
+        if (keybind === this.keybindSelectors[s].keybinds[keybindNumber].keybindA || keybind === this.keybindSelectors[s].keybinds[keybindNumber].keybindB) {
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+  load (savedArray) {
+    for (let k = 0; k < this.keybindSelectors.length; k++) {
+      if (savedArray[k].length === this.keybindSelectors[k].keybinds.length) {
+        this.keybindSelectors[k].keybinds = []
+        for (let keybindsLoaded = 0; keybindsLoaded < savedArray[k].length; keybindsLoaded++) {
+          const loadingArray = savedArray[k][keybindsLoaded]
+          this.keybindSelectors[k].keybinds.push(new Keybind(loadingArray.name, loadingArray.value, loadingArray.keybindA, loadingArray.keybindB, loadingArray.displayNameA, loadingArray.displayNameB))
+        }
+      }
+    }
+  }
+}
+
+class KeybindSelector {
+  constructor (keybinds, title, x, y, height, offset) {
+    this.keybinds = keybinds
+    this.originalKeybinds = this.keybinds
+    this.title = title
+    this.x = x
+    this.y = y
+    this.height = height
+    this.offset = offset
+    //
+    this.selectingKeybind = false
     this.triedRebinding = false
     this.currentMenuItem = undefined
     this.currentKeybind = undefined
     this.currentType = undefined
   }
 
+  Draw () {
+    for (let k = 0; k < this.keybinds.length; k++) {
+      this.keybinds[k].Draw()
+    }
+
+    canvas.context.font = '40px Arial'
+    canvas.context.fillStyle = 'darkgray'
+    canvas.context.fillText('Reset', 10 + this.x, (this.keybinds.length) * this.heightPerItem + (this.heightPerItem - this.offset) + this.y)
+  }
+
+  start () {
+    for (let k = 0; k < this.keybinds.length; k++) {
+      this.heightPerItem = this.height / (this.keybinds.length + 1)
+      this.keybinds[k].x = 10 + this.x
+      this.keybinds[k].y = k * this.heightPerItem + (this.heightPerItem - this.offset) + this.y
+    }
+  }
+
   startRebind (type, keybindNumber, usedMenuItem) {
-    this.seletingKeybind = true
+    this.selectingKeybind = true
     this.currentKeybind = this.keybinds[keybindNumber - 1]
     this.currentMenuItem = usedMenuItem
     this.currentType = type
   }
 
   setKeybinds (event) {
-    if (this.checkKeybinds(event.key)) {
+    if (gameStates.keybindController.checkKeybinds(event.key)) {
       console.log(event.key)
       console.log(event)
       switch (this.currentType) {
@@ -85,18 +144,10 @@ export class KeybindController {
     }
   }
 
-  checkKeybinds (keybind) {
-    for (let keybindNumber = 0; keybindNumber !== this.keybinds.length; keybindNumber++) {
-      if (keybind === this.keybinds[keybindNumber].keybindA || keybind === this.keybinds[keybindNumber].keybindB) {
-        return false
-      }
-    }
-    return true
-  }
-
   finishRebinding () {
-    this.seletingKeybind = false
+    this.selectingKeybind = false
     this.triedRebinding = false
+    eventFunctions.stopMouseUp = true
     this.currentMenuItem = undefined
     this.currentKeybind = undefined
     this.currentType = undefined
@@ -117,13 +168,6 @@ export class KeybindController {
       }
     }
   }
-
-  load (savedArray) {
-    this.keybinds = []
-    for (let keybindsLoaded = 0; keybindsLoaded < this.originalKeybinds.length; keybindsLoaded++) {
-      this.keybinds.push(new Keybind(savedArray[keybindsLoaded].name, savedArray[keybindsLoaded].value, savedArray[keybindsLoaded].keybindA, savedArray[keybindsLoaded].keybindB, savedArray[keybindsLoaded].displayNameA, savedArray[keybindsLoaded].displayNameB))
-    }
-  }
 }
 
 export class Keybind {
@@ -131,29 +175,28 @@ export class Keybind {
     this.name = name
 
     if (displayNameA === undefined) { this.displayNameA = keybindA } else { this.displayNameA = displayNameA }
-
-    ///
-
     if (displayNameB === undefined) { this.displayNameB = keybindB } else { this.displayNameB = displayNameB }
 
     this.keybindA = keybindA
     this.keybindB = keybindB
-    this.x = 10
-    this.y = (value - 1) * (600 / 7) + 55
+    this.x = 0
+    this.y = 0
     this.value = value
   }
 
   Draw () {
     canvas.context.font = '40px Arial'
     canvas.context.fillStyle = 'darkgray'
-    // canvas.context.textBaseline = 'middle'
     canvas.context.fillText(this.name, this.x, this.y)
-    canvas.context.fillText('Reset', this.x, (7 - 1) * (600 / 7) + 55)
-    canvas.context.textBaseline = 'alphabetic'
   }
 
   Update () {
-    gameStates.menuController.menus[2].menuItems[this.value - 1].title = this.displayNameA
-    gameStates.menuController.menus[2].menuItems[this.value + gameStates.keybindController.keybinds.length].title = this.displayNameB
+    const currentMenu = gameStates.menuController.CheckMenu()
+    console.log(gameStates.CurrentKeybind().seletingKeybind)
+    console.log(gameStates.menuController.menus)
+    console.log(currentMenu)
+    console.log(gameStates.menuController.menus[currentMenu])
+    gameStates.menuController.menus[currentMenu].menuItems[this.value - 1].title = this.displayNameA
+    gameStates.menuController.menus[currentMenu].menuItems[this.value + gameStates.CurrentKeybind().keybinds.length].title = this.displayNameB
   }
 }

@@ -16,12 +16,7 @@ export function MouseDown (event) {
 
   // Check if an Array Chart is beening displayed
   if (gameStates.arrayChartController.findCurrentArrayChart() !== false) {
-    const arrayChart = gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()]
-    for (let numberChecked = 0; numberChecked < arrayChart.items.length; numberChecked++) {
-      if (eventFunctions.isTouching(arrayChart.items[numberChecked].x, arrayChart.items[numberChecked].y, arrayChart.sectionWidth, arrayChart.sectionHeight, event)) {
-        arrayChart.action(arrayChart, numberChecked)
-      }
-    }
+    gameStates.arrayChartController.arrayCharts[gameStates.arrayChartController.findCurrentArrayChart()].MouseDown(event)
   }
 
   if (gameStates.menuController.CheckMenu() !== undefined) {
@@ -41,14 +36,14 @@ export function MouseDown (event) {
       return
     }
 
-    if (gameStates.currentGameMode === gameMode.ItemsInfo) {
-      gameStates.infoController.Mousedown(event)
+    if (gameStates.currentGameMode === gameMode.AdventureLog) {
+      gameStates.adventureLogController.Mousedown(event)
     }
 
     if (gameStates.currentStoryModeState === storyModeStates.Playing && gameStates.currentGameMode === gameMode.StoryMode) {
       if (eventFunctions.isTouching(925, 475, 100, 100, event)) {
         // Pause Game
-        gameStates.CurrentLevel().pauseLevelTime()
+        gameStates.CurrentLevel().pause()
       } else {
         for (let i = 0; i < gameStates.CurrentLevel().storage.items.length; i++) {
           if (gameStates.CurrentLevel().storage.items[i].availableFunctions[2]) {

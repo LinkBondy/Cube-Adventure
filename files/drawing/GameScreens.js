@@ -65,6 +65,12 @@ export class LossScreen {
       canvas.context.font = '85px Arial'
       canvas.context.fillText('You Ran Out Of Time!', 425, 120)
     }
+    // Death Clock
+    if (this.loseReason === 'death') {
+      canvas.context.font = '70px Arial'
+      canvas.context.fillText('You were drowned by', 425, 70)
+      canvas.context.fillText('Grapple Weed!', 425, 150)
+    }
     if (this.loseReason === 'hole') {
       canvas.context.font = '100px Arial'
       canvas.context.fillText('You Fell In a Hole!', 425, 120)
@@ -96,27 +102,30 @@ export class LossScreen {
       gameStates.CurrentLevel().players.forEach(function (player) {
         gameStates.CurrentLevel().cubers.forEach(function (cuber) {
           if (player.intersects(cuber)) {
-            self.SetLoss(gameStates.CurrentLevel().timeLimit, 'enemy')
+            self.SetLoss(gameStates.CurrentLevel().timers[0].time, 'enemy')
           }
         })
         gameStates.CurrentLevel().expanders.forEach(function (expander) {
           if (player.intersectsWithHitboxes(expander)) {
-            self.SetLoss(gameStates.CurrentLevel().timeLimit, 'enemy')
+            self.SetLoss(gameStates.CurrentLevel().timers[0].time, 'enemy')
           }
         })
         gameStates.CurrentLevel().holes.forEach(function (hole) {
-          if (player.intersectsAll(0, hole) && hole.fullHole) {
-            self.SetLoss(gameStates.CurrentLevel().timeLimit, 'hole')
+          if (player.intersectsAll(0, hole) && hole.revealedHole) {
+            self.SetLoss(gameStates.CurrentLevel().timers[0].time, 'hole')
           }
         })
         gameStates.CurrentLevel().waters.forEach(function (water) {
           if (player.intersects(water) && !gameStates.CurrentLevel().haveItem('lifeJacket')) {
-            self.SetLoss(gameStates.CurrentLevel().timeLimit, 'water')
+            self.SetLoss(gameStates.CurrentLevel().timers[0].time, 'water')
           }
         })
-        if (gameStates.CurrentLevel().timeLimit <= 0) {
-          self.SetLoss(0, 'time')
-        }
+
+        gameStates.CurrentLevel().timers.forEach(function (timer) {
+          if (timer.time <= 0 && timer.active) {
+            self.SetLoss(0, timer.type)
+          }
+        })
       })
     }
   }
@@ -125,7 +134,7 @@ export class LossScreen {
     const self = this
     this.loseLevel = true
     setTimeout(function () {
-      window.clearTimeout(gameStates.CurrentLevel().currentTimeout)
+      gameStates.CurrentLevel().timers.forEach(function (timer) { timer.pause() })
       self.loseReason = reason
       self.timeLeft = timeLeft
       self.currentLosses += 1
@@ -167,8 +176,8 @@ export class WinScreen {
     this.winLevel = true
     const self = this
     setTimeout(function () {
-      // Clear the level time
-      window.clearTimeout(gameStates.CurrentLevel().currentTimeout)
+      // Clear the level timers
+      gameStates.CurrentLevel().timers.forEach(function (timer) { timer.pause() })
 
       // Set the state to Story Mode
       gameStates.SetGameState(storyModeStates.WonStage, 'StoryMode')
@@ -197,7 +206,7 @@ export class WinScreen {
       gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
     } else {
       // Save the original level and world
-      const originalLevel = gameStates.currentLevelIndex
+      const originalLevel = gameStates.levelSelector.levelIndex
       const originalWorld = gameStates.worldSelector.currentSelectedWorld
       const originalWorldIndex = gameStates.worldSelector.worldIndex
 
@@ -209,13 +218,13 @@ export class WinScreen {
       gameStates.worldSelector.worldIndex = gameStates.CurrentLevel().nextLevels[this.exitCompleted].world
       gameStates.worldSelector.currentSelectedWorld = gameStates.gameController.worlds[gameStates.worldSelector.worldIndex]
       gameStates.worldSelector.currentWorld = gameStates.worldSelector.currentSelectedWorld
-      gameStates.currentLevelIndex = nextLevel
+      gameStates.levelSelector.levelIndex = nextLevel
 
       // Check if the next level is locked or if there are no more levels to continue to
       if (!gameStates.CurrentLevel().checkLocked()) {
         // If it is, set the game state to selecting and reset the level and world back to the original and exit to the selection menu
         gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
-        gameStates.currentLevelIndex = originalLevel
+        gameStates.levelSelector.levelIndex = originalLevel
         gameStates.worldSelector.currentSelectedWorld = originalWorld
         gameStates.worldSelector.currentWorld = originalWorld
         gameStates.worldSelector.worldIndex = originalWorldIndex

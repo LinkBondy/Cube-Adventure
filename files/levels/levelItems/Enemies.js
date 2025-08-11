@@ -1,8 +1,10 @@
-const { images } = require('../drawing/Images')
-const { draw } = require('../drawing/Draw')
-const { cubeStyle, gameStates, BackgroundStyles, storyModeStates } = require('../data/GameData')
-const { canvas } = require('../drawing/Canvas')
+'use strict'
+const { images } = require('../../drawing/Images')
+const { draw } = require('../../drawing/Draw')
+const { gameStates, BackgroundStyles, storyModeStates } = require('../../data/GameData')
+const { canvas } = require('../../drawing/Canvas')
 const { GameObject } = require('./Class')
+
 export class Cuber extends GameObject {
   constructor (x, y, width, height, directions, blockSpeed, waitTime) {
     super(x, y, width, height)
@@ -316,7 +318,36 @@ export class Cuber extends GameObject {
       draw.DrawImage(images.RedCubePlastic, this.x, this.y)
     }
   }
-};
+}
+
+export class ChangeDirectionSquare extends GameObject {
+  constructor (x, y, width, height, changeLeft, changeRight, changeUp, changeDown, allowDirectionChange, title) {
+    super(x, y, width, height, 'red')
+    this.original_x = this.x
+    this.original_y = this.y
+    this.color2 = 'orange'
+    this.allowDirectionChangeOld = allowDirectionChange
+    this.allowDirectionChange = allowDirectionChange
+    this.changeLeft = changeLeft
+    this.changeRight = changeRight
+    this.changeUp = changeUp
+    this.changeDown = changeDown
+    this.title = title
+  }
+
+  Draw () {
+    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
+      if (!this.allowDirectionChange) { canvas.context.fillStyle = this.color2 } else { canvas.context.fillStyle = this.color1 }
+      canvas.context.fillRect(this.x, this.y, this.width, this.height)
+    }
+  }
+
+  reset () {
+    this.x = this.original_x
+    this.y = this.original_y
+    this.allowDirectionChange = this.allowDirectionChangeOld
+  }
+}
 
 export class Expander extends GameObject {
   constructor (x, y, startWidth, startHeight, endWidth, endHeight, direction, widthSpeed, heightSpeed, waitTime) {
@@ -613,197 +644,4 @@ export class Expander extends GameObject {
     this.animating = false
     this.animatingDirection = 'backwards'
   }
-};
-
-export class Player extends GameObject {
-  constructor (x, y, width, height) {
-    super(x, y, width, height)
-    // Original variables for reseting
-    this.original_x = this.x
-    this.original_y = this.y
-    // Other
-    this.speed = 50
-    this.previousIntersectsHole = false
-    this.waterMovement = false
-  }
-
-  moveLeft () {
-    const oldX = this.x
-    this.x -= this.speed
-    const intersectsBarrier = this.checkMovement()
-
-    this.adjustObjects(intersectsBarrier)
-
-    if (intersectsBarrier) {
-      this.x = oldX
-    }
-  }
-
-  moveRight () {
-    const oldX = this.x
-    this.x += this.speed
-    const intersectsBarrier = this.checkMovement()
-
-    this.adjustObjects(intersectsBarrier)
-
-    if (intersectsBarrier) {
-      this.x = oldX
-    }
-  }
-
-  moveUp () {
-    const oldY = this.y
-    this.y -= this.speed
-    const intersectsBarrier = this.checkMovement()
-
-    this.adjustObjects(intersectsBarrier)
-
-    if (intersectsBarrier) {
-      this.y = oldY
-    }
-  }
-
-  moveDown () {
-    const oldY = this.y
-    this.y += this.speed
-    const intersectsBarrier = this.checkMovement()
-
-    this.adjustObjects(intersectsBarrier)
-
-    if (intersectsBarrier) {
-      this.y = oldY
-    }
-  }
-
-  checkMovement () {
-    const self = this
-    let stop = false
-
-    gameStates.CurrentLevel().walls.forEach(function (wall) {
-      if (!wall.AllowMovement(wall, 'player') && wall.intersects(self)) {
-        stop = true
-      }
-    })
-
-    gameStates.CurrentLevel().rocks.forEach(function (rock) {
-      if (!rock.allowMovement && rock.intersects(self)) {
-        stop = true
-      }
-    })
-
-    gameStates.CurrentLevel().crackedRocks.forEach(function (crackedRock) {
-      if (!crackedRock.allowMovement && crackedRock.intersects(self)) {
-        stop = true
-      }
-    })
-
-    gameStates.CurrentLevel().waters.forEach(function (water) {
-      if (!self.waterMovement && water.intersects(self)) {
-        stop = true
-      }
-    })
-
-    if (stop === true) {
-      return true
-    }
-
-    return false
-  }
-
-  adjustObjects (intersectsBarrier) {
-    const self = this
-    gameStates.CurrentLevel().holes.forEach(function (hole) {
-      if (hole.intersects(self) && !hole.fullHole && !intersectsBarrier) {
-        hole.currentIntersects = hole.currentIntersects + 0.5
-        hole.previousIntersectsHole = true
-      }
-      if (!hole.intersects(self) && hole.previousIntersectsHole && !intersectsBarrier) {
-        hole.currentIntersects = hole.currentIntersects + 0.5
-        hole.previousIntersectsHole = false
-      }
-    })
-
-    gameStates.CurrentLevel().items.forEach(function (item) {
-      if (item.intersects(self) && !item.collected) {
-        gameStates.CurrentLevel().storage.AddItem(item.type)
-        item.collected = true
-      }
-    })
-  }
-
-  Keydown (event, keybindArray) {
-    // "Right" Arrow || "d" Key
-    if (keybindArray[1/* right */].keybindA === event.key || keybindArray[1/* right */].keybindB === event.key) {
-      this.moveRight()
-      return
-    }
-
-    // "Down" Arrow || "s" Key
-    if (keybindArray[3/* down */].keybindA === event.key || keybindArray[3/* down */].keybindB === event.key) {
-      this.moveDown()
-      return
-    }
-
-    // "Up" Arrow || "w" Key
-    if (keybindArray[2/* up */].keybindA === event.key || keybindArray[2/* up */].keybindB === event.key) {
-      this.moveUp()
-      return
-    }
-
-    // "Left" Arrow || "a" Key
-    if (keybindArray[0/* left */].keybindA === event.key || keybindArray[0/* left */].keybindB === event.key) {
-      this.moveLeft()
-    }
-  }
-
-  update () {
-  }
-
-  reset () {
-    this.x = this.original_x
-    this.y = this.original_y
-    this.waterMovement = false
-  }
-
-  Draw () {
-    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
-      if (gameStates.currentCubeStyle === cubeStyle.Classic) { this.drawX = 0 } else if (gameStates.currentCubeStyle === cubeStyle.Alien) { this.drawX = 50 } else if (gameStates.currentCubeStyle === cubeStyle.Sad) { this.drawX = 100 } else if (gameStates.currentCubeStyle === cubeStyle.Happy) { this.drawX = 150 }
-
-      if (gameStates.currentBackgroundStyle === BackgroundStyles.Classic) {
-        canvas.context.drawImage(images.BlueCube, this.drawX, 0, 50, images.BlueCube.height, this.x, this.y, 50, images.BlueCube.height)
-      } else if (gameStates.currentBackgroundStyle === BackgroundStyles.Plastic) {
-        canvas.context.drawImage(images.BlueCubePlastic, this.drawX, 0, 50, images.BlueCubePlastic.height, this.x, this.y, 50, images.BlueCubePlastic.height)
-      }
-    }
-  }
-};
-gameStates.currentCubeStyle = cubeStyle.BlueCube
-
-export class ChangeDirectionSquare extends GameObject {
-  constructor (x, y, width, height, changeLeft, changeRight, changeUp, changeDown, allowDirectionChange, title) {
-    super(x, y, width, height, 'red')
-    this.original_x = this.x
-    this.original_y = this.y
-    this.color2 = 'orange'
-    this.allowDirectionChangeOld = allowDirectionChange
-    this.allowDirectionChange = allowDirectionChange
-    this.changeLeft = changeLeft
-    this.changeRight = changeRight
-    this.changeUp = changeUp
-    this.changeDown = changeDown
-    this.title = title
-  }
-
-  Draw () {
-    if ((this.x >= (gameStates.CurrentLevel().currentX - 1) * 850 && this.x < gameStates.CurrentLevel().currentX * 850) && (this.y >= (gameStates.CurrentLevel().currentY - 1) * 600 && this.y < gameStates.CurrentLevel().currentY * 600)) {
-      if (!this.allowDirectionChange) { canvas.context.fillStyle = this.color2 } else { canvas.context.fillStyle = this.color1 }
-      canvas.context.fillRect(this.x, this.y, this.width, this.height)
-    }
-  }
-
-  reset () {
-    this.x = this.original_x
-    this.y = this.original_y
-    this.allowDirectionChange = this.allowDirectionChangeOld
-  }
-};
+}

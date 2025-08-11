@@ -1,28 +1,38 @@
 'use strict'
-const { Player, Cuber, Expander, ChangeDirectionSquare } = require('./Moveable')
-const { TallGrass, FakeTallGrass, Rock, Water, CrackedRock } = require('./Barriers')
-const { ReverseTile, Teleporter, Hole, FinishArea } = require('./Interactable')
-const { LifeJacket, ThreeBead, Pickaxe } = require('./Collectable')
+const { Player } = require('./levelItems/Player')
+const { Cuber, Expander, ChangeDirectionSquare } = require('./levelItems/Enemies')
+const { TallGrass, FakeTallGrass, Rock, Water, CrackedRock } = require('./levelItems/Barriers')
+const { ReverseTile, Teleporter, FinishArea } = require('./levelItems/Interactable')
+const { Hole, GrappleWeed } = require('./levelItems/Hazards')
+const { LifeJacket, ThreeBead, Pickaxe } = require('./levelItems/Collectable')
 const { gameStates, storyModeStates } = require('../data/GameData')
 const { Storage, LifeJacketItem /* , ThreeBeadItem, PickaxeItem */ } = require('./Storage')
+const { Timer } = require('./Timer')
+const { images } = require('../drawing/Images')
 const { canvas } = require('../drawing/Canvas')
 
 class Level {
   constructor (levelData, title, requirements, requiredOrder, nextLevels, currentX, currentY, width, height, storage, currentArea, timeLimit) {
     // Level Items
     this.players = levelData.players ?? []
+    // Enemies
     this.cubers = levelData.cubers ?? []
+    this.changeDirectionSquares = levelData.changeDirectionSquares ?? []
     this.expanders = levelData.expanders ?? []
+    // Barriers
     this.walls = levelData.walls ?? []
     this.waters = levelData.waters ?? []
-    this.items = levelData.items ?? []
     this.rocks = levelData.rocks ?? []
     this.crackedRocks = levelData.crackedRocks ?? []
+    // Collectable
+    this.items = levelData.items ?? []
+    // Hazards
     this.holes = levelData.holes ?? []
-    this.finishAreas = levelData.finishAreas ?? []
-    this.changeDirectionSquares = levelData.changeDirectionSquares ?? []
+    this.grappleWeeds = levelData.grappleWeeds ?? []
+    // Interactable
     this.reverseTiles = levelData.reverseTiles ?? []
     this.teleporters = levelData.teleporters ?? []
+    this.finishAreas = levelData.finishAreas ?? []
 
     // Level Data
     this.title = title
@@ -56,12 +66,8 @@ class Level {
     // Area
     this.currentArea = currentArea
 
-    // Time
-    this.timeLimit = timeLimit
-    this.originalTimeLimit = this.timeLimit
-    this.clockFrame = 0
-    this.timeWaited = 0
-    this.timeRemaining = undefined
+    // Timers
+    this.timers = [new Timer(timeLimit, images.Clock, 'time'), new Timer(5, images.DeathClock, 'death')]
   }
 
   draw () {
@@ -141,6 +147,10 @@ class Level {
         teleporter.Draw()
       })
 
+      this.grappleWeeds.forEach(function (grappleWeed) {
+        grappleWeed.Draw()
+      })
+
       this.items.forEach(function (item) {
         item.Draw()
       })
@@ -172,6 +182,38 @@ class Level {
     }
   }
 
+  drawTimers () {
+    // const self = this
+    const activeTimers = []
+    if (gameStates.currentStoryModeState === storyModeStates.Playing || gameStates.currentStoryModeState === storyModeStates.Paused) {
+      // Creates an array of the active timers
+      this.timers.forEach(function (timer) {
+        if (timer.active) {
+          activeTimers.push(timer)
+        }
+      })
+
+      // Loop until the activeTimers Array has only 1 object
+      while (activeTimers.length !== 1) {
+        for (let i = 0; i < activeTimers.length; i++) {
+          for (let s = 0; s < activeTimers.length; s++) {
+            // if one timer's time is smaller than another, remove the larger time
+            if (activeTimers[i].time < activeTimers[s].time) {
+              activeTimers.splice(s, 1)
+            }
+          }
+        }
+      }
+      activeTimers[0].draw()
+    } else {
+      this.timers.forEach(function (timer) {
+        if (timer.type === 'time') {
+          timer.draw()
+        }
+      })
+    }
+  }
+
   update () {
     this.cubers.forEach(function (cuber) {
       cuber.update()
@@ -186,9 +228,6 @@ class Level {
     })
     this.reverseTiles.forEach(function (reverseTile) {
       reverseTile.update()
-    })
-    this.holes.forEach(function (hole) {
-      hole.update()
     })
     this.teleporters.forEach(function (teleporter) {
       teleporter.update()
@@ -229,6 +268,10 @@ class Level {
       teleporter.reset()
     })
 
+    this.grappleWeeds.forEach(function (grappleWeed) {
+      grappleWeed.reset()
+    })
+
     this.items.forEach(function (item) {
       item.reset()
     })
@@ -250,6 +293,57 @@ class Level {
     })
   }
 
+  pause () {
+    gameStates.SetGameState(storyModeStates.Paused, 'StoryMode')
+    this.timers.forEach(function (timer) {
+      if (timer.active) {
+        timer.pause()
+      }
+    })
+    this.cubers.forEach(function (cuber) {
+      cuber.stopTimer()
+    })
+  }
+
+  resume () {
+    this.timers.forEach(function (timer) {
+      if (timer.active) {
+        timer.resume()
+      }
+    })
+    gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
+    this.cubers.forEach(function (cuber) {
+      cuber.setTimer()
+    })
+  }
+
+  switchClock (clocks, type) {
+    for (let t = 0; t < clocks.length; t++) {
+      this.timers.forEach(function (timer) {
+        if (timer.type === clocks[t]) {
+          switch (type) {
+            case 'start':
+              timer.start()
+              break
+            case 'pause':
+              timer.pause()
+              break
+            case 'resume':
+              timer.resume()
+              break
+            case 'restart':
+              timer.reset()
+              timer.start()
+              break
+            case 'reset':
+              timer.reset()
+              break
+          }
+        }
+      })
+    }
+  }
+
   startLevel () {
     gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
     gameStates.CurrentLevel().storage.items.forEach(function (item) {
@@ -258,55 +352,17 @@ class Level {
         item.OnPickUp()
       }
     })
-    gameStates.CurrentLevel().startLevelTime()
-  }
-
-  startLevelTime () {
-    this.startDate = new Date()
-    const self = this
-    this.currentTimeout = window.setTimeout(function () { self.updateLevelTime() }, 1000 * gameStates.delta)
-  }
-
-  pauseLevelTime () {
-    const self = this
-    gameStates.pausedDate = new Date()
-    gameStates.SetGameState(storyModeStates.Paused, 'StoryMode')
-    window.clearTimeout(self.currentTimeout)
-    this.cubers.forEach(function (cuber) {
-      cuber.stopTimer()
-    })
-  }
-
-  resumeLevelTime () {
-    window.clearTimeout(this.currentTimeout)
-    if (this.timeRemaining === undefined) {
-      this.timeRemaining = 1000 - (gameStates.pausedDate - this.startDate)
-      this.currentTimeout = window.setTimeout(function () { gameStates.CurrentLevel().updateLevelTime() }, this.timeRemaining * gameStates.delta)
-    } else {
-      const oldRemainingTime = this.timeRemaining
-      this.timeRemaining = oldRemainingTime - (gameStates.pausedDate - this.startDate)
-      this.currentTimeout = window.setTimeout(function () { gameStates.CurrentLevel().updateLevelTime() }, this.timeRemaining * gameStates.delta)
-    }
-    this.startDate = new Date()
-  }
-
-  updateLevelTime () {
-    this.currentTimeout = window.setTimeout(function () { gameStates.CurrentLevel().updateLevelTime() }, 1000 * gameStates.delta)
-    this.timeRemaining = undefined
-    this.startDate = new Date()
-    if (gameStates.isRunning) {
-      this.timeLimit -= 1
-    }
+    this.switchClock(['time'], 'start')
   }
 
   reset () {
     this.currentX = this.startingX
     this.currentY = this.startingY
-    this.timeLimit = this.originalTimeLimit
     this.storage.items = []
     this.storage.items.push(...this.originalStorage)
-    this.clockFrame = 0
-    this.timeWaited = 0
+    this.timers.forEach(function (timer) {
+      timer.reset()
+    })
   }
 
   haveItem (item) {
@@ -634,9 +690,11 @@ export class GameController {
         new Cuber(450, 500, 50, 50, [false, false, true, false], 5),
         new Cuber(250, 50, 50, 50, [false, false, false, true], 5),
         new Cuber(50, 500, 50, 50, [false, false, true, false], 5),
-        new Cuber(100, 450 + 600, 50, 50, [false, true, false, false], 4)
+        new Cuber(550, 150 + 600, 50, 50, [false, false, false, true], 6),
+        new Cuber(200, 450 + 600, 50, 50, [false, true, false, false], 8.2)
       ],
       walls: [
+        // X=1, Y=1
         // Top Border
         new TallGrass(0, 0, 850, 50),
         // Bottom Border
@@ -669,7 +727,8 @@ export class GameController {
         // Lower Fifth Segment
         new TallGrass(100, 250, 150, 150),
         new TallGrass(100, 450, 150, 100),
-        /// Second Screen
+
+        /// X=1, Y=2
         new TallGrass(500, 50 + 600, 350, 50),
         // Begining
         new TallGrass(0, 100 + 600, 400, 50),
@@ -677,33 +736,32 @@ export class GameController {
         //
         new TallGrass(0, 150 + 600, 450, 50),
         new TallGrass(600, 150 + 600, 250, 50),
-        //
-        new TallGrass(0, 200 + 600, 500, 50),
-        new TallGrass(700, 200 + 600, 150, 50),
         // Middle
-        new TallGrass(0, 250 + 600, 600, 50),
-        new TallGrass(800, 250 + 600, 50, 50),
-        //
-        new TallGrass(0, 300 + 600, 550, 50),
-        new TallGrass(800, 300 + 600, 50, 50),
+        new TallGrass(0, 200 + 600, 500, 50),
+        new TallGrass(650, 200 + 600, 200, 50),
+        new TallGrass(0, 250 + 600, 150, 50),
+        new TallGrass(150, 250 + 600, 400, 100),
         // End
-        new TallGrass(0, 300 + 600, 550, 50),
-        new TallGrass(800, 300 + 600, 50, 50),
-        //
-        new TallGrass(0, 350 + 600, 150, 50),
-        new TallGrass(200, 350 + 600, 250, 50),
+        new TallGrass(200, 350 + 600, 300, 50),
         new TallGrass(650, 350 + 600, 200, 50),
         //
-        new TallGrass(250, 400 + 600, 150, 50),
+        new TallGrass(0, 400 + 600, 100, 50),
+        new TallGrass(250, 400 + 600, 200, 50),
+        new TallGrass(600, 400 + 600, 250, 50),
         //
-        new TallGrass(550, 400 + 600, 300, 50),
-        new TallGrass(500, 450 + 600, 350, 50),
+        new TallGrass(0, 450 + 600, 150, 50),
+        new TallGrass(550, 450 + 600, 300, 50),
         //
-        new TallGrass(0, 500 + 600, 250, 50),
-        new TallGrass(400, 500 + 600, 450, 50),
+        new TallGrass(0, 500 + 600, 200, 50),
+        new TallGrass(500, 500 + 600, 350, 50),
+        //
         new TallGrass(0, 550 + 600, 850, 50),
-        //
-        new TallGrass(0, 400 + 600, 100, 100)
+        // Place Holders
+        // A
+        new TallGrass(0, 300 + 600, 100, 100),
+        new TallGrass(100, 300 + 600, 50, 50),
+        // B
+        new TallGrass(650, 250 + 600, 200, 100)
       ],
       rocks: [
         new Rock(300, 50, 50, 50, 'blue', false),
@@ -717,7 +775,7 @@ export class GameController {
         // new ChangeDirectionSquare(600, 200, 50, 50, true, false, true, true, true)
       ],
       reverseTiles: [
-        new ReverseTile(150, 350 + 600, 50, 50, 'blue')
+        new ReverseTile(100, 350 + 600, 50, 50, 'blue')
       ],
       teleporters: [
         new Teleporter(550, 450, 50, 50, '6Teleporter', 2),
@@ -1029,50 +1087,50 @@ export class GameController {
         new Rock(400, 50, 50, 50, 'pink', false)
       ],
       holes: [
-        new Hole(300, 200 + 600, 50, 50, false, 0, 1),
-        new Hole(500, 200 + 600, 50, 50, false, 0, 1),
-        new Hole(600, 400 + 600, 50, 50, true, 0, 0),
+        new Hole(300, 200 + 600, 50, 50, 1),
+        new Hole(500, 200 + 600, 50, 50, 1),
+        new Hole(600, 400 + 600, 50, 50, 0),
         /// Secret Puzzle
         // Access Puzzle
         // Col 1
-        new Hole(850 + 350, 50, 50, 50, false, 0, 2),
-        new Hole(850 + 350, 100, 50, 50, false, 1, 2),
-        new Hole(850 + 350, 150, 50, 50, false, 1, 2),
-        new Hole(850 + 350, 200, 50, 50, false, 1, 2),
-        new Hole(850 + 350, 250, 50, 50, false, 1, 2),
-        new Hole(850 + 350, 300, 50, 50, false, 1, 2),
-        new Hole(850 + 350, 350, 50, 50, false, 1, 2),
+        new Hole(850 + 350, 50, 50, 50, 2),
+        new Hole(850 + 350, 100, 50, 50, 1),
+        new Hole(850 + 350, 150, 50, 50, 1),
+        new Hole(850 + 350, 200, 50, 50, 1),
+        new Hole(850 + 350, 250, 50, 50, 1),
+        new Hole(850 + 350, 300, 50, 50, 1),
+        new Hole(850 + 350, 350, 50, 50, 1),
         // Col 2
-        new Hole(850 + 400, 50, 50, 50, false, 1, 2),
-        new Hole(850 + 400, 100, 50, 50, false, 1, 2),
-        new Hole(850 + 400, 150, 50, 50, false, 1, 2),
-        new Hole(850 + 400, 200, 50, 50, false, 1, 2),
-        new Hole(850 + 400, 250, 50, 50, false, 1, 2),
-        new Hole(850 + 400, 300, 50, 50, false, 1, 2),
-        new Hole(850 + 400, 350, 50, 50, false, 1, 2),
+        new Hole(850 + 400, 50, 50, 50, 1),
+        new Hole(850 + 400, 100, 50, 50, 1),
+        new Hole(850 + 400, 150, 50, 50, 1),
+        new Hole(850 + 400, 200, 50, 50, 1),
+        new Hole(850 + 400, 250, 50, 50, 1),
+        new Hole(850 + 400, 300, 50, 50, 1),
+        new Hole(850 + 400, 350, 50, 50, 1),
         // Col 3
-        new Hole(850 + 450, 50, 50, 50, false, 1, 2),
-        new Hole(850 + 450, 100, 50, 50, false, 1, 2),
-        new Hole(850 + 450, 150, 50, 50, false, 0, 2),
-        new Hole(850 + 450, 200, 50, 50, false, 1, 2),
-        new Hole(850 + 450, 250, 50, 50, false, 1, 2),
-        new Hole(850 + 450, 300, 50, 50, false, 1, 2),
-        new Hole(850 + 450, 350, 50, 50, false, 1, 2),
+        new Hole(850 + 450, 50, 50, 50, 1),
+        new Hole(850 + 450, 100, 50, 50, 1),
+        new Hole(850 + 450, 150, 50, 50, 2),
+        new Hole(850 + 450, 200, 50, 50, 1),
+        new Hole(850 + 450, 250, 50, 50, 1),
+        new Hole(850 + 450, 300, 50, 50, 1),
+        new Hole(850 + 450, 350, 50, 50, 1),
         // Life Jacket Puzzle
-        new Hole(850 + 700, 450, 50, 50, false, 0, 2),
-        new Hole(850 + 650, 450, 50, 50, false, 0, 2),
-        new Hole(850 + 600, 450, 50, 50, false, 0, 1),
+        new Hole(850 + 700, 450, 50, 50, 2),
+        new Hole(850 + 650, 450, 50, 50, 2),
+        new Hole(850 + 600, 450, 50, 50, 1),
         ///
-        new Hole(850 + 650, 400, 50, 50, false, 0, 1),
-        new Hole(850 + 650, 350, 50, 50, false, 0, 1),
-        new Hole(850 + 600, 350, 50, 50, false, 0, 1),
-        new Hole(850 + 550, 350, 50, 50, false, 0, 1),
-        new Hole(850 + 550, 400, 50, 50, false, 0, 1),
+        new Hole(850 + 650, 400, 50, 50, 1),
+        new Hole(850 + 650, 350, 50, 50, 1),
+        new Hole(850 + 600, 350, 50, 50, 1),
+        new Hole(850 + 550, 350, 50, 50, 1),
+        new Hole(850 + 550, 400, 50, 50, 1),
         // Right
-        new Hole(850 + 600, 50, 50, 50, true, 0, 0),
-        new Hole(850 + 600, 100, 50, 50, true, 0, 0),
-        new Hole(850 + 600, 150, 50, 50, true, 0, 0),
-        new Hole(850 + 600, 200, 50, 50, true, 0, 0)
+        new Hole(850 + 600, 50, 50, 50, 0),
+        new Hole(850 + 600, 100, 50, 50, 0),
+        new Hole(850 + 600, 150, 50, 50, 0),
+        new Hole(850 + 600, 200, 50, 50, 0)
       ],
       finishAreas: [
         new FinishArea(400, 0, 50, 50, 0)
@@ -1207,8 +1265,7 @@ export class GameController {
       ],
       holes: [
         // Exit Puzzle Entracne
-        new Hole(150 + 850, 350, 50, 50, false, 1, 2)
-
+        new Hole(150 + 850, 350, 50, 50, 1)
       ],
       finishAreas: [
         new FinishArea(0, 400, 50, 150, 0)
@@ -1493,10 +1550,18 @@ export class GameController {
       ],
       holes: [
         // X=2, Y=2
-        new Hole(400 + 850, 350 + 600, 50, 50, false, 0, 1),
+        new Hole(400 + 850, 350 + 600, 50, 50, 1),
 
         // X=2, Y=1
-        new Hole(200 + 850, 250, 50, 50, false, 0, 1)
+        new Hole(200 + 850, 250, 50, 50, 1)
+      ],
+      grappleWeeds: [
+        new GrappleWeed(100, 150 + 600, 50, 50, 5),
+        new GrappleWeed(50, 250 + 600, 50, 50, 5),
+        new GrappleWeed(50, 300 + 600, 50, 50, 5),
+        new GrappleWeed(100, 400 + 600, 50, 50, 5),
+        new GrappleWeed(350, 450 + 600, 50, 50, 5),
+        new GrappleWeed(350, 500 + 600, 50, 50, 5)
       ],
       finishAreas: [
         new FinishArea(200, 0 + 600, 150, 50, 0),
@@ -1511,9 +1576,9 @@ export class GameController {
       ] */
     // }, 'Level 2A', /* Requirements */ [new Requirement(1, 1 - 1, 1)], 'default', /* Next Level */ [], /* Level Borders */ 2, 1, 2, 2, new Storage([]), /* Area */ 2, /* Time Limit */ 250))
 
-    // World 2 Level 2B
+    /* // World 2 Level 2B
     // this.world2.push(new Level({
-    /* players: [
+    players: [
         new Player(250, 300 + 600, 50, 50),
         new Player(300, 300 + 600, 50, 50)
       ] */
@@ -1615,6 +1680,297 @@ export class GameController {
       ]
     }, 'Special 1', /* Requirements */ [new Requirement(0, 3 - 1, 1)], 'default', /* Next Level */ [new NextLevel(2, 2 - 1)], /* Level Borders */ 1, 1, 1, 3, new Storage([]), /* Area */ 1, /* Time Limit */ 200))
 
+    // Level 1 + 5 + 6 + 7
+    this.specialLevels.push(new Level({
+      players: [
+        new Player(400 + 850 * 2, 550 + 600, 50, 50)
+      ],
+      cubers: [
+        new Cuber(700 + 850 * 2, 400 + 600, 50, 50, [true, false, false, false], 10),
+        new Cuber(100 + 850 * 2, 150 + 600, 50, 50, [false, true, false, false], 10),
+
+        // X=3 Y=1
+        new Cuber(250 + 850 * 2, 50, 50, 50, [false, true, false, false], 5),
+        ///
+        new Cuber(150 + 850 * 3, 275, 50, 50, [false, false, false, true], 6),
+        new Cuber(200 + 850 * 3, 275, 50, 50, [false, false, true, false], 6),
+
+        // X=2 Y=1
+        new Cuber(700 + 850, 50, 50, 50, [false, false, false, true], 5),
+        new Cuber(450 + 850, 500, 50, 50, [false, false, true, false], 5),
+        new Cuber(250 + 850, 50, 50, 50, [false, false, false, true], 5),
+        new Cuber(50 + 850, 500, 50, 50, [false, false, true, false], 5),
+
+        // X=2 Y=2
+        new Cuber(550 + 850, 150 + 600, 50, 50, [false, false, false, true], 6),
+        new Cuber(200 + 850, 450 + 600, 50, 50, [false, true, false, false], 8.2),
+
+        // X=1 Y=1
+        new Cuber(500, 500, 50, 50, [true, false, false, false], 3.5)
+      ],
+      walls: [
+        // X=3 Y=2
+        /// Left Wall
+        new TallGrass(0 + 850 * 2, 0 + 600, 50, 200),
+        new TallGrass(0 + 850 * 2, 400 + 600, 50, 200),
+        //
+        new TallGrass(50 + 850 * 2, 100 + 600, 50, 150),
+        new TallGrass(50 + 850 * 2, 350 + 600, 50, 150),
+        //
+        new TallGrass(50 + 850 * 2, 250 + 600, 50, 100),
+        new TallGrass(0 + 850 * 2, 200 + 600, 50, 200),
+        /// Right Wall
+        new TallGrass(800 + 850 * 2, 0 + 600, 50, 200),
+        new TallGrass(800 + 850 * 2, 400 + 600, 50, 200),
+        //
+        new TallGrass(750 + 850 * 2, 100 + 600, 50, 150),
+        new TallGrass(750 + 850 * 2, 350 + 600, 50, 150),
+        ///
+        new TallGrass(750 + 850 * 2, 250 + 600, 50, 100),
+        new TallGrass(800 + 850 * 2, 200 + 600, 50, 200),
+        /// Top Wall
+        new TallGrass(50 + 850 * 2, 0 + 600, 300, 50),
+        new TallGrass(500 + 850 * 2, 0 + 600, 300, 50),
+        //
+        new TallGrass(50 + 850 * 2, 50 + 600, 350, 50),
+        new TallGrass(450 + 850 * 2, 50 + 600, 350, 50),
+        /// Bottom Wall
+        new TallGrass(50 + 850 * 2, 550 + 600, 300, 50),
+        new TallGrass(500 + 850 * 2, 550 + 600, 300, 50),
+        //
+        new TallGrass(50 + 850 * 2, 500 + 600, 350, 50),
+        new TallGrass(450 + 850 * 2, 500 + 600, 350, 50),
+
+        // X=3 Y=1
+        // Top Borders
+        new TallGrass(0 + 850 * 2, 0, 700, 50),
+        // Bottom Borders
+        new TallGrass(0 + 850 * 2, 550, 350, 50),
+        new TallGrass(500 + 850 * 2, 550, 200, 50),
+        // Left Borders
+        new TallGrass(0 + 850 * 2, 50, 100, 150),
+        new TallGrass(0 + 850 * 2, 200, 50, 50),
+        new TallGrass(0 + 850 * 2, 350, 50, 50),
+        new TallGrass(0 + 850 * 2, 400, 100, 150),
+        // Left Box Area
+        new TallGrass(150 + 850 * 2, 100, 50, 150),
+        new TallGrass(200 + 850 * 2, 100, 50, 400),
+        new TallGrass(150 + 850 * 2, 350, 50, 150),
+        ///
+        new TallGrass(250 + 850 * 2, 150, 50, 50),
+        new FakeTallGrass(250 + 850 * 2, 400, 50, 50),
+        new TallGrass(300 + 850 * 2, 400, 100, 150),
+        // Middle Box Area
+        new TallGrass(300 + 850 * 2, 50, 400, 150),
+        ///
+        new TallGrass(600 + 850 * 2, 200, 100, 50),
+        new TallGrass(600 + 850 * 2, 350, 100, 50),
+        ///
+        //
+        new FakeTallGrass(600 + 850 * 2, 250, 100, 100),
+        new TallGrass(450 + 850 * 2, 400, 250, 150),
+        // Right Borders
+        new TallGrass(700 + 850 * 2, 0, 400, 100),
+        new TallGrass(800 + 850 * 2, 200, 200, 200),
+        new TallGrass(700 + 850 * 2, 500, 400, 100),
+
+        // X=4 Y=1
+        new TallGrass(250 + 850 * 3, 0, 100, 250),
+        new TallGrass(250 + 850 * 3, 350, 100, 250),
+        new TallGrass(350 + 850 * 3, 0, 50, 600),
+        ///
+        new TallGrass(400 + 850 * 3, 350, 450, 50),
+        new TallGrass(400 + 850 * 3, 400, 50, 50),
+        new TallGrass(500 + 850 * 3, 400, 50, 50),
+        new TallGrass(550 + 850 * 3, 400, 300, 200),
+        ///
+        new TallGrass(400 + 850 * 3, 0, 450, 400),
+
+        // X=2, Y=1
+        // Top Border
+        new TallGrass(0 + 850, 0, 850, 50),
+        // Bottom Border
+        new TallGrass(0 + 850, 550, 350, 150),
+        new TallGrass(400 + 850, 550, 450, 100),
+        // Left Border
+        new TallGrass(750 + 850, 50, 100, 200),
+        new TallGrass(750 + 850, 350, 100, 200),
+        // Left Border
+        new TallGrass(0 + 850, 50, 50, 200),
+        new TallGrass(0 + 850, 350, 50, 200),
+        // First Segment
+        new TallGrass(650 + 850, 50, 50, 100),
+        new TallGrass(650 + 850, 200, 50, 300),
+        // Second Segment
+        new TallGrass(550 + 850, 350, 50, 100),
+        new TallGrass(550 + 850, 500, 50, 50),
+        new TallGrass(550 + 850, 100, 50, 250),
+        new TallGrass(600 + 850, 300, 50, 50),
+        new TallGrass(500 + 850, 100, 50, 450),
+        // Third Segment
+        new TallGrass(400 + 850, 50, 50, 250),
+        new TallGrass(400 + 850, 350, 50, 200),
+        // Fourth Segment
+        new TallGrass(300 + 850, 100, 50, 450),
+        new TallGrass(350 + 850, 250, 50, 50),
+        // Upper Fifth Segment
+        new TallGrass(200 + 850, 50, 50, 150),
+        new TallGrass(100 + 850, 100, 50, 150),
+        // Lower Fifth Segment
+        new TallGrass(100 + 850, 250, 150, 150),
+        new TallGrass(100 + 850, 450, 150, 100),
+
+        /// X=2, Y=2
+        new TallGrass(500 + 850, 50 + 600, 350, 50),
+        // Begining
+        new TallGrass(0 + 850, 100 + 600, 400, 50),
+        new TallGrass(550 + 850, 100 + 600, 300, 50),
+        //
+        new TallGrass(0 + 850, 150 + 600, 450, 50),
+        new TallGrass(600 + 850, 150 + 600, 250, 50),
+        // Middle
+        new TallGrass(0 + 850, 200 + 600, 500, 50),
+        new TallGrass(650 + 850, 200 + 600, 200, 50),
+        new TallGrass(0 + 850, 250 + 600, 150, 50),
+        new TallGrass(150 + 850, 250 + 600, 400, 100),
+        // End
+        new TallGrass(200 + 850, 350 + 600, 300, 50),
+        new TallGrass(650 + 850, 350 + 600, 200, 50),
+        //
+        new TallGrass(0 + 850, 400 + 600, 100, 50),
+        new TallGrass(250 + 850, 400 + 600, 200, 50),
+        new TallGrass(600 + 850, 400 + 600, 250, 50),
+        //
+        new TallGrass(0 + 850, 450 + 600, 150, 50),
+        new TallGrass(550 + 850, 450 + 600, 300, 50),
+        //
+        new TallGrass(0 + 850, 500 + 600, 200, 50),
+        new TallGrass(500 + 850, 500 + 600, 350, 50),
+        //
+        new TallGrass(0 + 850, 550 + 600, 850, 50),
+        // Place Holders
+        // A
+        new TallGrass(0 + 850, 300 + 600, 100, 100),
+        new TallGrass(100 + 850, 300 + 600, 50, 50),
+        // B
+        new TallGrass(650 + 850, 250 + 600, 200, 100),
+
+        // X=1 Y=1
+        // Top and Bottom
+        new TallGrass(0, 0, 850, 50),
+        new TallGrass(0, 550, 850, 50),
+        // Left and Right
+        new TallGrass(0, 50, 50, 550),
+        new TallGrass(800, 50, 50, 200),
+        new TallGrass(800, 350, 50, 200),
+        ///
+        new TallGrass(750, 50, 50, 50),
+        new TallGrass(750, 500, 50, 50),
+        ///
+        new TallGrass(650, 50, 50, 100),
+        new TallGrass(650, 450, 50, 100),
+        ///
+        new TallGrass(700, 50, 50, 200),
+        new TallGrass(700, 350, 50, 200),
+        ///
+        new TallGrass(600, 50, 50, 550),
+        ///
+        new TallGrass(50, 50, 50, 250),
+        new TallGrass(50, 350, 50, 200),
+        ///
+        new TallGrass(100, 50, 50, 250),
+        ///
+        new TallGrass(150, 50, 50, 450),
+        ///
+        new TallGrass(200, 50, 50, 250),
+        new TallGrass(250, 350, 50, 200),
+        ///
+        new TallGrass(300, 150, 50, 400),
+        ///
+        new TallGrass(350, 150, 200, 50),
+        new TallGrass(300, 100, 250, 50),
+        ///
+        new TallGrass(400, 250, 200, 250),
+        ///
+        new TallGrass(550, 500, 50, 50)
+      ],
+      rocks: [
+        new Rock(50 + 850 * 2, 200, 50, 50, 'blue', false),
+        new Rock(50 + 850 * 2, 250, 50, 50, 'blue', false),
+        new Rock(50 + 850 * 2, 300, 50, 50, 'blue', false),
+        new Rock(50 + 850 * 2, 350, 50, 50, 'blue', false),
+        //
+        new Rock(0 + 850 * 2, 250, 50, 50, 'blue', false),
+        new Rock(0 + 850 * 2, 300, 50, 50, 'blue', false),
+
+        // X=2 Y=1
+        new Rock(800 + 850, 250, 50, 50, 'blue', false),
+        new Rock(800 + 850, 300, 50, 50, 'blue', false),
+        ///
+        new Rock(300 + 850, 50, 50, 50, 'blue', true),
+        new Rock(650 + 850, 500, 50, 50, 'blue', true),
+
+        // X=1 Y=1
+        new Rock(450, 500, 50, 50, 'pink', false),
+        ///
+        new Rock(700, 300, 50, 50, 'pink', false),
+        new Rock(700, 250, 50, 50, 'pink', false)
+      ],
+      changeDirectionSquares: [
+        new ChangeDirectionSquare(100 + 850 * 2, 50, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(100 + 850 * 2, 500, 50, 50, false, true, true, false, true),
+        new ChangeDirectionSquare(250 + 850 * 2, 500, 50, 50, true, false, true, false, true),
+        ///
+        new ChangeDirectionSquare(750 + 850 * 2, 400, 50, 50, false, true, true, false, true),
+        new ChangeDirectionSquare(700 + 850 * 2, 450, 50, 50, false, true, true, false, true),
+        //
+        new ChangeDirectionSquare(750 + 850 * 2, 150, 50, 50, false, true, false, true, true),
+        new ChangeDirectionSquare(700 + 850 * 2, 100, 50, 50, false, true, false, true, true),
+        //
+        new ChangeDirectionSquare(150 + 850 * 3, 400, 50, 50, true, false, true, false, true),
+        new ChangeDirectionSquare(200 + 850 * 3, 450, 50, 50, true, false, true, false, true),
+        //
+        new ChangeDirectionSquare(200 + 850 * 3, 100, 50, 50, true, false, false, true, true),
+        new ChangeDirectionSquare(150 + 850 * 3, 150, 50, 50, true, false, false, true, true),
+
+        // X=1 Y=1
+        // Right Side
+        new ChangeDirectionSquare(350, 500, 50, 50, false, true, true, false, true),
+        ///
+        new ChangeDirectionSquare(350, 200, 50, 50, false, true, false, true, true),
+        ///
+        new ChangeDirectionSquare(550, 200, 50, 50, true, false, true, false, true),
+        ///
+        new ChangeDirectionSquare(550, 50, 50, 50, true, false, false, true, true),
+        // Left Side
+        new ChangeDirectionSquare(250, 50, 50, 50, false, true, false, true, true),
+        ///
+        new ChangeDirectionSquare(250, 300, 50, 50, true, false, true, false, true),
+        ///
+        new ChangeDirectionSquare(200, 300, 50, 50, false, true, false, true, true),
+        ///
+        new ChangeDirectionSquare(200, 500, 50, 50, true, false, true, false, true),
+        ///
+        new ChangeDirectionSquare(100, 500, 50, 50, false, true, true, false, true)
+      ],
+      reverseTiles: [
+        new ReverseTile(250 + 850 * 2, 100, 50, 50, 'blue'),
+        // new ReverseTile(300 + 850 * 3, 275, 50, 50, 'pink'),
+        new ReverseTile(100 + 850, 350 + 600, 50, 50, 'blue'),
+        new ReverseTile(350, 500, 50, 50, 'pink')
+
+      ],
+      teleporters: [
+        new Teleporter(550 + 850, 450, 50, 50, 'SpecialB-P', 2),
+        new Teleporter(350 + 850, 200, 50, 50, 'SpecialB-P', 2),
+        new Teleporter(750, 450, 50, 50, 'SpecialB-R', 1),
+        new Teleporter(50, 300, 50, 50, 'SpecialB-R', 1)
+      ],
+      finishAreas: [
+        new FinishArea(650, 150, 50, 300, 0)
+      ]
+    }, 'Special 2', /* Requirements */ [new Requirement(0, 7 - 1, 1), new Requirement(2, 1 - 1, 1)], function (req) { if (req[0] && req[1]) { return true } else { return false } }, /* Next Level */ [new NextLevel(2, 3 - 1)], /* Level Borders */ 3, 1, 4, 2, new Storage([]), /* Area */ 1, /* Time Limit */ 250))
+
     // Level 10 + 11
     this.specialLevels.push(new Level({
       players: [
@@ -1628,10 +1984,10 @@ export class GameController {
         new Cuber(200 + 2550, 300 + 600, 50, 50, [false, true, false, false], 8, 1000)
       ],
       expanders: [
-        new Expander(455 + 850, 305 + 600, /* startLength */40, 90, /* endLength */140, 190, /* speed */ 1, 1, /* waitTime */750),
-        new Expander(205 + 850, 255 + 600, /* startLength */40, 40, /* endLength */140, 140, /* speed */ 1, 1, /* waitTime */1000),
-        new Expander(505, 405 + 600, /* startLength */90, 40, /* endLength */180, 140, /* speed */ 1, 1, /* waitTime */1000),
-        new Expander(305, 55 + 600, /* startLength */40, 40, /* endLength */140, 140, /* speed */ 4, 4, /* waitTime */1500)
+        new Expander(455 + 850, 305 + 600, /* startLength */40, 90, /* endLength */140, 190, /* direction */ 'growing', /* speed */ 1, 1, /* waitTime */750),
+        new Expander(205 + 850, 255 + 600, /* startLength */40, 40, /* endLength */140, 140, /* direction */ 'growing', /* speed */ 1, 1, /* waitTime */1000),
+        new Expander(505, 405 + 600, /* startLength */90, 40, /* endLength */180, 140, /* direction */ 'growing', /* speed */ 1, 1, /* waitTime */1000),
+        new Expander(305, 55 + 600, /* startLength */40, 40, /* endLength */140, 140, /* direction */ 'growing', /* speed */ 4, 4, /* waitTime */1500)
       ],
       walls: [
         /// Level 10
@@ -1815,7 +2171,7 @@ export class GameController {
       ],
       holes: [
         // Exit Puzzle Entracne
-        new Hole(150 + 2550, 350 + 600, 50, 50, false, 1, 2)
+        new Hole(150 + 2550, 350 + 600, 50, 50, 1)
 
       ],
       finishAreas: [
@@ -1831,7 +2187,7 @@ export class GameController {
         new Teleporter(100 + 1700, 300 + 600, 'Special2Teleporter', 50, 50, 1),
         new Teleporter(550 + 2550, 100 + 600, 'Special2Teleporter', 50, 50, 1)
       ]
-    }, 'Special 2', /* Requirements */ [new Requirement(0, 11 - 1, 1), new Requirement(2, 1 - 1, 1)], function (req) { if (req[0] && req[1]) { return true } else { return false } }, /* Next Level */ [], /* Level Borders */ 3, 2, 4, 2, new Storage([]), /* Area */ 1, /* Time Limit */ 250))
+    }, 'Special 3', /* Requirements */ [new Requirement(0, 11 - 1, 1), new Requirement(2, 2 - 1, 1)], function (req) { if (req[0] && req[1]) { return true } else { return false } }, /* Next Level */ [], /* Level Borders */ 3, 2, 4, 2, new Storage([]), /* Area */ 1, /* Time Limit */ 250))
   }
 }
 

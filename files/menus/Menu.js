@@ -56,7 +56,7 @@ class Menu {
     menuItem.action()
   }
 
-  Keydown (event, keybindArray, stopEvents) {
+  Keydown (event, keybindArray) {
     // Left "Menus"
     if (keybindArray[0/* left */].keybindA === event.key || keybindArray[0/* left */].keybindB === event.key) { this.moveLeft() }
 
@@ -72,7 +72,6 @@ class Menu {
     // Selected "Menus"
     if (keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) {
       this.selected()
-      if (gameStates.keybindController.seletingKeybind) { stopEvents.stopMouseUp = true }
     }
   }
 
@@ -151,7 +150,7 @@ export class MenuController {
       }),
       new MenuItem('Adventure Log', 1, 3, 'rgb(0, 67, 190)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
-        gameStates.currentGameMode = gameMode.ItemsInfo
+        gameStates.currentGameMode = gameMode.AdventureLog
       }),
       new MenuItem('Settings', 1, 4, 'rgb(0, 0, 139)', function () {
         gameStates.currentStartingMenusState = startingMenusStates.Selected
@@ -163,61 +162,84 @@ export class MenuController {
     ], /* itemWidth */1, /* itemHeight */4, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */85))
 
     this.menus.push(this.ShopMenu = new Menu([
-      new MenuItem('Player', 1, 1, 'lightcoral', function () {
+      new MenuItem('Player', 1, 1, 'rgb(240, 128, 128)', function () {
         gameStates.currentShopState = shopStates.Player
       }),
       new MenuItem('Theme Colour', 1, 2, 'rgb(240, 160, 40)', function () {
         gameStates.currentShopState = shopStates.ThemeColour
       }),
-      new MenuItem('Background', 1, 3, 'gold', function () {
+      new MenuItem('Background', 1, 3, 'rgb(255, 215, 0)', function () {
         gameStates.currentShopState = shopStates.Background
       })
     ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */105))
 
-    this.menus.push(this.KeybindsSelector = new Menu([
-      new MenuItem('ArrowLeft', 1, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.startRebind('A', 1, this) }),
-      new MenuItem('ArrowRight', 1, 2, 'rgb(183, 0, 158)', function () { gameStates.keybindController.startRebind('A', 2, this) }),
-      new MenuItem('ArrowUp', 1, 3, 'rgb(195, 0, 144)', function () { gameStates.keybindController.startRebind('A', 3, this) }),
-      new MenuItem('ArrowDown', 1, 4, 'rgb(207, 0, 130)', function () { gameStates.keybindController.startRebind('A', 4, this) }),
+    this.menus.push(this.KeybindSelector = new Menu([
+      new MenuItem('ArrowLeft', 1, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('A', 1, this) }),
+      new MenuItem('ArrowRight', 1, 2, 'rgb(183, 0, 158)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('A', 2, this) }),
+      new MenuItem('ArrowUp', 1, 3, 'rgb(195, 0, 144)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('A', 3, this) }),
+      new MenuItem('ArrowDown', 1, 4, 'rgb(207, 0, 130)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('A', 4, this) }),
       ///
-      new MenuItem('Space', 1, 5, 'rgb(219, 0, 116)', function () { gameStates.keybindController.startRebind('A', 5, this) }),
-      new MenuItem('Backspace', 1, 6, 'rgb(231, 0, 102)', function () { gameStates.keybindController.startRebind('A', 6, this) }),
-      new MenuItem('Column 1', 1, 7, 'rgb(255, 0, 75)', function () { gameStates.keybindController.resetKeybinds('A') }),
+      new MenuItem('Space', 1, 5, 'rgb(219, 0, 116)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('A', 5, this) }),
+      new MenuItem('Backspace', 1, 6, 'rgb(231, 0, 102)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('A', 6, this) }),
+      new MenuItem('Column 1', 1, 7, 'rgb(255, 0, 75)', function () { gameStates.keybindController.keybindSelectors[0].resetKeybinds('A') }),
       ///
       ///
-      new MenuItem('a', 2, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.startRebind('B', 1, this) }),
-      new MenuItem('d', 2, 2, 'rgb(183, 0, 158)', function () { gameStates.keybindController.startRebind('B', 2, this) }),
-      new MenuItem('w', 2, 3, 'rgb(195, 0, 144)', function () { gameStates.keybindController.startRebind('B', 3, this) }),
-      new MenuItem('s', 2, 4, 'rgb(207, 0, 130)', function () { gameStates.keybindController.startRebind('B', 4, this) }),
+      new MenuItem('a', 2, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('B', 1, this) }),
+      new MenuItem('d', 2, 2, 'rgb(183, 0, 158)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('B', 2, this) }),
+      new MenuItem('w', 2, 3, 'rgb(195, 0, 144)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('B', 3, this) }),
+      new MenuItem('s', 2, 4, 'rgb(207, 0, 130)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('B', 4, this) }),
       ///
-      new MenuItem('Enter', 2, 5, 'rgb(219, 0, 116)', function () { gameStates.keybindController.startRebind('B', 5, this) }),
-      new MenuItem('b', 2, 6, 'rgb(231, 0, 102)', function () { gameStates.keybindController.startRebind('B', 6, this) }),
-      new MenuItem('Column 2', 2, 7, 'rgb(255, 0, 75)', function () { gameStates.keybindController.resetKeybinds('B') })
+      new MenuItem('Enter', 2, 5, 'rgb(219, 0, 116)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('B', 5, this) }),
+      new MenuItem('b', 2, 6, 'rgb(231, 0, 102)', function () { gameStates.keybindController.keybindSelectors[0].startRebind('B', 6, this) }),
+      new MenuItem('Column 2', 2, 7, 'rgb(255, 0, 75)', function () { gameStates.keybindController.keybindSelectors[0].resetKeybinds('B') })
     ], /* itemWidth */2, /* itemHeight */7, /* x */290, /* y */0, /* width */510, /* height */600, /* fontSize */40))
+
+    this.menus.push(this.SpecialKeybindSelector = new Menu([
+      new MenuItem('p', 1, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.keybindSelectors[1].startRebind('A', 1, this) }),
+      new MenuItem('Column 1', 1, 2, 'rgb(255, 0, 75)', function () { gameStates.keybindController.keybindSelectors[1].resetKeybinds('A') }),
+      ///
+      new MenuItem('P', 2, 1, 'rgb(172, 0, 172)', function () { gameStates.keybindController.keybindSelectors[1].startRebind('B', 1, this) }),
+      new MenuItem('Column 2', 2, 2, 'rgb(255, 0, 75)', function () { gameStates.keybindController.keybindSelectors[1].resetKeybinds('B') })
+    ], /* itemWidth */2, /* itemHeight */2, /* x */300, /* y */0, /* width */500, /* height */300, /* fontSize */50))
 
     this.menus.push(this.SettingsMenu = new Menu([
       new MenuItem('Keybinds', 1, 1, 'rgb(230, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Keybinds, 'Settings')
       }),
-      /* new MenuItem('Mobile', 1, 2, 'rgb(182, 200, 0)', function () {
-        gameStates.SetGameState(settingStates.Mobile, 'Settings')
-      }), */
-      new MenuItem('Saving', 1, 2, 'rgb(135, 200, 0)', function () {
+      new MenuItem('Special Keybinds', 1, 2, 'rgb(182, 200, 0)', function () {
+        gameStates.SetGameState(settingStates.SpecialKeybinds, 'Settings')
+      }),
+      new MenuItem('Mobile(Comming Soon)', 1, 3, 'rgb(135, 200, 0)', function () {
+        // gameStates.SetGameState(settingStates.Mobile, 'Settings')
+      }),
+      new MenuItem('Saving', 1, 4, 'rgb(0, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Saving, 'Settings')
       })
       /* new MenuItem('Sound', 1, 4, 'rgb(0, 200, 0)', function () {
         gameStates.SetGameState(settingStates.Sound, 'Settings')
       }) */
-    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */95))
+    ], /* itemWidth */1, /* itemHeight */4, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */75))
+
+    this.menus.push(this.MobileMenu = new Menu([
+      new MenuItem('Mobile', 1, 1, 'blue', function () {
+        dataManagement.autoSave = !dataManagement.autoSave
+      }),
+      new MenuItem('Style', 1, 2, 'purple', function () {
+        dataManagement.Save(true)
+      })
+    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */105))
 
     this.menus.push(this.SavingMenu = new Menu([
       new MenuItem('Auto Save', 1, 1, 'limeGreen', function () {
         dataManagement.autoSave = !dataManagement.autoSave
       }),
-      new MenuItem('Save Game', 1, 2, 'rgb(40, 200, 150)', function () {
+      new MenuItem('Save Game', 1, 2, 'rgb(20, 205, 135)', function () {
         dataManagement.Save(true)
+      }),
+      new MenuItem('Erase Save Data', 1, 3, 'rgb(40, 210, 210)', function () {
+        dataManagement.Reset()
       })
-    ], /* itemWidth */1, /* itemHeight */2, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */115))
+    ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */105))
 
     this.menus.push(this.SoundMenu = new Menu([
       new MenuItem('Music', 1, 1, 'limeGreen', function () {
@@ -247,7 +269,7 @@ export class MenuController {
         gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
         gameStates.currentGameMode = gameMode.Unselected
-        gameStates.currentLevelIndex = 0
+        gameStates.levelSelector.levelIndex = 0
         gameStates.lossScreen.loseLevel = false
       })
     ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */175, /* width */850, /* height */425, /* fontSize */90))
@@ -266,18 +288,14 @@ export class MenuController {
         gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
         gameStates.currentStartingMenusState = startingMenusStates.Menu
         gameStates.currentGameMode = gameMode.Unselected
-        gameStates.currentLevelIndex = 0
+        gameStates.levelSelector.levelIndex = 0
         gameStates.winScreen.winLevel = false
       })
     ], /* itemWidth */1, /* itemHeight */3, /* x */0, /* y */150, /* width */850, /* height */450, /* fontSize */100))
 
     this.menus.push(this.PauseMenu = new Menu([
       new MenuItem('Resume', 1, 1, 'rgb(255, 0, 86)', function () {
-        gameStates.CurrentLevel().resumeLevelTime()
-        gameStates.SetGameState(storyModeStates.Playing, 'StoryMode')
-        gameStates.CurrentLevel().cubers.forEach(function (cuber) {
-          cuber.setTimer()
-        })
+        gameStates.CurrentLevel().resume()
       }),
       new MenuItem('Retry', 1, 2, 'rgb(255, 85, 20)', function () {
         gameStates.CurrentLevel().restart()
@@ -292,7 +310,7 @@ export class MenuController {
         gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
         gameStates.currentGameMode = gameMode.Unselected
         gameStates.currentStartingMenusState = startingMenusStates.Menu
-        gameStates.currentLevelIndex = 0
+        gameStates.levelSelector.levelIndex = 0
       })
     ], /* itemWidth */1, /* itemHeight */4, /* x */0, /* y */0, /* width */850, /* height */600, /* fontSize */90))
   }
@@ -305,21 +323,24 @@ export class MenuController {
       if (gameStates.currentShopState === shopStates.Menu && gameStates.currentGameMode === gameMode.Shop) { return 1 }
       ///
       if (gameStates.currentGameMode === gameMode.Settings) {
-        if (gameStates.currentSettingState === settingStates.Keybinds && !gameStates.keybindController.seletingKeybind) { return 2 }
+        if (gameStates.currentSettingState === settingStates.Keybinds && !gameStates.CurrentKeybind().selectingKeybind) { return 2 }
+        if (gameStates.currentSettingState === settingStates.SpecialKeybinds && !gameStates.CurrentKeybind().selectingKeybind) { return 3 }
         ///
-        if (gameStates.currentSettingState === settingStates.Selecting) { return 3 }
+        if (gameStates.currentSettingState === settingStates.Selecting) { return 4 }
 
-        if (gameStates.currentSettingState === settingStates.Saving) { return 4 }
+        if (gameStates.currentSettingState === settingStates.Mobile) { return 5 }
 
-        if (gameStates.currentSettingState === settingStates.Sound) { return 5 }
+        if (gameStates.currentSettingState === settingStates.Saving) { return 6 }
+
+        if (gameStates.currentSettingState === settingStates.Sound) { return 7 }
       }
       ///
       if (gameStates.currentGameMode === gameMode.StoryMode) {
-        if (gameStates.currentStoryModeState === storyModeStates.Lost) { return 6 }
+        if (gameStates.currentStoryModeState === storyModeStates.Lost) { return 8 }
         ///
-        if (gameStates.currentStoryModeState === storyModeStates.WonStage) { return 7 }
+        if (gameStates.currentStoryModeState === storyModeStates.WonStage) { return 9 }
         ///
-        if (gameStates.currentStoryModeState === storyModeStates.Paused) { return 8 }
+        if (gameStates.currentStoryModeState === storyModeStates.Paused) { return 10 }
       }
     }
   }

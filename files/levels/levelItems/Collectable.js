@@ -1,6 +1,7 @@
-const { images } = require('../drawing/Images')
-const { draw } = require('../drawing/Draw')
-const { gameStates, BackgroundStyles } = require('../data/GameData')
+'use strict'
+const { images } = require('../../drawing/Images')
+const { draw } = require('../../drawing/Draw')
+const { gameStates, BackgroundStyles } = require('../../data/GameData')
 const { GameObject } = require('./Class')
 export class Item extends GameObject {
   constructor (x, y, width, height, type, collected) {

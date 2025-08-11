@@ -9,7 +9,7 @@ export const gameMode = {
   Unselected: 0,
   StoryMode: 1,
   Shop: 2,
-  ItemsInfo: 3,
+  AdventureLog: 3,
   Settings: 4
 }
 
@@ -45,9 +45,10 @@ export const cubeStyle = {
 export const settingStates = {
   Selecting: 1,
   Keybinds: 2,
-  Mobile: 3,
-  Saving: 4,
-  Sound: 5
+  SpecialKeybinds: 3,
+  Mobile: 4,
+  Saving: 5,
+  Sound: 6
 }
 
 export const gameStates = {
@@ -59,7 +60,6 @@ export const gameStates = {
   currentBackgroundStyle: BackgroundStyles.Classic,
   currentCubeStyle: cubeStyle.BlueCube,
   currentThemeColour: 'lightgray',
-  currentLevelIndex: 0,
   delta: 1,
   debug: false,
   pausedDate: undefined,
@@ -68,11 +68,21 @@ export const gameStates = {
   loading: true,
   stopTime: false,
   CurrentLevel: function () {
-    return gameStates.worldSelector.currentWorld.levels[gameStates.currentLevelIndex]
+    return gameStates.worldSelector.currentWorld.levels[gameStates.levelSelector.levelIndex]
   },
 
   FindLevel: function (world, level) {
     return gameStates.gameController.worlds[world].levels[level]
+  },
+
+  CurrentKeybind: function () {
+    if (this.currentSettingState === settingStates.Keybinds) {
+      return this.keybindController.keybindSelectors[0]
+    }
+
+    if (this.currentSettingState === settingStates.SpecialKeybinds) {
+      return this.keybindController.keybindSelectors[1]
+    }
   },
 
   SetGameState: function (gameState, type) {
@@ -123,71 +133,87 @@ export const dataManagement = {
       window.localStorage.setItem('StyleCube', gameStates.currentCubeStyle)
       window.localStorage.setItem('backgroundStyle', gameStates.currentBackgroundStyle)
       window.localStorage.setItem('currentThemeColourSelection', gameStates.arrayChartController.arrayCharts[1].currentSelection)
-      window.localStorage.setItem('keybindArray', JSON.stringify(gameStates.keybindController.keybinds))
+      window.localStorage.setItem('basicKeybinds', JSON.stringify(gameStates.keybindController.keybindSelectors[0].keybinds))
+      window.localStorage.setItem('specialKeybinds', JSON.stringify(gameStates.keybindController.keybindSelectors[1].keybinds))
+      window.localStorage.setItem('version', JSON.stringify(1.0))
     }
   },
 
   Load: function () {
-    if (window.localStorage.getItem('autoSave') !== null) {
-      this.autoSave = JSON.parse(window.localStorage.getItem('autoSave'))
-    }
+    if (window.localStorage.getItem('version') !== null) {
+      if (window.localStorage.getItem('autoSave') !== null) {
+        this.autoSave = JSON.parse(window.localStorage.getItem('autoSave'))
+      }
 
-    if (window.localStorage.getItem('levelsCompleted') !== null) {
-      const completedLevels = JSON.parse(window.localStorage.getItem('levelsCompleted'))
+      if (window.localStorage.getItem('levelsCompleted') !== null) {
+        const completedLevels = JSON.parse(window.localStorage.getItem('levelsCompleted'))
 
-      for (let w = 0; w < gameStates.gameController.worlds.length; w++) {
-        for (let l = 0; l < gameStates.gameController.worlds[w].levels.length; l++) {
-          const currentLevelLoading = gameStates.gameController.worlds[w].levels[l]
-          for (let e = 0; e < currentLevelLoading.exitsCompleted.length; e++) {
-            currentLevelLoading.exitsCompleted[e] = completedLevels[w][l][e]
+        for (let w = 0; w < gameStates.gameController.worlds.length; w++) {
+          for (let l = 0; l < gameStates.gameController.worlds[w].levels.length; l++) {
+            const currentLevelLoading = gameStates.gameController.worlds[w].levels[l]
+            for (let e = 0; e < currentLevelLoading.exitsCompleted.length; e++) {
+              currentLevelLoading.exitsCompleted[e] = completedLevels[w][l][e]
+            }
           }
         }
       }
-    }
 
-    if (window.localStorage.getItem('highestLevelLock') !== null) {
-      const highestLevelLock = JSON.parse(window.localStorage.getItem('highestLevelLock'))
-      drawUpdate.highestLevelLock = highestLevelLock
-    }
-
-    if (window.localStorage.getItem('PlayerSadLock') !== null) {
-      const SadLock = JSON.parse(window.localStorage.getItem('PlayerSadLock'))
-      drawUpdate.blueCubeSadLock = SadLock
-    }
-
-    if (window.localStorage.getItem('PlayerAlienLock') !== null) {
-      const AlienLock = JSON.parse(window.localStorage.getItem('PlayerAlienLock'))
-      drawUpdate.blueCubeAlienLock = AlienLock
-      if (!drawUpdate.blueCubeAlienLock) {
-        gameStates.gameController.world1[8].items.splice(1, 1)
+      if (window.localStorage.getItem('highestLevelLock') !== null) {
+        const highestLevelLock = JSON.parse(window.localStorage.getItem('highestLevelLock'))
+        drawUpdate.highestLevelLock = highestLevelLock
       }
-    }
 
-    const BackgroundStyle = Number(window.localStorage.getItem('backgroundStyle'))
-    if (BackgroundStyle !== null) {
-      gameStates.currentBackgroundStyle = BackgroundStyle
-      gameStates.arrayChartController.arrayCharts[2].currentSelection = BackgroundStyle
-    }
+      if (window.localStorage.getItem('PlayerSadLock') !== null) {
+        const SadLock = JSON.parse(window.localStorage.getItem('PlayerSadLock'))
+        drawUpdate.blueCubeSadLock = SadLock
+      }
 
-    const StyleCube = Number(window.localStorage.getItem('StyleCube'))
-    if (StyleCube !== null) {
-      gameStates.currentCubeStyle = StyleCube
-      gameStates.arrayChartController.arrayCharts[0].currentSelection = StyleCube
-    }
+      if (window.localStorage.getItem('PlayerAlienLock') !== null) {
+        const AlienLock = JSON.parse(window.localStorage.getItem('PlayerAlienLock'))
+        drawUpdate.blueCubeAlienLock = AlienLock
+        if (!drawUpdate.blueCubeAlienLock) {
+          gameStates.FindLevel(0, 8).items.splice(1, 1)
+        }
+      }
 
-    const currentThemeColourSelection = window.localStorage.getItem('currentThemeColourSelection')
-    if (currentThemeColourSelection !== null) {
-      gameStates.currentThemeColour = gameStates.arrayChartController.arrayCharts[1].items[Number(currentThemeColourSelection)].value
-      gameStates.arrayChartController.arrayCharts[1].currentSelection = currentThemeColourSelection
-    }
+      const BackgroundStyle = Number(window.localStorage.getItem('backgroundStyle'))
+      if (BackgroundStyle !== null) {
+        gameStates.currentBackgroundStyle = BackgroundStyle
+        gameStates.arrayChartController.arrayCharts[2].currentSelection = BackgroundStyle
+      }
 
-    const loadArrayKeybind = JSON.parse(window.localStorage.getItem('keybindArray'))
-    if (loadArrayKeybind !== null) { gameStates.keybindController.load(loadArrayKeybind) }
+      const StyleCube = Number(window.localStorage.getItem('StyleCube'))
+      if (StyleCube !== null) {
+        gameStates.currentCubeStyle = StyleCube
+        gameStates.arrayChartController.arrayCharts[0].currentSelection = StyleCube
+      }
+
+      const currentThemeColourSelection = window.localStorage.getItem('currentThemeColourSelection')
+      if (currentThemeColourSelection !== null) {
+        gameStates.currentThemeColour = gameStates.arrayChartController.arrayCharts[1].items[Number(currentThemeColourSelection)].value
+        gameStates.arrayChartController.arrayCharts[1].currentSelection = currentThemeColourSelection
+      }
+
+      const loadKeybindBasic = JSON.parse(window.localStorage.getItem('basicKeybinds'))
+      const loadKeybindSpecial = JSON.parse(window.localStorage.getItem('specialKeybinds'))
+      if (loadKeybindBasic !== null && loadKeybindSpecial !== null) {
+        const loadKeybinds = [loadKeybindBasic, loadKeybindSpecial]
+        gameStates.keybindController.load(loadKeybinds)
+      }
+    } else {
+      window.localStorage.clear()
+    }
+  },
+
+  Reset: function () {
+    window.localStorage.clear()
+    window.location.reload()
   }
 }
 
 export const eventFunctions = {
   stopMovement: false,
+  stopMouseUp: true,
 
   isTouching: function (x, y, width, height, event) {
     const boxLeft = x
@@ -215,7 +241,7 @@ export const eventFunctions = {
         gameStates.ReturnToMainMenu()
       } else if (gameStates.currentStoryModeState === storyModeStates.Selecting) {
         gameStates.SetGameState(storyModeStates.WorldSelecting, 'StoryMode')
-        gameStates.currentLevelIndex = 0
+        gameStates.levelSelector.levelIndex = 0
       }
       return
     }
@@ -229,7 +255,7 @@ export const eventFunctions = {
       return
     }
 
-    if (gameStates.currentGameMode === gameMode.ItemsInfo) {
+    if (gameStates.currentGameMode === gameMode.AdventureLog) {
       gameStates.ReturnToMainMenu()
       return
     }
@@ -237,16 +263,18 @@ export const eventFunctions = {
     if (gameStates.currentGameMode === gameMode.Settings) {
       if (gameStates.currentSettingState === 1) {
         gameStates.ReturnToMainMenu()
-      } else {
-        switch (gameStates.keybindController.seletingKeybind) {
+      } else if (gameStates.currentSettingState === settingStates.Keybinds || gameStates.currentSettingState === settingStates.SpecialKeybinds) {
+        switch (gameStates.CurrentKeybind().selectingKeybind) {
           case true:
-            gameStates.keybindController.finishRebinding()
+            gameStates.CurrentKeybind().finishRebinding()
             break
 
           case false:
             gameStates.currentSettingState = settingStates.Selecting
             break
         }
+      } else {
+        gameStates.currentSettingState = settingStates.Selecting
       }
     }
   }

@@ -13,55 +13,58 @@ export class WorldSelector {
 
   KeyDown (event, keybindArray) {
     if ((keybindArray[0/* left */].keybindA === event.key || keybindArray[0/* left */].keybindB === event.key)) {
-      if (this.worldIndex > 0) {
-        this.worldIndex -= 1
-      } else if (this.worldIndex === 0) {
-        this.worldIndex = gameStates.gameController.worlds.length - 1
-      }
+      this.Left()
     }
 
     if ((keybindArray[1/* right */].keybindA === event.key || keybindArray[1/* right */].keybindB === event.key)) {
-      if (this.worldIndex < gameStates.gameController.worlds.length - 1) {
-        this.worldIndex += 1
-      } else if (this.worldIndex === gameStates.gameController.worlds.length - 1) {
-        this.worldIndex = 0
-      }
+      this.Right()
     }
 
     if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key)) {
-      gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
-      this.currentWorld = gameStates.gameController.worlds[this.worldIndex]
+      this.Select()
     }
     this.currentSelectedWorld = gameStates.gameController.worlds[this.worldIndex]
-    console.log(this.currentSelectedWorld)
+    // console.log(this.currentSelectedWorld)
   }
 
   MouseDown (event) {
     // Left "World Selector"
-    if (eventFunctions.isTouching(690, 450, 160, 150, event)) {
-      if (this.worldIndex > 0) {
-        this.worldIndex -= 1
-      } else if (this.worldIndex === 0) {
-        this.worldIndex = gameStates.gameController.worlds.length - 1
-      }
+    if (eventFunctions.isTouching(0, 450, 160, 150, event)) {
+      this.Left()
     }
 
     // Right "World Selector"
-    if (eventFunctions.isTouching(0, 450, 160, 150, event)) {
-      if (this.worldIndex < gameStates.gameController.worlds.length - 1) {
-        this.worldIndex += 1
-      } else if (this.worldIndex === gameStates.gameController.worlds.length - 1) {
-        this.worldIndex = 0
-      }
+    if (eventFunctions.isTouching(690, 450, 160, 150, event)) {
+      this.Right()
     }
 
     // World Selector to Level Selector
-    if (eventFunctions.isTouching(0, 120, 850, 200, event) && this.CheckLocked()) {
-      gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
-      this.currentWorld = gameStates.gameController.worlds[this.worldIndex]
+    if (eventFunctions.isTouching(0, 120, 850, 200, event)) {
+      this.Select()
     }
     this.currentSelectedWorld = gameStates.gameController.worlds[this.worldIndex]
-    console.log(this.currentSelectedWorld)
+    // console.log(this.currentSelectedWorld)
+  }
+
+  Left () {
+    if (this.worldIndex > 0) {
+      this.worldIndex -= 1
+    } else if (this.worldIndex === 0) {
+      this.worldIndex = gameStates.gameController.worlds.length - 1
+    }
+  }
+
+  Right () {
+    if (this.worldIndex < gameStates.gameController.worlds.length - 1) {
+      this.worldIndex += 1
+    } else if (this.worldIndex === gameStates.gameController.worlds.length - 1) {
+      this.worldIndex = 0
+    }
+  }
+
+  Select () {
+    gameStates.SetGameState(storyModeStates.Selecting, 'StoryMode')
+    this.currentWorld = gameStates.gameController.worlds[this.worldIndex]
   }
 
   Draw () {
@@ -115,21 +118,21 @@ export class LevelSelector {
     }
 
     // Draw arrows to change level if applicable
-    if (gameStates.currentLevelIndex < gameStates.worldSelector.currentWorld.levels.length - 1) {
+    if (this.levelIndex < gameStates.worldSelector.currentWorld.levels.length - 1) {
       draw.DrawImage(images.DownArrow, 690, 450)
     }
 
-    if (gameStates.currentLevelIndex > 0) {
+    if (this.levelIndex > 0) {
       draw.DrawImage(images.UpArrow, 10, 450)
     }
   }
 
   KeyDown (event, keybindArray) {
     // Down "Level Selector"
-    if ((keybindArray[3/* down */].keybindA === event.key || keybindArray[3/* down */].keybindB === event.key) && gameStates.currentLevelIndex < gameStates.worldSelector.currentWorld.levels.length - 1) { gameStates.currentLevelIndex += 1 }
+    if ((keybindArray[3/* down */].keybindA === event.key || keybindArray[3/* down */].keybindB === event.key) && this.levelIndex < gameStates.worldSelector.currentWorld.levels.length - 1) { this.levelIndex += 1 }
 
     // Up "Level Selector"
-    if ((keybindArray[2/* up */].keybindA === event.key || keybindArray[2/* up */].keybindB === event.key) && gameStates.currentLevelIndex !== 0) { gameStates.currentLevelIndex -= 1 }
+    if ((keybindArray[2/* up */].keybindA === event.key || keybindArray[2/* up */].keybindB === event.key) && this.levelIndex !== 0) { this.levelIndex -= 1 }
 
     // Level Selector to Game
     if ((keybindArray[4/* select */].keybindA === event.key || keybindArray[4/* select */].keybindB === event.key) && gameStates.CurrentLevel().checkLocked()) {
@@ -139,10 +142,10 @@ export class LevelSelector {
 
   MouseDown (event) {
     // Down "Level Selector"
-    if (eventFunctions.isTouching(690, 450, 160, 150, event) && gameStates.currentLevelIndex < gameStates.worldSelector.currentWorld.levels.length - 1) { gameStates.currentLevelIndex += 1 }
+    if (eventFunctions.isTouching(690, 450, 160, 150, event) && this.levelIndex < gameStates.worldSelector.currentWorld.levels.length - 1) { this.levelIndex += 1 }
 
     // Up "Level Selector"
-    if (eventFunctions.isTouching(0, 450, 160, 150, event) && gameStates.currentLevelIndex !== 0) { gameStates.currentLevelIndex -= 1 }
+    if (eventFunctions.isTouching(0, 450, 160, 150, event) && this.levelIndex !== 0) { this.levelIndex -= 1 }
 
     // Level Selector to Game
     if (eventFunctions.isTouching(225, 500, 385, 100, event) && gameStates.CurrentLevel().checkLocked()) {

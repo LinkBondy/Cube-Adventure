@@ -1,8 +1,8 @@
 'use strict'
-const { images } = require('../drawing/Images')
-const { draw } = require('../drawing/Draw')
-const { storyModeStates, gameStates, BackgroundStyles } = require('../data/GameData')
-const { canvas } = require('../drawing/Canvas')
+const { images } = require('../../drawing/Images')
+const { draw } = require('../../drawing/Draw')
+const { storyModeStates, gameStates, BackgroundStyles } = require('../../data/GameData')
+const { canvas } = require('../../drawing/Canvas')
 const { GameObject } = require('./Class')
 
 export class Wall extends GameObject {
